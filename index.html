@@ -32,19 +32,19 @@
     --chip:rgba(15,35,73,.05);
   }
   html.dark{
-    --navy-900:#E8EEFB;
-    --navy-800:#CFD9F2;
-    --navy-700:#A9BDE4;
-    --navy-600:#7B95C9;
-    --ink:#E8EEFB;
-    --paper:#07132B;
-    --paper-2:#0B1B3A;
-    --line:rgba(255,255,255,.08);
-    --muted:#8FA1C1;
-    --card:#0D1E40;
-    --card-2:#0A1732;
-    --chip:rgba(255,255,255,.06);
-    --teal-50:rgba(43,200,183,.12);
+    --navy-900:#F0F4FF;
+    --navy-800:#D8E2F8;
+    --navy-700:#ADBFE8;
+    --navy-600:#7A9AD0;
+    --ink:#F0F4FF;
+    --paper:#02060F;
+    --paper-2:#040A18;
+    --line:rgba(255,255,255,.06);
+    --muted:#6E85A8;
+    --card:#060E1E;
+    --card-2:#040A17;
+    --chip:rgba(255,255,255,.05);
+    --teal-50:rgba(43,200,183,.10);
   }
   html,body{background:var(--paper);color:var(--ink);transition:background .4s ease;}
   body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;font-feature-settings:"ss01","cv11";}
@@ -82,6 +82,10 @@
   .dash-fade-y{mask-image:linear-gradient(to bottom,black 50%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,black 50%,transparent 100%);}
   .dash-fade-x{mask-image:linear-gradient(to right,black 50%,transparent 100%);-webkit-mask-image:linear-gradient(to right,black 50%,transparent 100%);}
   html.dark .pulse-dot{box-shadow:0 0 0 0 rgba(43,200,183,.7);}
+  #cta a,#cta div>a{white-space:nowrap;}
+  .phrase-wrap{display:inline-block;transition:opacity .38s ease,transform .38s ease,filter .38s ease;}
+  .phrase-wrap.p-in{opacity:1;transform:translateY(0);filter:blur(0);}
+  .phrase-wrap.p-out{opacity:0;transform:translateY(-14px);filter:blur(8px);}
   /* Scroll-stack */
   .scroll-stack{position:relative;}
   .scroll-stack.on{height:200vh;}
@@ -105,6 +109,14 @@
   .parallax__blob{position:absolute;border-radius:999px;filter:blur(80px);opacity:.55;}
   .parallax__content{position:relative;padding:90px 24px 120px;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;background:var(--paper);}
   .parallax__content .mark{width:56px;height:56px;color:var(--teal-500);}
+  /* Services section */
+  .svc-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.07);transition:opacity .75s cubic-bezier(.33,1,.68,1),transform .75s cubic-bezier(.33,1,.68,1);}
+  .svc-img.svc-active{opacity:1;transform:scale(1);}
+  .svc-row{transition:opacity .25s ease,transform .25s ease;}
+  @keyframes tag-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .svc-tag{animation:tag-in .4s ease both;}
+  @keyframes line-grow{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+  .svc-line{transform-origin:left;animation:line-grow .5s cubic-bezier(.33,1,.68,1) both;}
 </style>
 </head>
 <body>
@@ -132,25 +144,25 @@ function Nav({theme,setTheme}){
   ];
   return (
     <header className="fixed top-0 inset-x-0 z-40 px-3">
-      <nav className={`mx-auto mt-3 max-w-6xl transition-all duration-500 ${scrolled?'max-w-4xl bg-[var(--card)]/75 backdrop-blur-xl border border-[var(--line)] rounded-2xl shadow-[0_10px_40px_-20px_rgba(15,35,73,.25)] dark:shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)]':'bg-transparent'}`}>
+      <nav className={`mx-auto mt-3 border rounded-2xl transition-all duration-500 ${scrolled?'max-w-4xl bg-[var(--card)]/75 backdrop-blur-xl border-[var(--line)] shadow-[0_10px_40px_-20px_rgba(15,35,73,.25)] dark:shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)]':'max-w-6xl bg-transparent border-transparent shadow-none backdrop-blur-none'}`}>
         <div className="flex items-center justify-between px-5 py-3">
           <a href="#" className="flex items-center gap-2">
             <Logo className="h-7 w-auto"/>
           </a>
-          <ul className="hidden lg:flex items-center gap-8 text-[13.5px] font-medium text-[var(--muted)]">
+          <ul className={`hidden lg:flex items-center gap-8 text-[13.5px] font-medium ${scrolled ? 'text-[var(--muted)]' : 'text-white/80'}`}>
             {items.map(i=>(
-              <li key={i.n}><a href={i.h} className="hover:text-[var(--navy-900)] transition">{i.n}</a></li>
+              <li key={i.n}><a href={i.h} className={`transition ${scrolled ? 'hover:text-[var(--navy-900)]' : 'hover:text-white'}`}>{i.n}</a></li>
             ))}
           </ul>
           <div className="hidden lg:flex items-center gap-2">
-            <button onClick={()=>setTheme(theme==='dark'?'light':'dark')} aria-label="Toggle theme" className="h-9 w-9 rounded-xl border border-[var(--line)] bg-[var(--chip)] flex items-center justify-center text-[var(--navy-900)] hover:text-[var(--teal-500)] transition">
+            <button onClick={()=>setTheme(theme==='dark'?'light':'dark')} aria-label="Toggle theme" className={`h-9 w-9 rounded-xl flex items-center justify-center transition hover:text-[var(--teal-500)] ${scrolled ? 'border border-[var(--line)] bg-[var(--chip)] text-[var(--navy-900)]' : 'text-white/80 hover:text-white'}`}>
               {theme==='dark' ? (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
               ) : (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
               )}
             </button>
-            <a href="#" className="text-sm font-medium text-[var(--navy-900)] px-4 py-2 rounded-xl hover:bg-[var(--paper-2)] transition">Client Login</a>
+            <a href="#" className={`text-sm font-medium px-4 py-2 rounded-xl transition ${scrolled ? 'text-[var(--navy-900)] hover:bg-[var(--paper-2)]' : 'text-white/80 hover:text-white'}`}>Client Login</a>
             <a href="#cta" className="text-sm font-semibold px-4 py-2 rounded-xl btn-primary inline-flex items-center gap-2">
               Book a Call
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
@@ -177,20 +189,30 @@ function Nav({theme,setTheme}){
 }
 
 function Headline(){
+  const phrases = ["generate leads.", "drive sales.", "scale your business."];
+  const [idx, setIdx] = useState(0);
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const t = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => { setIdx(i => (i + 1) % phrases.length); setVisible(true); }, 380);
+    }, 2800);
+    return () => clearInterval(t);
+  }, []);
   return (
-    <h1 className="t-heading rise-2 mt-8 max-w-5xl mx-auto text-center text-[40px] leading-[1.02] sm:text-[56px] md:text-[68px] lg:text-[76px] font-extrabold tracking-[-0.035em] text-[var(--navy-900)]">
+    <h1 className="t-heading rise-2 mt-8 max-w-5xl mx-auto text-center text-[40px] leading-[1.15] sm:text-[56px] md:text-[68px] lg:text-[76px] font-extrabold tracking-[-0.035em] text-[var(--navy-900)]">
       We build <span className="relative inline-block">
         <span className="relative z-10">custom growth</span>
         <svg aria-hidden className="absolute -bottom-1 left-0 w-full" viewBox="0 0 300 14" preserveAspectRatio="none" height="12">
           <path d="M2 9 C 70 2, 150 2, 298 8" stroke="var(--teal-500)" strokeWidth="4" fill="none" strokeLinecap="round"/>
         </svg>
       </span>{' '}
-      <span className="text-[var(--navy-700)]">systems</span> that{' '}
-      <em className="not-italic">
-        <span className="shine">generate leads,</span>
-      </em>{' '}
-      <span className="text-[var(--navy-900)]">drive sales</span>
-      <span className="text-[var(--muted)] font-semibold"> &amp; scale your business.</span>
+      <span className="text-[var(--navy-700)]">systems</span> that
+      <span className="block mt-1">
+        <span className={`phrase-wrap inline-block ${visible ? 'p-in' : 'p-out'}`}>
+          <span className="shine">{phrases[idx]}</span>
+        </span>
+      </span>
     </h1>
   );
 }
@@ -496,15 +518,17 @@ function Parallax(){
       const el=ref.current;
       if(!el) return;
       const layers=el.querySelector('[data-parallax-layers]');
-      if(!layers) return;
-      const rect=layers.getBoundingClientRect();
-      const total=layers.offsetHeight-window.innerHeight;
-      const p=Math.min(1,Math.max(0,-rect.top/total));
+      const header=el.querySelector('.parallax__header');
+      if(!layers||!header) return;
+      const rect=header.getBoundingClientRect();
+      const scrollable=header.offsetHeight-window.innerHeight;
+      if(scrollable<=0) return;
+      const p=Math.min(1,Math.max(0,-rect.top/scrollable));
       const config=[
-        {sel:'[data-parallax-layer="1"]',y:70},
-        {sel:'[data-parallax-layer="2"]',y:55},
-        {sel:'[data-parallax-layer="3"]',y:40},
-        {sel:'[data-parallax-layer="4"]',y:10},
+        {sel:'[data-parallax-layer="1"]',y:-90},
+        {sel:'[data-parallax-layer="2"]',y:-55},
+        {sel:'[data-parallax-layer="3"]',y:-22},
+        {sel:'[data-parallax-layer="4"]',y:-6},
       ];
       config.forEach(c=>{
         const n=layers.querySelector(c.sel);
@@ -579,6 +603,212 @@ function Parallax(){
   );
 }
 
+function ParallaxHero({theme}){
+  const wrapRef=useRef(null);
+  const bgRef=useRef(null);
+  useEffect(()=>{
+    let raf=0;
+    const tick=()=>{
+      raf=0;
+      const wrap=wrapRef.current;
+      const bg=bgRef.current;
+      if(!wrap||!bg) return;
+      const rect=wrap.getBoundingClientRect();
+      const vh=window.innerHeight;
+      const p=(vh-rect.top)/(vh+wrap.offsetHeight);
+      bg.style.transform=`translateY(${(p-0.5)*-22}%)`;
+    };
+    const onScroll=()=>{if(!raf) raf=requestAnimationFrame(tick);};
+    tick();
+    window.addEventListener('scroll',onScroll,{passive:true});
+    window.addEventListener('resize',tick);
+    return()=>{
+      window.removeEventListener('scroll',onScroll);
+      window.removeEventListener('resize',tick);
+      if(raf) cancelAnimationFrame(raf);
+    };
+  },[]);
+  const check=<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="text-[var(--teal-500)]"><path d="M20 6 9 17l-5-5"/></svg>;
+  return (
+    <section ref={wrapRef} style={{position:'relative',height:'100vh',overflow:'hidden',display:'flex',alignItems:'center'}}>
+      {/* Background: video in light mode, earth in dark mode */}
+      <div ref={bgRef} style={{position:'absolute',inset:0,willChange:'transform',pointerEvents:'none'}}>
+        {theme === 'dark'
+          ? <img src="earth.png" alt="" style={{position:'absolute',left:'50%',top:'50%',transform:'translateX(-50%) translateY(-50%)',height:'92vh',width:'auto',display:'block',userSelect:'none'}}/>
+          : <video autoPlay muted loop playsInline src="assets/hero-video.mp4" style={{position:'absolute',left:'50%',top:'50%',transform:'translateX(-50%) translateY(-50%)',minWidth:'100%',minHeight:'100%',width:'auto',height:'auto',objectFit:'cover',userSelect:'none'}}/>
+        }
+      </div>
+      {/* Radial overlay */}
+      <div style={{position:'absolute',inset:0,background: theme === 'dark'
+        ? 'radial-gradient(ellipse 75% 80% at 50% 50%,rgba(2,6,15,.1) 0%,rgba(2,6,15,.55) 55%,rgba(2,6,15,.95) 90%)'
+        : 'radial-gradient(ellipse 75% 80% at 50% 50%,rgba(2,6,15,.05) 0%,rgba(2,6,15,.3) 55%,rgba(2,6,15,.7) 90%)'
+      }}/>
+      {/* Top/bottom edge fades */}
+      <div style={{position:'absolute',inset:0,background: theme === 'dark'
+        ? 'linear-gradient(to bottom,rgba(2,6,15,.6) 0%,transparent 20%,transparent 75%,rgba(2,6,15,.7) 100%)'
+        : 'linear-gradient(to bottom,rgba(2,6,15,.3) 0%,transparent 20%,transparent 75%,rgba(2,6,15,.4) 100%)',
+        pointerEvents:'none'}}/>
+      {/* Centered content */}
+      <div style={{position:'relative',zIndex:2,width:'100%',padding:'clamp(100px,14vh,150px) clamp(24px,6vw,96px) 0',textAlign:'center'}}>
+        <div style={{maxWidth:860,margin:'0 auto'}}>
+          <Headline/>
+          <Sub/>
+          <CTAs/>
+          <div className="rise-5 mt-8 flex items-center justify-center gap-5 text-[12px] text-[var(--muted)]" style={{flexWrap:'wrap'}}>
+            <span className="inline-flex items-center gap-1.5">{check} No contracts</span>
+            <span className="inline-flex items-center gap-1.5">{check} 30-min intro call</span>
+            <span className="inline-flex items-center gap-1.5">{check} Plan delivered in 48h</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Services(){
+  const [active,setActive]=useState(0);
+  const SERVICES=[
+    {
+      emoji:"🧲",title:"Growth & Marketing",count:7,
+      items:["Paid Ads","Social Media Ads","Retargeting","SEO","Content Marketing","AI Visibility (GEO)","Advanced Growth Strategies"],
+      imageUrl:"https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=900&auto=format&fit=crop",
+    },
+    {
+      emoji:"🎯",title:"Conversion & Funnels",count:6,
+      items:["Landing Pages","Sales Funnels","CRO","A/B Testing","UX Optimization","Personalization Systems"],
+      imageUrl:"https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=900&auto=format&fit=crop",
+    },
+    {
+      emoji:"🌐",title:"Websites & Development",count:6,
+      items:["Landing Pages","E-Commerce","Performance Optimization","CMS","Web Apps","SaaS Development"],
+      imageUrl:"https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=900&auto=format&fit=crop",
+    },
+    {
+      emoji:"🛒",title:"E-Commerce",count:5,
+      items:["Shopify","WooCommerce","Custom Platforms","Marketing Integration","Conversion Optimization"],
+      imageUrl:"https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=900&auto=format&fit=crop",
+    },
+    {
+      emoji:"🤖",title:"AI & Automation",count:7,
+      items:["WhatsApp & Website Chatbots","CRM Automation","Email Automation","Lead Management","AI Sales Agents","n8n Workflows","Custom AI"],
+      imageUrl:"https://images.unsplash.com/photo-1677442135703-1787eea5ce01?q=80&w=900&auto=format&fit=crop",
+    },
+    {
+      emoji:"📊",title:"Data & Analytics",count:6,
+      items:["GA4 / Meta Setup","Conversion Tracking","Dashboards","Reporting","Attribution Modeling","Revenue Forecasting"],
+      imageUrl:"https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=900&auto=format&fit=crop",
+    },
+  ];
+  return (
+    <section id="services" className="py-24 md:py-36">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Header */}
+        <div className="mb-16">
+          <div className="mono text-[11px] uppercase tracking-[0.2em] text-[var(--muted)] mb-3">/ what we do</div>
+          <h2 className="text-[38px] md:text-[54px] font-extrabold tracking-[-0.035em] text-[var(--navy-900)] leading-[1.08]">
+            Everything you need<br/><span className="text-[var(--teal-500)]">to grow.</span>
+          </h2>
+        </div>
+
+        {/* Body */}
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-20 items-start">
+
+          {/* Left — service list */}
+          <div className="flex-1 min-w-0">
+            {SERVICES.map((svc,idx)=>(
+              <div
+                key={idx}
+                className="svc-row py-5 border-b border-[var(--line)] cursor-pointer flex items-center gap-5 group"
+                style={{opacity: active===idx ? 1 : 0.35}}
+                onMouseEnter={()=>setActive(idx)}
+              >
+                <span className="text-xl flex-shrink-0 transition-transform duration-200 group-hover:scale-110">{svc.emoji}</span>
+                <div
+                  className="flex-1 text-[22px] md:text-[28px] font-extrabold tracking-tight text-[var(--navy-900)] transition-all duration-200"
+                  style={{transform: active===idx ? 'translateX(6px)' : 'translateX(0)'}}
+                >
+                  {svc.title}
+                </div>
+                <div className={`mono text-[11px] flex-shrink-0 tabular-nums transition-colors duration-200 ${active===idx ? 'text-[var(--teal-500)]' : 'text-[var(--muted)]'}`}>
+                  {String(svc.count).padStart(2,'0')}
+                </div>
+                <div className={`w-7 h-7 rounded-full border flex items-center justify-center flex-shrink-0 transition-all duration-300 ${active===idx ? 'border-[var(--teal-500)] bg-[var(--teal-500)]' : 'border-[var(--line)]'}`}>
+                  {active===idx && (
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.8"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                  )}
+                </div>
+              </div>
+            ))}
+            {/* CTA */}
+            <div className="mt-10">
+              <a href="#cta" className="inline-flex items-center gap-2.5 text-[13px] font-semibold text-[var(--navy-900)] hover:text-[var(--teal-500)] transition-colors">
+                Book a free strategy call
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+
+          {/* Right — image panel */}
+          <div className="w-full lg:w-[400px] xl:w-[460px] flex-shrink-0 sticky top-24 self-start">
+            <div className="relative rounded-[28px] overflow-hidden" style={{aspectRatio:'3/4'}}>
+              {/* Stacked images */}
+              {SERVICES.map((svc,idx)=>(
+                <img
+                  key={idx}
+                  src={svc.imageUrl}
+                  alt={svc.title}
+                  className={`svc-img${active===idx ? ' svc-active' : ''}`}
+                  loading={idx===0?'eager':'lazy'}
+                  decoding="async"
+                />
+              ))}
+              {/* Vignette overlay */}
+              <div className="absolute inset-0 pointer-events-none" style={{background:'linear-gradient(to top,rgba(6,20,47,.88) 0%,rgba(6,20,47,.25) 45%,transparent 75%)'}}/>
+
+              {/* Service label top-left */}
+              <div className="absolute top-5 left-5 flex items-center gap-2">
+                <span className="text-lg">{SERVICES[active].emoji}</span>
+                <span className="mono text-[11px] uppercase tracking-[0.16em] text-white/70">{SERVICES[active].title}</span>
+              </div>
+
+              {/* Count badge top-right */}
+              <div className="absolute top-5 right-5 mono text-[11px] text-white/60 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-3 py-1">
+                {SERVICES[active].count} services
+              </div>
+
+              {/* Bottom: animated service chips */}
+              <div className="absolute bottom-0 inset-x-0 p-6">
+                <div key={active} className="flex flex-wrap gap-2">
+                  {SERVICES[active].items.map((item,i)=>(
+                    <span
+                      key={i}
+                      className="svc-tag text-[11.5px] font-medium text-white/90 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-3 py-1.5"
+                      style={{animationDelay:`${i*0.07}s`}}
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+                {/* Active indicator line */}
+                <div className="mt-5 flex gap-1.5">
+                  {SERVICES.map((_,i)=>(
+                    <div
+                      key={i}
+                      className="h-[3px] rounded-full flex-1 transition-all duration-500"
+                      style={{background: active===i ? 'var(--teal-500)' : 'rgba(255,255,255,.18)'}}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function App(){
   const [theme,setTheme]=useState('dark');
   useEffect(()=>{
@@ -586,37 +816,17 @@ function App(){
     if(theme==='dark') root.classList.add('dark'); else root.classList.remove('dark');
   },[theme]);
 
-  const hero = (
-    <div className="max-w-7xl mx-auto px-6 pt-36 md:pt-44">
-      <Headline/>
-      <Sub/>
-      <CTAs/>
-      <div className="rise-5 mt-8 flex items-center justify-center gap-6 text-[12px] text-[var(--muted)]">
-        <span className="inline-flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="text-[var(--teal-500)]"><path d="M20 6 9 17l-5-5"/></svg> No contracts</span>
-        <span className="inline-flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="text-[var(--teal-500)]"><path d="M20 6 9 17l-5-5"/></svg> 30-min intro call</span>
-        <span className="hidden sm:inline-flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="text-[var(--teal-500)]"><path d="M20 6 9 17l-5-5"/></svg> Plan delivered in 48h</span>
-      </div>
-      <MetaStrip/>
-    </div>
-  );
-
-  const dashSection = (
-    <div className="px-6 py-10">
-      <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
-        <Dashboard/>
-      </div>
-    </div>
-  );
-
   return (
     <div className="relative min-h-screen overflow-x-clip">
-      <div aria-hidden className="absolute inset-0 -z-10 grain opacity-60"></div>
-      <div aria-hidden className="absolute inset-x-0 top-0 -z-10 h-[900px]" style={{background:"radial-gradient(1200px 600px at 50% -100px, rgba(43,200,183,.18), transparent 60%), radial-gradient(900px 500px at 100% 0, rgba(30,58,110,.14), transparent 60%)"}}></div>
-      <div aria-hidden className="absolute inset-0 -z-10" style={{backgroundImage:"linear-gradient(to right, rgba(15,35,73,.055) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,35,73,.055) 1px, transparent 1px)",backgroundSize:"28px 28px",maskImage:"radial-gradient(ellipse 80% 60% at 50% 20%, #000 30%, transparent 75%)"}}></div>
-
       <Nav theme={theme} setTheme={setTheme}/>
       <main>
-        <ScrollStack panel1={hero} panel2={dashSection}/>
+        <ParallaxHero theme={theme}/>
+        <div className="px-6 py-16">
+          <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
+            <Dashboard/>
+          </div>
+        </div>
+        <Services/>
         <Parallax/>
         <SystemRibbon/>
         <div className="mt-24 md:mt-32 max-w-6xl mx-auto px-6 pb-24">

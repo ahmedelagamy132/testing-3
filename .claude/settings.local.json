@@ -4,7 +4,14 @@
       "WebFetch(domain:api.anthropic.com)",
       "Bash(gunzip -c \"webfetch-1776973440943-qlhfl7.bin\")",
       "PowerShell(Out-File *)",
-      "PowerShell(New-Item *)"
+      "PowerShell(New-Item *)",
+      "Bash(npm --version)",
+      "Bash(yes)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --no-src-dir --import-alias=\"@/*\")",
+      "Bash(npx create-next-app@latest miduva-app --typescript --tailwind --eslint --app --no-src-dir --import-alias=\"@/*\")",
+      "Bash(npx shadcn@latest init --defaults)",
+      "Bash(npm install *)",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }
