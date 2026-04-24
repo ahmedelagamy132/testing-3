@@ -11,6 +11,7 @@ import TrustedLogos from "./trusted-logos"
 import SystemsBento from "./systems-bento"
 import ProblemSolution from "./problem-solution"
 import HowItWorks from "./how-it-works"
+import ResultsStats from "./results-stats"
 
 function MetaStrip() {
   const items = [
@@ -48,6 +49,7 @@ export function AppWrapper() {
         <SystemsBento />
         <ProblemSolution />
         <HowItWorks />
+        <ResultsStats />
         <ParallaxSection />
         <div className="px-6 py-10 md:py-14">
           <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
