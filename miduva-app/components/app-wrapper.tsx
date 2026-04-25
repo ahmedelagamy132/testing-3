@@ -54,12 +54,12 @@ export function AppWrapper() {
         <SectionReveal><SystemsBento /></SectionReveal>
         <SectionReveal><ProblemSolution /></SectionReveal>
 
-        <HowItWorks />
+        <SectionReveal><HowItWorks /></SectionReveal>
 
         <SectionReveal><ResultsStats /></SectionReveal>
         <SectionReveal><WhyMiduva /></SectionReveal>
 
-        <ParallaxSection />
+        <SectionReveal><ParallaxSection /></SectionReveal>
 
         <SectionReveal>
           <div className="px-6 py-10 md:py-14">
