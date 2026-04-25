@@ -12,6 +12,10 @@ import SystemsBento from "./systems-bento"
 import ProblemSolution from "./problem-solution"
 import HowItWorks from "./how-it-works"
 import ResultsStats from "./results-stats"
+import WhyMiduva from "./why-miduva"
+import FreeOffer from "./free-offer"
+import { CinematicFooter } from "@/components/ui/motion-footer"
+import { SectionReveal } from "./section-reveal"
 
 function MetaStrip() {
   const items = [
@@ -46,20 +50,35 @@ export function AppWrapper() {
       <Nav theme={theme} setTheme={setTheme} />
       <main>
         <ParallaxHero theme={theme} />
-        <SystemsBento />
-        <ProblemSolution />
+
+        <SectionReveal><SystemsBento /></SectionReveal>
+        <SectionReveal><ProblemSolution /></SectionReveal>
+
         <HowItWorks />
-        <ResultsStats />
+
+        <SectionReveal><ResultsStats /></SectionReveal>
+        <SectionReveal><WhyMiduva /></SectionReveal>
+
         <ParallaxSection />
-        <div className="px-6 py-10 md:py-14">
-          <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
-            <Dashboard />
+
+        <SectionReveal>
+          <div className="px-6 py-10 md:py-14">
+            <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
+              <Dashboard />
+            </div>
           </div>
-        </div>
-        <Services />
-        <SystemRibbon />
-        <TrustedLogos />
+        </SectionReveal>
+
+        <SectionReveal><Services /></SectionReveal>
+
+        <SectionReveal>
+          <SystemRibbon />
+          <TrustedLogos />
+        </SectionReveal>
+
+        <SectionReveal><FreeOffer /></SectionReveal>
       </main>
+      <CinematicFooter />
     </div>
   )
 }
