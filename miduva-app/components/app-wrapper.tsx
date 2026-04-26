@@ -15,7 +15,7 @@ import ResultsStats from "./results-stats"
 import WhyMiduva from "./why-miduva"
 import FreeOffer from "./free-offer"
 import { CinematicFooter } from "@/components/ui/motion-footer"
-import { SectionReveal } from "@/components/ui/section-reveal"
+
 
 function MetaStrip() {
   const items = [
@@ -49,10 +49,8 @@ export function AppWrapper() {
     <div className="relative min-h-screen overflow-x-clip">
       <Nav theme={theme} setTheme={setTheme} />
       <main>
-        <SectionReveal
-          frontSection={<ParallaxHero theme={theme} />}
-          backSection={<SystemsBento />}
-        />
+        <ParallaxHero theme={theme} />
+        <SystemsBento />
         <ProblemSolution />
 
         <HowItWorks />
