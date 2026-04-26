@@ -15,7 +15,7 @@ import ResultsStats from "./results-stats"
 import WhyMiduva from "./why-miduva"
 import FreeOffer from "./free-offer"
 import { CinematicFooter } from "@/components/ui/motion-footer"
-import { SectionReveal } from "./section-reveal"
+import { SectionReveal } from "@/components/ui/section-reveal"
 
 function MetaStrip() {
   const items = [
@@ -49,34 +49,31 @@ export function AppWrapper() {
     <div className="relative min-h-screen overflow-x-clip">
       <Nav theme={theme} setTheme={setTheme} />
       <main>
-        <ParallaxHero theme={theme} />
+        <SectionReveal
+          frontSection={<ParallaxHero theme={theme} />}
+          backSection={<SystemsBento />}
+        />
+        <ProblemSolution />
 
-        <SectionReveal><SystemsBento /></SectionReveal>
-        <SectionReveal><ProblemSolution /></SectionReveal>
+        <HowItWorks />
 
-        <SectionReveal><HowItWorks /></SectionReveal>
+        <ResultsStats />
+        <WhyMiduva />
 
-        <SectionReveal><ResultsStats /></SectionReveal>
-        <SectionReveal><WhyMiduva /></SectionReveal>
+        <ParallaxSection />
 
-        <SectionReveal><ParallaxSection /></SectionReveal>
-
-        <SectionReveal>
-          <div className="px-6 py-10 md:py-14">
-            <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
-              <Dashboard />
-            </div>
+        <div className="px-6 py-10 md:py-14">
+          <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
+            <Dashboard />
           </div>
-        </SectionReveal>
+        </div>
 
-        <SectionReveal><Services /></SectionReveal>
+        <Services />
 
-        <SectionReveal>
-          <SystemRibbon />
-          <TrustedLogos />
-        </SectionReveal>
+        <SystemRibbon />
+        <TrustedLogos />
 
-        <SectionReveal><FreeOffer /></SectionReveal>
+        <FreeOffer />
       </main>
       <CinematicFooter />
     </div>

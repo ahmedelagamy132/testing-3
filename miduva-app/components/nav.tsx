@@ -10,10 +10,20 @@ interface NavProps {
 export default function Nav({ theme, setTheme }: NavProps) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const [isHidden, setIsHidden] = useState(false)
 
   useEffect(() => {
-    const on = () => setScrolled(window.scrollY > 30)
-    window.addEventListener("scroll", on)
+    const on = () => {
+      setScrolled(window.scrollY > 30)
+      
+      const scrollPosition = window.scrollY
+      const windowHeight = window.innerHeight
+      const docHeight = document.documentElement.scrollHeight
+      
+      // Hide navigation when scrolled into the last ~50% of the viewport (during the cinematic footer reveal)
+      setIsHidden(docHeight - (scrollPosition + windowHeight) < windowHeight * 0.5)
+    }
+    window.addEventListener("scroll", on, { passive: true })
     return () => window.removeEventListener("scroll", on)
   }, [])
 
@@ -25,7 +35,11 @@ export default function Nav({ theme, setTheme }: NavProps) {
   ]
 
   return (
-    <header className="fixed top-0 inset-x-0 z-40 px-3">
+    <header 
+      className={`fixed top-0 inset-x-0 z-40 px-3 transition-transform duration-500 will-change-transform ${
+        isHidden ? "-translate-y-[150%]" : "translate-y-0"
+      }`}
+    >
       <nav
         className={`mx-auto mt-3 border rounded-2xl transition-all duration-500 ${
           scrolled

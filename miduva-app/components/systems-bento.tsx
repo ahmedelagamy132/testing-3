@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { motion, useMotionValue, useTransform, useSpring, useInView } from "motion/react"
+import { motion, useMotionValue, useTransform, useSpring } from "motion/react"
 
 const SYSTEMS = [
   {
@@ -52,8 +52,6 @@ function BentoCard({
   const imgX = useSpring(useTransform(mouseX, [-1, 1], [-10, 10]), springConfig)
   const imgY = useSpring(useTransform(mouseY, [-1, 1], [-8, 8]), springConfig)
 
-  const isInView = useInView(cardRef, { once: true, margin: "-80px" })
-
   function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const rect = cardRef.current?.getBoundingClientRect()
     if (!rect) return
@@ -68,12 +66,9 @@ function BentoCard({
   }
 
   return (
-    <motion.div
+    <div
       ref={cardRef}
       className={`relative overflow-hidden rounded-[24px] border border-[var(--line)] group cursor-pointer transition-colors duration-500 hover:border-[var(--teal-500)]/40 ${full ? "min-h-[240px] md:min-h-[280px]" : "min-h-[340px] md:min-h-[400px]"}`}
-      initial={{ opacity: 0, y: 44 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 44 }}
-      transition={{ duration: 0.65, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
       onMouseMove={onMouseMove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={onMouseLeave}
@@ -141,14 +136,11 @@ function BentoCard({
           </a>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
 export default function SystemsBento() {
-  const headerRef = useRef<HTMLDivElement>(null)
-  const headerInView = useInView(headerRef, { once: true, margin: "-60px" })
-
   const topCards = SYSTEMS.filter((s) => s.span === "col")
   const fullCard = SYSTEMS.find((s) => s.span === "full")!
 
@@ -156,19 +148,13 @@ export default function SystemsBento() {
     <section id="systems-bento" className="py-20 md:py-24">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
-        <motion.div
-          ref={headerRef}
-          className="mb-12"
-          initial={{ opacity: 0, y: 24 }}
-          animate={headerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        >
+        <div className="mb-12">
           <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">/ our systems</div>
           <h2 className="text-[48px] md:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.02]">
             Three systems.<br />
             <span className="text-[var(--teal-500)]">One growth machine.</span>
           </h2>
-        </motion.div>
+        </div>
 
         {/* Bento grid */}
         <div className="flex flex-col gap-4">
