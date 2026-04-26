@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef } from "react"
+import Image from "next/image"
 import { motion, useScroll, useTransform } from "motion/react"
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -184,12 +185,12 @@ function StepSlide({
           }}
         >
           {/* Image */}
-          <img
+          <Image
             src={step.image}
             alt={step.title}
+            fill
+            unoptimized
             style={{
-              width: "100%",
-              height: "100%",
               objectFit: "cover",
               objectPosition: "center",
             }}

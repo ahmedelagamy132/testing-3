@@ -12,6 +12,7 @@ interface HoverSliderImageProps {
   index: number
   imageUrl: string
 }
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface HoverSliderProps {}
 interface HoverSliderContextValue {
   activeSlide: number
