@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react"
 import Nav from "./nav"
 import SvgMaskHero from "./svg-mask-hero"
+import HeroContent from "./hero-content"
 import Dashboard from "./dashboard"
 import Services from "./services"
 import ParallaxSection from "./parallax-section"
@@ -57,6 +58,7 @@ export function AppWrapper() {
           onRevealComplete={onRevealComplete}
           onRevealReverse={onRevealReverse}
         />
+        <HeroContent />
         <SystemsZoomSection />
         <ProblemSolution />
 

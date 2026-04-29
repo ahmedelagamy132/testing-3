@@ -20,49 +20,35 @@ export default function SvgMaskHero({
   bgSrc = "/assets/background.png",
   overlayColor = "#0b1220",
   scrollLength = 2000,
-  initialScale = 50,
-  endScale = 1,
+  initialScale = 1,
+  endScale = 35,
   onRevealComplete,
   onRevealReverse,
 }: SvgMaskHeroProps) {
   const sectionRef = useRef<HTMLElement>(null)
-  const svgRef = useRef<SVGSVGElement>(null)
-  const maskRectRef = useRef<SVGRectElement>(null)
-  const overlayRectRef = useRef<SVGRectElement>(null)
-  const textRef = useRef<SVGTextElement>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const textRef = useRef<HTMLDivElement>(null)
+  const hintRef = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
     const section = sectionRef.current
-    const svg = svgRef.current
-    const textEl = textRef.current
-    if (!section || !svg || !textEl) return
+    const overlay = overlayRef.current
+    const text = textRef.current
+    const hint = hintRef.current
+    if (!section || !overlay || !text) return
 
-    const w = window.innerWidth
-    const h = window.innerHeight
-    const cx = w / 2
-    const cy = h / 2
-    // Scale font so the word fills a nice portion of the viewport at scale 1
-    const fontSize = Math.min(w * 0.18, 280)
-
-    // Set SVG dimensions and element positions directly — no state re-render
-    svg.setAttribute("viewBox", `0 0 ${w} ${h}`)
-    maskRectRef.current?.setAttribute("width", String(w))
-    maskRectRef.current?.setAttribute("height", String(h))
-    overlayRectRef.current?.setAttribute("width", String(w))
-    overlayRectRef.current?.setAttribute("height", String(h))
-    textEl.setAttribute("x", String(cx))
-    textEl.setAttribute("y", String(cy))
-    textEl.setAttribute("font-size", String(fontSize))
-
-    // Apply initial scale BEFORE browser paints
     gsap.registerPlugin(ScrollTrigger)
-    const origin = `${cx} ${cy}`
-    gsap.set(textEl, { scale: initialScale, svgOrigin: origin })
 
-    const tween = gsap.to(textEl, {
+    // Initial states
+    gsap.set(text, { scale: initialScale, opacity: 1 })
+    gsap.set(overlay, { opacity: 1 })
+
+    // Scale text up and fade it out
+    const textTween = gsap.to(text, {
       scale: endScale,
+      opacity: 0,
       ease: "none",
-      svgOrigin: origin,
+      transformOrigin: "center center",
       scrollTrigger: {
         trigger: section,
         start: "top top",
@@ -75,9 +61,39 @@ export default function SvgMaskHero({
       },
     })
 
+    // Fade dark overlay out so full background is visible by the end
+    const overlayTween = gsap.to(overlay, {
+      opacity: 0,
+      ease: "none",
+      scrollTrigger: {
+        trigger: section,
+        start: "top top",
+        end: `+=${scrollLength}`,
+        scrub: true,
+      },
+    })
+
+    // Fade scroll hint quickly
+    const hintTween = hint
+      ? gsap.to(hint, {
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: `+=${scrollLength * 0.12}`,
+            scrub: true,
+          },
+        })
+      : null
+
     return () => {
-      tween.scrollTrigger?.kill()
-      tween.kill()
+      textTween.scrollTrigger?.kill()
+      textTween.kill()
+      overlayTween.scrollTrigger?.kill()
+      overlayTween.kill()
+      hintTween?.scrollTrigger?.kill()
+      hintTween?.kill()
     }
   }, [initialScale, endScale, scrollLength, onRevealComplete, onRevealReverse])
 
@@ -88,10 +104,9 @@ export default function SvgMaskHero({
         position: "relative",
         width: "100%",
         height: "100vh",
-        overflow: "hidden",
-        backgroundColor: overlayColor,
       }}
     >
+      {/* 1. Background image — completely static, never moves or scales */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={bgSrc}
@@ -109,49 +124,57 @@ export default function SvgMaskHero({
         }}
       />
 
-      <svg
-        ref={svgRef}
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="none"
+      {/* 2. Dark overlay — fades out on scroll */}
+      <div
+        ref={overlayRef}
         style={{
           position: "absolute",
           inset: 0,
-          width: "100%",
-          height: "100%",
-          display: "block",
-          overflow: "visible",
+          backgroundColor: overlayColor,
         }}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <mask id="letter-reveal-mask" maskUnits="userSpaceOnUse">
-            <rect ref={maskRectRef} x="0" y="0" width="1440" height="900" fill="white" />
-            <text
-              ref={textRef}
-              x="720"
-              y="450"
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontSize="280"
-              fontFamily="ui-sans-serif, system-ui, -apple-system, sans-serif"
-              fontWeight="900"
-              fill="black"
-            >
-              {text}
-            </text>
-          </mask>
-        </defs>
+      />
 
-        <rect
-          ref={overlayRectRef}
-          x="0"
-          y="0"
-          width="1440"
-          height="900"
-          fill={overlayColor}
-          mask="url(#letter-reveal-mask)"
-        />
-      </svg>
+      {/* 3. Text — scales up and fades out on scroll */}
+      <div
+        ref={textRef}
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 2,
+          pointerEvents: "none",
+        }}
+      >
+        <span
+          style={{
+            fontSize: "clamp(80px, 18vw, 280px)",
+            fontWeight: 900,
+            letterSpacing: "-0.04em",
+            lineHeight: 1,
+            fontFamily: "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
+            color: "rgba(255,255,255,0.92)",
+            userSelect: "none",
+            textShadow: "0 0 80px rgba(43,200,183,0.35)",
+            willChange: "transform",
+          }}
+        >
+          {text}
+        </span>
+      </div>
+
+      {/* Scroll hint */}
+      <div
+        ref={hintRef}
+        className="scroll-hint"
+        style={{ zIndex: 3, color: "rgba(255,255,255,0.55)" }}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <path d="M12 5v14M5 12l7 7 7-7"/>
+        </svg>
+        scroll
+      </div>
     </section>
   )
 }
