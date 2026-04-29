@@ -5,9 +5,10 @@ import { useState, useEffect } from "react"
 interface NavProps {
   theme: "dark" | "light"
   setTheme: (t: "dark" | "light") => void
+  heroRevealed?: boolean
 }
 
-export default function Nav({ theme, setTheme }: NavProps) {
+export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
@@ -15,11 +16,11 @@ export default function Nav({ theme, setTheme }: NavProps) {
   useEffect(() => {
     const on = () => {
       setScrolled(window.scrollY > 30)
-      
+
       const scrollPosition = window.scrollY
       const windowHeight = window.innerHeight
       const docHeight = document.documentElement.scrollHeight
-      
+
       // Hide navigation when scrolled into the last ~50% of the viewport (during the cinematic footer reveal)
       setIsHidden(docHeight - (scrollPosition + windowHeight) < windowHeight * 0.5)
     }
@@ -34,10 +35,12 @@ export default function Nav({ theme, setTheme }: NavProps) {
     { n: "About",    h: "#about"    },
   ]
 
+  const hidden = !heroRevealed || isHidden
+
   return (
-    <header 
+    <header
       className={`fixed top-0 inset-x-0 z-40 px-3 transition-transform duration-500 will-change-transform ${
-        isHidden ? "-translate-y-[150%]" : "translate-y-0"
+        hidden ? "-translate-y-[150%]" : "translate-y-0"
       }`}
     >
       <nav

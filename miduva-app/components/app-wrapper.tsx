@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Nav from "./nav"
 import SvgMaskHero from "./svg-mask-hero"
 import Dashboard from "./dashboard"
@@ -8,7 +8,7 @@ import Services from "./services"
 import ParallaxSection from "./parallax-section"
 import SystemRibbon from "./system-ribbon"
 import TrustedLogos from "./trusted-logos"
-import SystemsBento from "./systems-bento"
+import SystemsZoomSection from "./systems-zoom-section"
 import ProblemSolution from "./problem-solution"
 import HowItWorks from "./how-it-works"
 import ResultsStats from "./results-stats"
@@ -38,6 +38,7 @@ function MetaStrip() {
 
 export function AppWrapper() {
   const [theme, setTheme] = useState<"dark" | "light">("dark")
+  const [heroRevealed, setHeroRevealed] = useState(false)
 
   useEffect(() => {
     const root = document.documentElement
@@ -45,12 +46,18 @@ export function AppWrapper() {
     else root.classList.remove("dark")
   }, [theme])
 
+  const onRevealComplete = useCallback(() => setHeroRevealed(true), [])
+  const onRevealReverse = useCallback(() => setHeroRevealed(false), [])
+
   return (
     <div className="relative min-h-screen overflow-x-clip">
-      <Nav theme={theme} setTheme={setTheme} />
+      <Nav theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} />
       <main>
-        <SvgMaskHero />
-        <SystemsBento />
+        <SvgMaskHero
+          onRevealComplete={onRevealComplete}
+          onRevealReverse={onRevealReverse}
+        />
+        <SystemsZoomSection />
         <ProblemSolution />
 
         <HowItWorks />

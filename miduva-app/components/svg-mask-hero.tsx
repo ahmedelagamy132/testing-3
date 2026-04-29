@@ -5,39 +5,44 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 interface SvgMaskHeroProps {
-  letter?: string
+  text?: string
   bgSrc?: string
   overlayColor?: string
   scrollLength?: number
   initialScale?: number
   endScale?: number
+  onRevealComplete?: () => void
+  onRevealReverse?: () => void
 }
 
 export default function SvgMaskHero({
-  letter = "M",
+  text = "Miduva",
   bgSrc = "/assets/background.png",
   overlayColor = "#0b1220",
   scrollLength = 2000,
   initialScale = 50,
   endScale = 1,
+  onRevealComplete,
+  onRevealReverse,
 }: SvgMaskHeroProps) {
   const sectionRef = useRef<HTMLElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
   const maskRectRef = useRef<SVGRectElement>(null)
   const overlayRectRef = useRef<SVGRectElement>(null)
-  const letterRef = useRef<SVGTextElement>(null)
+  const textRef = useRef<SVGTextElement>(null)
 
   useLayoutEffect(() => {
     const section = sectionRef.current
     const svg = svgRef.current
-    const letter = letterRef.current
-    if (!section || !svg || !letter) return
+    const textEl = textRef.current
+    if (!section || !svg || !textEl) return
 
     const w = window.innerWidth
     const h = window.innerHeight
     const cx = w / 2
     const cy = h / 2
-    const fontSize = Math.min(w * 0.38, 680)
+    // Scale font so the word fills a nice portion of the viewport at scale 1
+    const fontSize = Math.min(w * 0.18, 280)
 
     // Set SVG dimensions and element positions directly — no state re-render
     svg.setAttribute("viewBox", `0 0 ${w} ${h}`)
@@ -45,16 +50,16 @@ export default function SvgMaskHero({
     maskRectRef.current?.setAttribute("height", String(h))
     overlayRectRef.current?.setAttribute("width", String(w))
     overlayRectRef.current?.setAttribute("height", String(h))
-    letter.setAttribute("x", String(cx))
-    letter.setAttribute("y", String(cy))
-    letter.setAttribute("font-size", String(fontSize))
+    textEl.setAttribute("x", String(cx))
+    textEl.setAttribute("y", String(cy))
+    textEl.setAttribute("font-size", String(fontSize))
 
     // Apply initial scale BEFORE browser paints
     gsap.registerPlugin(ScrollTrigger)
     const origin = `${cx} ${cy}`
-    gsap.set(letter, { scale: initialScale, svgOrigin: origin })
+    gsap.set(textEl, { scale: initialScale, svgOrigin: origin })
 
-    const tween = gsap.to(letter, {
+    const tween = gsap.to(textEl, {
       scale: endScale,
       ease: "none",
       svgOrigin: origin,
@@ -65,6 +70,8 @@ export default function SvgMaskHero({
         scrub: true,
         pin: true,
         anticipatePin: 1,
+        onLeave: () => onRevealComplete?.(),
+        onEnterBack: () => onRevealReverse?.(),
       },
     })
 
@@ -72,7 +79,7 @@ export default function SvgMaskHero({
       tween.scrollTrigger?.kill()
       tween.kill()
     }
-  }, [initialScale, endScale, scrollLength])
+  }, [initialScale, endScale, scrollLength, onRevealComplete, onRevealReverse])
 
   return (
     <section
@@ -120,17 +127,17 @@ export default function SvgMaskHero({
           <mask id="letter-reveal-mask" maskUnits="userSpaceOnUse">
             <rect ref={maskRectRef} x="0" y="0" width="1440" height="900" fill="white" />
             <text
-              ref={letterRef}
+              ref={textRef}
               x="720"
               y="450"
               textAnchor="middle"
               dominantBaseline="central"
-              fontSize="547"
+              fontSize="280"
               fontFamily="ui-sans-serif, system-ui, -apple-system, sans-serif"
               fontWeight="900"
               fill="black"
             >
-              {letter}
+              {text}
             </text>
           </mask>
         </defs>
