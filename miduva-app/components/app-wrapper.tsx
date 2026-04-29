@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Nav from "./nav"
-import ParallaxHero from "./parallax-hero"
+import SvgMaskHero from "./svg-mask-hero"
 import Dashboard from "./dashboard"
 import Services from "./services"
 import ParallaxSection from "./parallax-section"
@@ -49,7 +49,7 @@ export function AppWrapper() {
     <div className="relative min-h-screen overflow-x-clip">
       <Nav theme={theme} setTheme={setTheme} />
       <main>
-        <ParallaxHero theme={theme} />
+        <SvgMaskHero />
         <SystemsBento />
         <ProblemSolution />
 
