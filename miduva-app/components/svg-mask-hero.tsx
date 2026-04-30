@@ -1,101 +1,108 @@
 "use client"
 
-import { useLayoutEffect, useRef } from "react"
+import type React from "react"
+import { useId, useLayoutEffect, useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 interface SvgMaskHeroProps {
   text?: string
-  bgSrc?: string
   overlayColor?: string
   scrollLength?: number
-  initialScale?: number
   endScale?: number
   onRevealComplete?: () => void
   onRevealReverse?: () => void
+  children?: React.ReactNode
 }
 
 export default function SvgMaskHero({
   text = "Miduva",
-  bgSrc = "/assets/background.png",
   overlayColor = "#0b1220",
-  scrollLength = 2000,
-  initialScale = 1,
-  endScale = 35,
+  scrollLength = 2200,
+  endScale = 38,
   onRevealComplete,
   onRevealReverse,
+  children,
 }: SvgMaskHeroProps) {
   const sectionRef = useRef<HTMLElement>(null)
-  const overlayRef = useRef<HTMLDivElement>(null)
-  const textRef = useRef<HTMLDivElement>(null)
+  const textGroupRef = useRef<SVGGElement>(null)
+  const fillRef = useRef<SVGRectElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const hintRef = useRef<HTMLDivElement>(null)
+  const maskId = `miduva-text-mask-${useId().replace(/:/g, "")}`
+  // Track whether we've already fired the reveal callback so onUpdate doesn't spam it
+  const revealFiredRef = useRef(false)
 
   useLayoutEffect(() => {
     const section = sectionRef.current
-    const overlay = overlayRef.current
-    const text = textRef.current
+    const textGroup = textGroupRef.current
+    const fillRect = fillRef.current
+    const content = contentRef.current
     const hint = hintRef.current
-    if (!section || !overlay || !text) return
+    if (!section || !textGroup || !fillRect || !content) return
 
     gsap.registerPlugin(ScrollTrigger)
 
-    // Initial states
-    gsap.set(text, { scale: initialScale, opacity: 1 })
-    gsap.set(overlay, { opacity: 1 })
+    gsap.set(textGroup, { svgOrigin: "800 450", scale: 1 })
+    gsap.set(content, { opacity: 0, y: 30 })
+    revealFiredRef.current = false
 
-    // Scale text up and fade it out
-    const textTween = gsap.to(text, {
-      scale: endScale,
-      opacity: 0,
-      ease: "none",
-      transformOrigin: "center center",
+    // Threshold (0–1) at which hero content starts appearing → nav should show
+    const NAV_THRESHOLD = 0.68
+
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
         start: "top top",
         end: `+=${scrollLength}`,
-        scrub: true,
+        scrub: 0.4,
         pin: true,
         anticipatePin: 1,
-        onLeave: () => onRevealComplete?.(),
-        onEnterBack: () => onRevealReverse?.(),
+        onUpdate: (self) => {
+          if (self.progress >= NAV_THRESHOLD && !revealFiredRef.current) {
+            revealFiredRef.current = true
+            onRevealComplete?.()
+          } else if (self.progress < NAV_THRESHOLD && revealFiredRef.current) {
+            revealFiredRef.current = false
+            onRevealReverse?.()
+          }
+        },
+        onEnterBack: () => {
+          if (revealFiredRef.current) {
+            revealFiredRef.current = false
+            onRevealReverse?.()
+          }
+        },
       },
     })
 
-    // Fade dark overlay out so full background is visible by the end
-    const overlayTween = gsap.to(overlay, {
-      opacity: 0,
-      ease: "none",
-      scrollTrigger: {
-        trigger: section,
-        start: "top top",
-        end: `+=${scrollLength}`,
-        scrub: true,
-      },
-    })
+    // Phase 1 (0% → 70%): zoom the text-shaped hole until it covers the screen
+    tl.to(textGroup, { scale: endScale, ease: "power1.in", duration: 0.7 }, 0)
+    tl.to(fillRect, { opacity: 1, ease: "power1.in", duration: 0.7 }, 0)
+    // Phase 2 (70% → 100%): fade in the hero content over the revealed background
+    tl.to(content, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 0.7)
 
-    // Fade scroll hint quickly
-    const hintTween = hint
-      ? gsap.to(hint, {
-          opacity: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top top",
-            end: `+=${scrollLength * 0.12}`,
-            scrub: true,
-          },
-        })
-      : null
+    let hintTween: gsap.core.Tween | null = null
+    if (hint) {
+      hintTween = gsap.to(hint, {
+        opacity: 0,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: `+=${scrollLength * 0.1}`,
+          scrub: true,
+        },
+      })
+    }
 
     return () => {
-      textTween.scrollTrigger?.kill()
-      textTween.kill()
-      overlayTween.scrollTrigger?.kill()
-      overlayTween.kill()
+      tl.scrollTrigger?.kill()
+      tl.kill()
       hintTween?.scrollTrigger?.kill()
       hintTween?.kill()
     }
-  }, [initialScale, endScale, scrollLength, onRevealComplete, onRevealReverse])
+  }, [endScale, scrollLength, onRevealComplete, onRevealReverse])
 
   return (
     <section
@@ -104,74 +111,85 @@ export default function SvgMaskHero({
         position: "relative",
         width: "100%",
         height: "100vh",
+        overflow: "hidden",
       }}
     >
-      {/* 1. Background image — completely static, never moves or scales */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={bgSrc}
-        alt=""
+      {/* Dark overlay with a text-shaped hole. As the text scales up, the hole
+          grows until the entire overlay is "punched out" and the bg is fully visible. */}
+      <svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 1600 900"
+        preserveAspectRatio="xMidYMid slice"
         style={{
           position: "absolute",
           inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          objectPosition: "center",
-          userSelect: "none",
+          zIndex: 1,
           pointerEvents: "none",
-          display: "block",
         }}
-      />
+        aria-hidden
+      >
+        <defs>
+          <mask id={maskId} maskUnits="userSpaceOnUse">
+            <rect x="-2000" y="-2000" width="5600" height="4900" fill="white" />
+            <rect ref={fillRef} x="0" y="0" width="1600" height="900" fill="black" opacity="0" />
+            <g ref={textGroupRef}>
+              <text
+                x="800"
+                y="450"
+                textAnchor="middle"
+                dominantBaseline="central"
+                fill="black"
+                fontSize="260"
+                fontWeight={900}
+                letterSpacing="-10"
+                style={{
+                  fontFamily:
+                    "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
+                }}
+              >
+                {text}
+              </text>
+            </g>
+          </mask>
+        </defs>
+        <rect
+          x="-2000"
+          y="-2000"
+          width="5600"
+          height="4900"
+          fill={overlayColor}
+          mask={`url(#${maskId})`}
+        />
+      </svg>
 
-      {/* 2. Dark overlay — fades out on scroll */}
+      {/* Hero content fades in over the revealed background */}
       <div
-        ref={overlayRef}
+        ref={contentRef}
         style={{
           position: "absolute",
           inset: 0,
-          backgroundColor: overlayColor,
-        }}
-      />
-
-      {/* 3. Text — scales up and fades out on scroll */}
-      <div
-        ref={textRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           zIndex: 2,
-          pointerEvents: "none",
+          willChange: "opacity, transform",
         }}
       >
-        <span
-          style={{
-            fontSize: "clamp(80px, 18vw, 280px)",
-            fontWeight: 900,
-            letterSpacing: "-0.04em",
-            lineHeight: 1,
-            fontFamily: "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
-            color: "rgba(255,255,255,0.92)",
-            userSelect: "none",
-            textShadow: "0 0 80px rgba(43,200,183,0.35)",
-            willChange: "transform",
-          }}
-        >
-          {text}
-        </span>
+        {children}
       </div>
 
-      {/* Scroll hint */}
       <div
         ref={hintRef}
         className="scroll-hint"
         style={{ zIndex: 3, color: "rgba(255,255,255,0.55)" }}
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <path d="M12 5v14M5 12l7 7 7-7"/>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+        >
+          <path d="M12 5v14M5 12l7 7 7-7" />
         </svg>
         scroll
       </div>

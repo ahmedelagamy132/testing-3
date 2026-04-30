@@ -57,8 +57,9 @@ export function AppWrapper() {
         <SvgMaskHero
           onRevealComplete={onRevealComplete}
           onRevealReverse={onRevealReverse}
-        />
-        <HeroContent />
+        >
+          <HeroContent />
+        </SvgMaskHero>
         <SystemsZoomSection />
         <ProblemSolution />
 

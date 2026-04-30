@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 
-function Headline() {
-  const phrases = ["generate leads.", "drive sales.", "scale your business."]
+const phrases = ["generate leads.", "drive sales.", "scale your business."]
+
+export default function HeroContent() {
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
 
@@ -16,108 +17,186 @@ function Headline() {
       }, 380)
     }, 2800)
     return () => clearInterval(t)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
-    <h1 className="mt-8 max-w-5xl mx-auto text-center text-[40px] leading-[1.15] sm:text-[56px] md:text-[68px] lg:text-[76px] font-extrabold tracking-[-0.035em] text-[var(--navy-900)]">
-      We build{" "}
-      <span className="relative inline-block">
-        <span className="relative z-10">custom growth</span>
-        <svg
-          aria-hidden
-          className="absolute -bottom-1 left-0 w-full"
-          viewBox="0 0 300 14"
-          preserveAspectRatio="none"
-          height="12"
-        >
-          <path
-            d="M2 9 C 70 2, 150 2, 298 8"
-            stroke="var(--teal-500)"
-            strokeWidth="4"
-            fill="none"
-            strokeLinecap="round"
-          />
-        </svg>
-      </span>{" "}
-      <span className="text-[var(--navy-700)]">systems</span> that
-      <span className="block mt-1">
-        <span className={`phrase-wrap inline-block ${visible ? "p-in" : "p-out"}`}>
-          <span className="shine">{phrases[idx]}</span>
-        </span>
-      </span>
-    </h1>
-  )
-}
-
-function Sub() {
-  return (
-    <p className="mx-auto text-center mt-7 max-w-2xl text-[17px] md:text-[19px] leading-[1.55] text-[var(--muted)] text-balance">
-      No generic services. We design tailored systems using{" "}
-      <span className="text-[var(--navy-900)] font-semibold">
-        ads, funnels, automation &amp; data
-      </span>{" "}
-      to grow your business — engineered end-to-end, owned by you.
-    </p>
-  )
-}
-
-function CTAs() {
-  return (
-    <div id="cta" className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-      <div className="bg-gradient-to-b from-[var(--teal-300)]/60 to-[var(--teal-500)]/30 p-[2px] rounded-2xl shadow-[0_15px_40px_-15px_rgba(43,200,183,.5)]">
-        <a
-          href="#"
-          className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-[14px] btn-primary font-semibold text-[15px] tracking-tight"
-        >
-          <span className="inline-block">🔥</span>
-          Book a Free Strategy Call
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-            <path d="M5 12h14M13 5l7 7-7 7"/>
-          </svg>
-        </a>
-      </div>
-      <a
-        href="#"
-        className="group inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl border border-[var(--line)] bg-[var(--card)] hover:bg-[var(--paper-2)] font-semibold text-[15px] text-[var(--navy-900)] transition"
-      >
-        Get Your Free Growth Plan
-        <span className="mono text-[11px] text-[var(--muted)] border border-[var(--line)] rounded-md px-1.5 py-0.5 group-hover:border-[var(--teal-500)] group-hover:text-[var(--teal-500)] transition">
-          PDF
-        </span>
-      </a>
-    </div>
-  )
-}
-
-export default function HeroContent() {
-  const check = (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="text-[var(--teal-500)]">
-      <path d="M20 6 9 17l-5-5"/>
-    </svg>
-  )
-
-  return (
-    <section
+    <div
       style={{
-        position: "relative",
-        padding: "clamp(80px,12vh,140px) clamp(24px,6vw,96px)",
-        textAlign: "center",
-        background: "var(--paper)",
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "flex-end",
       }}
     >
-      <div style={{ maxWidth: 860, margin: "0 auto" }}>
-        <Headline />
-        <Sub />
-        <CTAs />
-        <div
-          className="mt-8 flex items-center justify-center gap-5 text-[12px] text-[var(--muted)]"
-          style={{ flexWrap: "wrap" }}
+      {/* Vertical edge label (desktop only) */}
+      <div
+        className="hidden md:flex"
+        style={{
+          position: "absolute",
+          left: "clamp(20px, 2.4vw, 36px)",
+          top: "50%",
+          transform: "translateY(-50%)",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 20,
+          pointerEvents: "none",
+        }}
+      >
+        <span
+          style={{
+            display: "block",
+            width: 1,
+            height: 80,
+            background: "rgba(255,255,255,0.3)",
+          }}
+        />
+        <span
+          style={{
+            writingMode: "vertical-rl",
+            transform: "rotate(180deg)",
+            display: "block",
+            fontFamily:
+              "var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
+            fontSize: 15,
+            fontWeight: 500,
+            letterSpacing: "0.34em",
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.75)",
+            whiteSpace: "nowrap",
+          }}
         >
-          <span className="inline-flex items-center gap-1.5">{check} No contracts</span>
-          <span className="inline-flex items-center gap-1.5">{check} 30-min intro call</span>
-          <span className="inline-flex items-center gap-1.5">{check} Plan delivered in 48h</span>
+          Your Portal for Revenue
+        </span>
+        <span
+          style={{
+            display: "block",
+            width: 1,
+            height: 80,
+            background: "rgba(255,255,255,0.3)",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          width: "100%",
+          padding: "clamp(28px, 5vh, 64px) clamp(24px, 6vw, 80px)",
+          color: "#fff",
+        }}
+      >
+        <h1
+          style={{
+            fontFamily:
+              "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
+            fontWeight: 600,
+            fontSize: "clamp(36px, 5.6vw, 88px)",
+            lineHeight: 1.04,
+            letterSpacing: "-0.025em",
+            margin: 0,
+            color: "#fff",
+            textWrap: "balance",
+          }}
+        >
+          We build custom growth systems.
+        </h1>
+
+        <p
+          style={{
+            fontFamily:
+              "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
+            fontWeight: 300,
+            fontSize: "clamp(22px, 3vw, 44px)",
+            lineHeight: 1.15,
+            letterSpacing: "-0.015em",
+            marginTop: 8,
+            color: "rgba(255,255,255,0.55)",
+          }}
+        >
+          Engineered to{" "}
+          <span
+            className={`phrase-wrap inline-block ${visible ? "p-in" : "p-out"}`}
+            style={{ color: "rgba(255,255,255,0.85)" }}
+          >
+            {phrases[idx]}
+          </span>
+        </p>
+
+        <div
+          style={{
+            marginTop: "clamp(28px, 5vh, 56px)",
+            height: 1,
+            width: "100%",
+            background: "rgba(255,255,255,0.18)",
+          }}
+        />
+
+        <div
+          style={{
+            marginTop: 22,
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            columnGap: 32,
+            rowGap: 18,
+          }}
+          className="hero-footer-grid"
+        >
+          <div style={{ maxWidth: 360 }}>
+            <p
+              style={{
+                fontFamily:
+                  "var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
+                fontSize: 11,
+                letterSpacing: "0.18em",
+                lineHeight: 1.6,
+                textTransform: "uppercase",
+                color: "rgba(255,255,255,0.5)",
+                margin: 0,
+              }}
+            >
+              A system that learns, adapts, and accelerates your growth.
+            </p>
+          </div>
+
+          <div style={{ maxWidth: 520 }}>
+            <p
+              style={{
+                fontSize: 14,
+                lineHeight: 1.7,
+                color: "rgba(255,255,255,0.7)",
+                margin: 0,
+              }}
+            >
+              No generic services. We design tailored systems using ads,
+              funnels, automation, and data — engineered end-to-end, owned by
+              you.
+            </p>
+            <p
+              style={{
+                fontSize: 14,
+                lineHeight: 1.7,
+                color: "rgba(255,255,255,0.7)",
+                margin: "12px 0 0",
+              }}
+            >
+              Growth that doesn&apos;t just respond — it anticipates, adapts,
+              and scales with precision.
+            </p>
+          </div>
         </div>
       </div>
-    </section>
+
+      <style jsx>{`
+        @media (min-width: 768px) {
+          .hero-footer-grid {
+            grid-template-columns: 1fr 1fr !important;
+            justify-content: space-between;
+          }
+          .hero-footer-grid > div:last-child {
+            justify-self: end;
+          }
+        }
+      `}</style>
+    </div>
   )
 }
