@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 interface NavProps {
   theme: "dark" | "light"
@@ -13,17 +13,24 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
   const [open, setOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
 
+  // Capture the scroll position at the moment the hero finishes revealing.
+  // Any scroll beyond that point should pill the nav.
+  const baselineRef = useRef<number | null>(null)
   useEffect(() => {
-    // The element right after the hero section. When its top reaches the viewport
-    // top, the hero is fully past — that's our trigger to pill the nav.
-    const afterHero = document.querySelector("main > *:nth-child(2)") as HTMLElement | null
+    if (heroRevealed) {
+      baselineRef.current = window.scrollY
+      setScrolled(false)
+    } else {
+      baselineRef.current = null
+      setScrolled(false)
+    }
+  }, [heroRevealed])
 
+  useEffect(() => {
     const on = () => {
       const scrollPosition = window.scrollY
-
-      if (afterHero) {
-        setScrolled(afterHero.getBoundingClientRect().top <= 30)
-      }
+      const baseline = baselineRef.current
+      setScrolled(baseline !== null && scrollPosition - baseline > 4)
 
       const windowHeight = window.innerHeight
       const docHeight = document.documentElement.scrollHeight
@@ -31,13 +38,8 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
       // Hide navigation when scrolled into the last ~50% of the viewport (during the cinematic footer reveal)
       setIsHidden(docHeight - (scrollPosition + windowHeight) < windowHeight * 0.5)
     }
-    on()
     window.addEventListener("scroll", on, { passive: true })
-    window.addEventListener("resize", on)
-    return () => {
-      window.removeEventListener("scroll", on)
-      window.removeEventListener("resize", on)
-    }
+    return () => window.removeEventListener("scroll", on)
   }, [])
 
   const leftItems = [
