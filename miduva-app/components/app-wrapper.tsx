@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import Nav from "./nav"
 import SvgMaskHero from "./svg-mask-hero"
 import HeroContent from "./hero-content"
@@ -40,6 +40,7 @@ function MetaStrip() {
 export function AppWrapper() {
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const [heroRevealed, setHeroRevealed] = useState(false)
+  const navRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const root = document.documentElement
@@ -52,11 +53,12 @@ export function AppWrapper() {
 
   return (
     <div className="relative min-h-screen overflow-x-clip">
-      <Nav theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} />
+      <Nav ref={navRef} theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} />
       <main>
         <SvgMaskHero
           onRevealComplete={onRevealComplete}
           onRevealReverse={onRevealReverse}
+          scanTarget={navRef}
         >
           <HeroContent />
         </SvgMaskHero>

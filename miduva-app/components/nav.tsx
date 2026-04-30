@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { forwardRef, useState, useEffect, useRef } from "react"
 
 interface NavProps {
   theme: "dark" | "light"
@@ -8,7 +8,10 @@ interface NavProps {
   heroRevealed?: boolean
 }
 
-export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) {
+const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
+  { theme, setTheme, heroRevealed = true },
+  ref,
+) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
@@ -53,7 +56,10 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
     { n: "Get Started",  h: "#cta"    },
   ]
 
-  const hidden = !heroRevealed || isHidden
+  // The header's clip-path is GSAP-driven from the hero's scroll timeline,
+  // so it stays in lockstep with the scan beam. Translate-y handles the
+  // cinematic footer reveal independently.
+  const hiddenForFooter = isHidden
 
   const linkBase =
     "uppercase tracking-[0.14em] text-[11.5px] font-medium transition"
@@ -63,8 +69,9 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
 
   return (
     <header
+      ref={ref}
       className={`fixed top-0 inset-x-0 z-40 px-3 transition-transform duration-500 will-change-transform ${
-        hidden ? "-translate-y-[150%]" : "translate-y-0"
+        hiddenForFooter ? "-translate-y-[150%]" : "translate-y-0"
       }`}
     >
       <nav
@@ -166,4 +173,6 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
       </nav>
     </header>
   )
-}
+})
+
+export default Nav
