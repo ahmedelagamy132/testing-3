@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 interface NavProps {
   theme: "dark" | "light"
@@ -12,12 +12,26 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
+  const baselineRef = useRef<number | null>(null)
+
+  // Reset baseline whenever hero reveal state changes — so "scrolled" is measured
+  // from the moment the nav appears, not from page top (the hero pins ~2200px).
+  useEffect(() => {
+    if (heroRevealed) {
+      baselineRef.current = window.scrollY
+      setScrolled(false)
+    } else {
+      baselineRef.current = null
+      setScrolled(false)
+    }
+  }, [heroRevealed])
 
   useEffect(() => {
     const on = () => {
-      setScrolled(window.scrollY > 30)
-
       const scrollPosition = window.scrollY
+      const baseline = baselineRef.current
+      setScrolled(baseline !== null && scrollPosition - baseline > 30)
+
       const windowHeight = window.innerHeight
       const docHeight = document.documentElement.scrollHeight
 
