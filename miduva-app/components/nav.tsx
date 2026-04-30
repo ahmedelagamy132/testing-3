@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 
 interface NavProps {
   theme: "dark" | "light"
@@ -12,25 +12,18 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
-  const baselineRef = useRef<number | null>(null)
-
-  // Reset baseline whenever hero reveal state changes — so "scrolled" is measured
-  // from the moment the nav appears, not from page top (the hero pins ~2200px).
-  useEffect(() => {
-    if (heroRevealed) {
-      baselineRef.current = window.scrollY
-      setScrolled(false)
-    } else {
-      baselineRef.current = null
-      setScrolled(false)
-    }
-  }, [heroRevealed])
 
   useEffect(() => {
+    // The element right after the hero section. When its top reaches the viewport
+    // top, the hero is fully past — that's our trigger to pill the nav.
+    const afterHero = document.querySelector("main > *:nth-child(2)") as HTMLElement | null
+
     const on = () => {
       const scrollPosition = window.scrollY
-      const baseline = baselineRef.current
-      setScrolled(baseline !== null && scrollPosition - baseline > 30)
+
+      if (afterHero) {
+        setScrolled(afterHero.getBoundingClientRect().top <= 30)
+      }
 
       const windowHeight = window.innerHeight
       const docHeight = document.documentElement.scrollHeight
@@ -38,8 +31,13 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
       // Hide navigation when scrolled into the last ~50% of the viewport (during the cinematic footer reveal)
       setIsHidden(docHeight - (scrollPosition + windowHeight) < windowHeight * 0.5)
     }
+    on()
     window.addEventListener("scroll", on, { passive: true })
-    return () => window.removeEventListener("scroll", on)
+    window.addEventListener("resize", on)
+    return () => {
+      window.removeEventListener("scroll", on)
+      window.removeEventListener("resize", on)
+    }
   }, [])
 
   const leftItems = [
@@ -85,11 +83,7 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
 
           <a href="#" className="flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={scrolled ? "/assets/miduva-logo.png" : "/assets/miduva-logo-white.png"}
-              alt="Miduva"
-              className="h-7 w-auto"
-            />
+            <img src="/assets/miduva-logo-white.png" alt="Miduva" className="h-7 w-auto" />
           </a>
 
           <div className="flex items-center justify-end gap-8">
@@ -126,11 +120,7 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
         <div className="lg:hidden flex items-center justify-between px-5 py-3">
           <a href="#" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={scrolled ? "/assets/miduva-logo.png" : "/assets/miduva-logo-white.png"}
-              alt="Miduva"
-              className="h-7 w-auto"
-            />
+            <img src="/assets/miduva-logo-white.png" alt="Miduva" className="h-7 w-auto" />
           </a>
 
           <div className="flex items-center gap-2">
