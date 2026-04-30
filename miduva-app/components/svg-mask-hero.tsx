@@ -116,28 +116,184 @@ export default function SvgMaskHero({
         backgroundColor: "#05081a",
       }}
     >
-      {/* Background image — contain so the full illustration is always visible */}
-      <Image
-        src="/hero-bg-image.png"
-        alt=""
-        fill
-        priority
-        unoptimized
-        aria-hidden
-        style={{ objectFit: "contain", objectPosition: "center right" }}
-      />
+      {/* Atmospheric backdrop — sits BEHIND the illustration to give it depth */}
+      <div className="hero-backdrop" aria-hidden>
+        <div className="hb-base" />
+        <div className="hb-orb hb-orb-cyan" />
+        <div className="hb-orb hb-orb-blue" />
+        <div className="hb-orb hb-orb-violet" />
+        <div className="hb-grid" />
+        <div className="hb-conic" />
+      </div>
 
-      {/* Permanent gradient to keep text legible over the background image */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 0,
-          pointerEvents: "none",
+      {/* Background illustration — full-bleed cover, anchored to the right */}
+      <div className="hero-illustration" aria-hidden>
+        <Image
+          src="/hero-bg-image.png"
+          alt=""
+          fill
+          priority
+          unoptimized
+          style={{ objectFit: "contain", objectPosition: "center right" }}
+        />
+      </div>
+
+      {/* Vignette layered above the image: darkens the left for text legibility,
+          fades the image edges into the atmospheric backdrop */}
+      <div className="hb-vignette" aria-hidden />
+
+      <style jsx>{`
+        .hero-backdrop {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+        .hero-illustration {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+          /* Mix the illustration with the glow behind it */
+          mix-blend-mode: screen;
+          filter: drop-shadow(0 0 60px rgba(0, 180, 255, 0.18))
+            drop-shadow(0 0 120px rgba(140, 70, 255, 0.12));
+          animation: hb-float 9s ease-in-out infinite alternate;
+        }
+        @keyframes hb-float {
+          from { transform: translateY(0); }
+          to { transform: translateY(-10px); }
+        }
+        .hb-base {
+          position: absolute;
+          inset: 0;
           background:
-            "linear-gradient(to top, rgba(5,8,20,0.88) 0%, rgba(5,8,20,0.55) 35%, rgba(5,8,20,0.15) 65%, transparent 100%)",
-        }}
-      />
+            radial-gradient(
+              120% 90% at 75% 50%,
+              #0a1633 0%,
+              #060a1f 55%,
+              #03050f 100%
+            );
+        }
+        .hb-orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(90px);
+          will-change: transform;
+          mix-blend-mode: screen;
+        }
+        .hb-orb-cyan {
+          width: 42vw;
+          height: 42vw;
+          top: 8%;
+          right: 4%;
+          background: radial-gradient(
+            circle,
+            rgba(0, 200, 255, 0.55) 0%,
+            rgba(0, 200, 255, 0) 65%
+          );
+          animation: hb-drift-a 22s ease-in-out infinite alternate;
+        }
+        .hb-orb-blue {
+          width: 34vw;
+          height: 34vw;
+          top: 35%;
+          right: 28%;
+          background: radial-gradient(
+            circle,
+            rgba(40, 90, 255, 0.5) 0%,
+            rgba(40, 90, 255, 0) 65%
+          );
+          animation: hb-drift-b 28s ease-in-out infinite alternate;
+        }
+        .hb-orb-violet {
+          width: 30vw;
+          height: 30vw;
+          top: -4%;
+          right: 48%;
+          background: radial-gradient(
+            circle,
+            rgba(140, 70, 255, 0.4) 0%,
+            rgba(140, 70, 255, 0) 65%
+          );
+          animation: hb-drift-c 32s ease-in-out infinite alternate;
+        }
+        .hb-grid {
+          position: absolute;
+          inset: 0;
+          background-image:
+            linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+          background-size: 64px 64px;
+          background-position: -1px -1px;
+          -webkit-mask-image: radial-gradient(
+            ellipse 70% 60% at 70% 50%,
+            #000 0%,
+            transparent 80%
+          );
+          mask-image: radial-gradient(
+            ellipse 70% 60% at 70% 50%,
+            #000 0%,
+            transparent 80%
+          );
+        }
+        .hb-conic {
+          position: absolute;
+          inset: -10%;
+          background: conic-gradient(
+            from 200deg at 78% 50%,
+            transparent 0deg,
+            rgba(0, 200, 255, 0.1) 50deg,
+            transparent 120deg,
+            rgba(140, 70, 255, 0.08) 230deg,
+            transparent 320deg
+          );
+          mix-blend-mode: screen;
+          animation: hb-spin 60s linear infinite;
+        }
+        .hb-vignette {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          background:
+            linear-gradient(
+              to right,
+              rgba(3, 5, 15, 0.92) 0%,
+              rgba(3, 5, 15, 0.55) 30%,
+              rgba(3, 5, 15, 0) 55%
+            ),
+            linear-gradient(
+              to top,
+              rgba(3, 5, 15, 0.55) 0%,
+              rgba(3, 5, 15, 0.15) 40%,
+              transparent 75%
+            );
+        }
+        @keyframes hb-drift-a {
+          from { transform: translate(0, 0) scale(1); }
+          to { transform: translate(-4vw, 3vw) scale(1.08); }
+        }
+        @keyframes hb-drift-b {
+          from { transform: translate(0, 0) scale(1); }
+          to { transform: translate(3vw, -4vw) scale(1.1); }
+        }
+        @keyframes hb-drift-c {
+          from { transform: translate(0, 0) scale(1); }
+          to { transform: translate(2vw, 4vw) scale(1.05); }
+        }
+        @keyframes hb-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hb-orb,
+          .hb-conic {
+            animation: none;
+          }
+        }
+      `}</style>
 
       {/* Dark overlay with a text-shaped hole. As the text scales up, the hole
           grows until the entire overlay is "punched out" and the bg is fully visible. */}
