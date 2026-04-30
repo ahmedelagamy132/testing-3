@@ -6,7 +6,10 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
       "Bash(curl -s http://localhost:3000/)",
       "Bash(git remote *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(taskkill /PID 7276 /F)",
+      "PowerShell(Stop-Process -Id 7276 -Force)",
+      "Bash(npm run *)"
     ]
   }
 }

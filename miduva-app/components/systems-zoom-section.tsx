@@ -144,9 +144,9 @@ function SystemsScrollReveal() {
 
 				if (isFirst) {
 					// ---- System 1: continues from zoom ----
-					// Starts large & centered (matching the end of zoom parallax)
+					// Starts invisible, fades in large & centered
 					gsap.set(imageEl, {
-						opacity: 1,
+						opacity: 0,
 						scale: 2.6,
 						x: 0,
 						y: 0,
@@ -156,6 +156,13 @@ function SystemsScrollReveal() {
 						x: side === 'left' ? '10vw' : '-10vw',
 						y: '6vh',
 					});
+
+					// Fade in the image (crossfade from zoom)
+					tl.to(
+						imageEl,
+						{ opacity: 1, duration: segment * 0.05, ease: 'none' },
+						start
+					);
 
 					// Image shrinks and drifts to its side
 					tl.to(

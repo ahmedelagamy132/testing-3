@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import Image from "next/image"
 import { useId, useLayoutEffect, useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
@@ -12,8 +13,6 @@ interface SvgMaskHeroProps {
   endScale?: number
   onRevealComplete?: () => void
   onRevealReverse?: () => void
-  /** Element whose clip-path should be swept in lockstep with the scan beam. */
-  scanTarget?: React.RefObject<HTMLElement | null>
   children?: React.ReactNode
 }
 
@@ -24,7 +23,6 @@ export default function SvgMaskHero({
   endScale = 38,
   onRevealComplete,
   onRevealReverse,
-  scanTarget,
   children,
 }: SvgMaskHeroProps) {
   const sectionRef = useRef<HTMLElement>(null)
@@ -32,8 +30,6 @@ export default function SvgMaskHero({
   const fillRef = useRef<SVGRectElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const hintRef = useRef<HTMLDivElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
-  const scanRef = useRef<HTMLDivElement>(null)
   const maskId = `miduva-text-mask-${useId().replace(/:/g, "")}`
   // Track whether we've already fired the reveal callback so onUpdate doesn't spam it
   const revealFiredRef = useRef(false)
@@ -44,19 +40,12 @@ export default function SvgMaskHero({
     const fillRect = fillRef.current
     const content = contentRef.current
     const hint = hintRef.current
-    const grid = gridRef.current
-    const scan = scanRef.current
-    const navEl = scanTarget?.current ?? null
     if (!section || !textGroup || !fillRect || !content) return
 
     gsap.registerPlugin(ScrollTrigger)
 
     gsap.set(textGroup, { svgOrigin: "800 450", scale: 1 })
-    gsap.set(content, { opacity: 0, y: 30, clipPath: "inset(0 100% 0 0)" })
-    // Grid is hidden — the scan paints it into existence during Phase 2.
-    if (grid) gsap.set(grid, { opacity: 0, clipPath: "inset(0 100% 0 0)" })
-    if (scan) gsap.set(scan, { opacity: 0, left: "-4%" })
-    if (navEl) gsap.set(navEl, { clipPath: "inset(0 100% 0 0)" })
+    gsap.set(content, { opacity: 0, y: 30 })
     revealFiredRef.current = false
 
     // Threshold (0–1) at which hero content starts appearing → nav should show
@@ -91,22 +80,8 @@ export default function SvgMaskHero({
     // Phase 1 (0% → 70%): zoom the text-shaped hole until it covers the screen
     tl.to(textGroup, { scale: endScale, ease: "power1.in", duration: 0.7 }, 0)
     tl.to(fillRect, { opacity: 1, ease: "power1.in", duration: 0.7 }, 0)
-    // Phase 2 (70% → 88%): a vertical light beam sweeps across, painting the
-    // blueprint grid and the hero content into existence as it passes.
-    if (scan) {
-      tl.to(scan, { opacity: 1, ease: "power2.out", duration: 0.02 }, 0.7)
-      tl.to(scan, { left: "104%", ease: "none", duration: 0.18 }, 0.7)
-      tl.to(scan, { opacity: 0, ease: "power2.in", duration: 0.03 }, 0.86)
-    }
-    if (grid) {
-      tl.to(grid, { opacity: 1, ease: "none", duration: 0.02 }, 0.7)
-      tl.to(grid, { clipPath: "inset(0 0% 0 0)", ease: "none", duration: 0.18 }, 0.7)
-    }
-    tl.to(content, { opacity: 1, y: 0, ease: "power2.out", duration: 0.04 }, 0.7)
-    tl.to(content, { clipPath: "inset(0 0% 0 0)", ease: "none", duration: 0.18 }, 0.7)
-    if (navEl) {
-      tl.to(navEl, { clipPath: "inset(0 0% 0 0)", ease: "none", duration: 0.18 }, 0.7)
-    }
+    // Phase 2 (70% → 100%): fade in the hero content over the revealed background
+    tl.to(content, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 0.7)
 
     let hintTween: gsap.core.Tween | null = null
     if (hint) {
@@ -128,7 +103,7 @@ export default function SvgMaskHero({
       hintTween?.scrollTrigger?.kill()
       hintTween?.kill()
     }
-  }, [endScale, scrollLength, onRevealComplete, onRevealReverse, scanTarget])
+  }, [endScale, scrollLength, onRevealComplete, onRevealReverse])
 
   return (
     <section
@@ -138,44 +113,34 @@ export default function SvgMaskHero({
         width: "100%",
         height: "100vh",
         overflow: "hidden",
+        backgroundColor: "#05081a",
       }}
     >
-      {/* Solid dark base. */}
+      {/* Background image — contain so the full illustration is always visible */}
+      <Image
+        src="/hero-bg-image.png"
+        alt=""
+        fill
+        priority
+        unoptimized
+        aria-hidden
+        style={{ objectFit: "contain", objectPosition: "center right" }}
+      />
+
+      {/* Permanent gradient to keep text legible over the background image */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           zIndex: 0,
-          background: overlayColor,
-        }}
-      />
-      {/* Soft luminous gradient — what the text-shaped hole reveals during Phase 1.
-          A radial blue glow gives the letters a lit-from-within quality. */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 1,
+          pointerEvents: "none",
           background:
-            "radial-gradient(ellipse 90% 70% at 50% 50%, rgba(70,120,210,0.55) 0%, rgba(40,75,150,0.35) 35%, rgba(20,40,90,0.18) 65%, transparent 90%)",
+            "linear-gradient(to top, rgba(5,8,20,0.88) 0%, rgba(5,8,20,0.55) 35%, rgba(5,8,20,0.15) 65%, transparent 100%)",
         }}
       />
-      {/* Blueprint grid — hidden until the scan beam paints it in during Phase 2. */}
-      <div
-        ref={gridRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 2,
-          backgroundImage:
-            "linear-gradient(to right, rgba(190,215,255,0.16) 1px, transparent 1px), linear-gradient(to bottom, rgba(190,215,255,0.16) 1px, transparent 1px)",
-          backgroundSize: "80px 80px",
-          backgroundPosition: "center",
-          willChange: "opacity, clip-path",
-        }}
-      />
+
       {/* Dark overlay with a text-shaped hole. As the text scales up, the hole
-          grows until the entire overlay is "punched out" and the surface below is fully visible. */}
+          grows until the entire overlay is "punched out" and the bg is fully visible. */}
       <svg
         width="100%"
         height="100%"
@@ -184,7 +149,7 @@ export default function SvgMaskHero({
         style={{
           position: "absolute",
           inset: 0,
-          zIndex: 3,
+          zIndex: 1,
           pointerEvents: "none",
         }}
         aria-hidden
@@ -223,34 +188,14 @@ export default function SvgMaskHero({
         />
       </svg>
 
-      {/* Vertical light beam — sweeps left→right and "paints" the hero into existence. */}
-      <div
-        ref={scanRef}
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          left: "-4%",
-          width: 2,
-          zIndex: 4,
-          pointerEvents: "none",
-          background:
-            "linear-gradient(to bottom, transparent 0%, rgba(220,235,255,0.95) 40%, rgba(220,235,255,0.95) 60%, transparent 100%)",
-          boxShadow:
-            "0 0 18px 4px rgba(190,215,255,0.55), 0 0 60px 18px rgba(120,160,240,0.28)",
-          willChange: "left, opacity",
-        }}
-      />
-
-      {/* Hero content fades in (and is revealed by the scan beam) over the background */}
+      {/* Hero content fades in over the revealed background */}
       <div
         ref={contentRef}
         style={{
           position: "absolute",
           inset: 0,
-          zIndex: 5,
-          willChange: "opacity, transform, clip-path",
+          zIndex: 2,
+          willChange: "opacity, transform",
         }}
       >
         {children}
@@ -259,7 +204,7 @@ export default function SvgMaskHero({
       <div
         ref={hintRef}
         className="scroll-hint"
-        style={{ zIndex: 6, color: "rgba(255,255,255,0.55)" }}
+        style={{ zIndex: 3, color: "rgba(255,255,255,0.55)" }}
       >
         <svg
           width="18"
