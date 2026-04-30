@@ -28,14 +28,24 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
     return () => window.removeEventListener("scroll", on)
   }, [])
 
-  const items = [
-    { n: "Services", h: "#services" },
-    { n: "Systems",  h: "#systems"  },
-    { n: "Case Studies", h: "#cases" },
-    { n: "About",    h: "#about"    },
+  const leftItems = [
+    { n: "Services",     h: "#services"    },
+    { n: "Systems",      h: "#systems"     },
+    { n: "How it Works", h: "#how-it-works"},
+  ]
+  const rightItems = [
+    { n: "Case Studies", h: "#cases"  },
+    { n: "About",        h: "#about"  },
+    { n: "Get Started",  h: "#cta"    },
   ]
 
   const hidden = !heroRevealed || isHidden
+
+  const linkBase =
+    "uppercase tracking-[0.14em] text-[11.5px] font-medium transition"
+  const linkColor = scrolled
+    ? "text-[var(--muted)] hover:text-[var(--navy-900)]"
+    : "text-white/75 hover:text-white"
 
   return (
     <header
@@ -44,42 +54,44 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
       }`}
     >
       <nav
-        className={`mx-auto mt-3 border rounded-2xl transition-all duration-500 ${
+        className={`mx-auto mt-3 rounded-full transition-all duration-500 ${
           scrolled
-            ? "max-w-4xl bg-[var(--card)]/75 backdrop-blur-xl border-[var(--line)] shadow-[0_10px_40px_-20px_rgba(15,35,73,.25)] dark:shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)]"
-            : "max-w-6xl bg-transparent border-transparent shadow-none backdrop-blur-none"
+            ? "max-w-5xl border bg-[var(--card)]/75 backdrop-blur-xl border-[var(--line)] shadow-[0_10px_40px_-20px_rgba(15,35,73,.25)] dark:shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)]"
+            : "max-w-6xl border border-transparent bg-transparent shadow-none backdrop-blur-none"
         }`}
       >
-        <div className="flex items-center justify-between px-5 py-3">
-          <a href="#" className="flex items-center gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/miduva-logo.png" alt="Miduva" className="h-7 w-auto" />
-          </a>
-
-          <ul
-            className={`hidden lg:flex items-center gap-8 text-[13.5px] font-medium ${
-              scrolled ? "text-[var(--muted)]" : "text-white/80"
-            }`}
-          >
-            {items.map((i) => (
+        <div className="hidden lg:grid grid-cols-[1fr_auto_1fr] items-center px-8 py-3 gap-8">
+          <ul className={`flex items-center justify-start gap-8 ${linkBase} ${linkColor}`}>
+            {leftItems.map((i) => (
               <li key={i.n}>
-                <a
-                  href={i.h}
-                  className={`transition ${scrolled ? "hover:text-[var(--navy-900)]" : "hover:text-white"}`}
-                >
-                  {i.n}
-                </a>
+                <a href={i.h}>{i.n}</a>
               </li>
             ))}
           </ul>
 
-          <div className="hidden lg:flex items-center gap-2">
+          <a href="#" className="flex items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={scrolled ? "/assets/miduva-logo.png" : "/assets/miduva-logo-white.png"}
+              alt="Miduva"
+              className="h-7 w-auto"
+            />
+          </a>
+
+          <div className="flex items-center justify-end gap-8">
+            <ul className={`flex items-center gap-8 ${linkBase} ${linkColor}`}>
+              {rightItems.map((i) => (
+                <li key={i.n}>
+                  <a href={i.h}>{i.n}</a>
+                </li>
+              ))}
+            </ul>
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle theme"
-              className={`h-9 w-9 rounded-xl flex items-center justify-center transition hover:text-[var(--teal-500)] ${
+              className={`h-8 w-8 rounded-full flex items-center justify-center transition hover:text-[var(--teal-500)] ${
                 scrolled
-                  ? "border border-[var(--line)] bg-[var(--chip)] text-[var(--navy-900)]"
+                  ? "text-[var(--navy-900)]"
                   : "text-white/80 hover:text-white"
               }`}
             >
@@ -94,23 +106,20 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
                 </svg>
               )}
             </button>
-            <a
-              href="#"
-              className={`text-sm font-medium px-4 py-2 rounded-xl transition ${
-                scrolled ? "text-[var(--navy-900)] hover:bg-[var(--paper-2)]" : "text-white/80 hover:text-white"
-              }`}
-            >
-              Client Login
-            </a>
-            <a href="#cta" className="text-sm font-semibold px-4 py-2 rounded-xl btn-primary inline-flex items-center gap-2">
-              Book a Call
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <path d="M5 12h14M13 5l7 7-7 7"/>
-              </svg>
-            </a>
           </div>
+        </div>
 
-          <div className="lg:hidden flex items-center gap-2">
+        <div className="lg:hidden flex items-center justify-between px-5 py-3">
+          <a href="#" className="flex items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={scrolled ? "/assets/miduva-logo.png" : "/assets/miduva-logo-white.png"}
+              alt="Miduva"
+              className="h-7 w-auto"
+            />
+          </a>
+
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle theme"
@@ -141,17 +150,11 @@ export default function Nav({ theme, setTheme, heroRevealed = true }: NavProps) 
 
         {open && (
           <div className="lg:hidden px-5 pb-5 border-t border-[var(--line)] pt-3 space-y-3">
-            {items.map((i) => (
+            {[...leftItems, ...rightItems].map((i) => (
               <a key={i.n} href={i.h} className="block text-[var(--muted)] text-sm">
                 {i.n}
               </a>
             ))}
-            <a
-              href="#cta"
-              className="block text-center text-sm font-semibold px-4 py-2 rounded-xl btn-primary"
-            >
-              Book a Call
-            </a>
           </div>
         )}
       </nav>
