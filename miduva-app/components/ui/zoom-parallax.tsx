@@ -20,11 +20,15 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 		offset: ['start start', 'end end'],
 	});
 
-	const scale4 = useTransform(scrollYProgress, [0, 1], [1, 4]);
-	const scale5 = useTransform(scrollYProgress, [0, 1], [1, 5]);
-	const scale6 = useTransform(scrollYProgress, [0, 1], [1, 6]);
-	const scale8 = useTransform(scrollYProgress, [0, 1], [1, 8]);
-	const scale9 = useTransform(scrollYProgress, [0, 1], [1, 9]);
+	// Scales animate over the first 75% of scroll, then hold at peak
+	const scale4 = useTransform(scrollYProgress, [0, 0.75], [1, 4]);
+	const scale5 = useTransform(scrollYProgress, [0, 0.75], [1, 5]);
+	const scale6 = useTransform(scrollYProgress, [0, 0.75], [1, 6]);
+	const scale8 = useTransform(scrollYProgress, [0, 0.75], [1, 8]);
+	const scale9 = useTransform(scrollYProgress, [0, 0.75], [1, 9]);
+
+	// Center image (index 0) fades out over the last 25% of scroll
+	const centerOpacity = useTransform(scrollYProgress, [0.78, 1.0], [1, 0]);
 
 	const scales = [scale4, scale5, scale6, scale5, scale6, scale8, scale9];
 
@@ -39,17 +43,20 @@ export function ZoomParallax({ images }: ZoomParallaxProps) {
 	];
 
 	return (
-		<div ref={container} className="relative h-[300vh] w-full">
+		// Extended to 400vh: 300vh for zoom, 100vh for the full-screen hold + fade-out
+		<div ref={container} className="relative h-[400vh] w-full">
 			<div className="sticky top-0 h-screen w-full overflow-hidden">
 				{images.map(({ src, alt }, index) => {
 					const scale = scales[index % scales.length];
 					const posClass = positionClasses[index] ?? '';
+					const opacity = index === 0 ? centerOpacity : undefined;
 
 					return (
 						<motion.div
 							key={index}
 							style={{
 								scale,
+								opacity,
 								transformOrigin: 'center center',
 								willChange: 'transform',
 							}}

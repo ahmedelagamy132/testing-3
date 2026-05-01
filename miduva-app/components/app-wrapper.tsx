@@ -9,7 +9,6 @@ import Services from "./services"
 import ParallaxSection from "./parallax-section"
 import SystemRibbon from "./system-ribbon"
 import TrustedLogos from "./trusted-logos"
-import StickyMaskSection from "./sticky-mask-section"
 import SystemsZoomSection from "./systems-zoom-section"
 import ProblemSolution from "./problem-solution"
 import HowItWorks from "./how-it-works"
@@ -63,7 +62,6 @@ export function AppWrapper() {
         >
           <HeroContent />
         </SvgMaskHero>
-        <StickyMaskSection />
         <SystemsZoomSection />
         <ProblemSolution />
 

@@ -31,6 +31,12 @@ export default function SvgMaskHero({
   const [phase, setPhase] = useState<Phase>("intro")
   const hintRef = useRef<HTMLDivElement>(null)
 
+  // Lock scroll during the intro animation so users can't skip past it
+  useEffect(() => {
+    document.body.style.overflow = "hidden"
+    return () => { document.body.style.overflow = "" }
+  }, [])
+
   useEffect(() => {
     const cascadeEnd = (text.length - 1) * LETTER_STAGGER_MS + LETTER_RISE_MS
     const splitAt = cascadeEnd + HOLD_MS
@@ -40,6 +46,7 @@ export default function SvgMaskHero({
     const t1 = window.setTimeout(() => setPhase("split"), splitAt)
     const t2 = window.setTimeout(() => {
       setPhase("done")
+      document.body.style.overflow = ""
       onRevealComplete?.()
     }, revealAt)
 
@@ -101,7 +108,13 @@ export default function SvgMaskHero({
       <div className="hb-vignette" aria-hidden />
 
       {/* Hero content — fades in once the wordmark splits */}
-      <div className={`hero-content-wrap ${phase !== "intro" ? "in" : ""}`}>
+      <div
+        className="hero-content-wrap"
+        style={{
+          opacity: phase !== "intro" ? 1 : 0,
+          transform: phase !== "intro" ? "translateY(0)" : "translateY(18px)",
+        }}
+      >
         {children}
       </div>
 
@@ -123,7 +136,7 @@ export default function SvgMaskHero({
                 <span
                   key={`t-${i}`}
                   className="hero-letter"
-                  style={{ animationDelay: `${i * LETTER_STAGGER_MS}ms` }}
+                  style={{ opacity: 0, animationDelay: `${i * LETTER_STAGGER_MS}ms` }}
                 >
                   {c}
                 </span>
@@ -134,7 +147,7 @@ export default function SvgMaskHero({
                 <span
                   key={`b-${i}`}
                   className="hero-letter"
-                  style={{ animationDelay: `${i * LETTER_STAGGER_MS}ms` }}
+                  style={{ opacity: 0, animationDelay: `${i * LETTER_STAGGER_MS}ms` }}
                 >
                   {c}
                 </span>
@@ -297,15 +310,9 @@ export default function SvgMaskHero({
           position: absolute;
           inset: 0;
           z-index: 2;
-          opacity: 0;
-          transform: translateY(18px);
           transition:
             opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
             transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .hero-content-wrap.in {
-          opacity: 1;
-          transform: translateY(0);
         }
 
         /* Intro overlay */
@@ -326,7 +333,8 @@ export default function SvgMaskHero({
           left: 0;
           right: 0;
           height: 50%;
-          background:
+          background-color: #05081a;
+          background-image:
             radial-gradient(
               80% 100% at 50% 100%,
               rgba(10, 22, 51, 1) 0%,
@@ -337,7 +345,8 @@ export default function SvgMaskHero({
         }
         .hero-curtain-top {
           top: 0;
-          background:
+          background-color: #05081a;
+          background-image:
             radial-gradient(
               80% 100% at 50% 100%,
               rgba(10, 22, 51, 1) 0%,
@@ -346,7 +355,8 @@ export default function SvgMaskHero({
         }
         .hero-curtain-bottom {
           bottom: 0;
-          background:
+          background-color: #05081a;
+          background-image:
             radial-gradient(
               80% 100% at 50% 0%,
               rgba(10, 22, 51, 1) 0%,
