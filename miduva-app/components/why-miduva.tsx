@@ -7,41 +7,49 @@ import {
   useSpring,
   useTransform,
   useInView,
+  useScroll,
 } from "motion/react"
-import { Layers, BarChart2, Cpu, DollarSign } from "lucide-react"
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   DATA
+   ═══════════════════════════════════════════════════════════════════════════════ */
 
 const DIFFERENTIATORS = [
   {
     id: "custom",
     num: "01",
-    icon: Layers,
     title: "Custom Solutions",
+    subtitle: "Tailored architecture",
     oldWay: "cookie-cutter packages",
     newWay: "systems built around your business",
+    grid: "md:col-span-7 md:row-span-2",
   },
   {
     id: "data",
     num: "02",
-    icon: BarChart2,
     title: "Data-Driven Decisions",
+    subtitle: "Quantified strategy",
     oldWay: "gut-feel strategy",
     newWay: "every move backed by real numbers",
+    grid: "md:col-span-5",
   },
   {
     id: "ai",
     num: "03",
-    icon: Cpu,
     title: "AI-Powered Systems",
+    subtitle: "Intelligent automation",
     oldWay: "manual, repetitive tasks",
     newWay: "AI agents running the heavy lifting",
+    grid: "md:col-span-5",
   },
   {
     id: "roi",
     num: "04",
-    icon: DollarSign,
     title: "Focus on ROI",
+    subtitle: "Revenue-first metrics",
     oldWay: "vanity metrics and reports",
     newWay: "revenue impact, measured and proven",
+    grid: "md:col-span-12",
   },
 ] as const
 
@@ -53,7 +61,71 @@ const PHRASES = [
   { text: "designed to grow your business.", dim: false, shine: false, strike: false },
 ] as const
 
-// ─── Single differentiator card ───────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ULTRA-THIN CUSTOM ICONS
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+function IconLayers({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+      <path d="M2 12l10 5 10-5" />
+      <path d="M2 17l10 5 10-5" />
+    </svg>
+  )
+}
+
+function IconChart({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="3" y="12" width="4" height="9" rx="1" />
+      <rect x="10" y="7" width="4" height="14" rx="1" />
+      <rect x="17" y="3" width="4" height="18" rx="1" />
+    </svg>
+  )
+}
+
+function IconChip({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect x="6" y="6" width="12" height="12" rx="2" />
+      <rect x="10" y="10" width="4" height="4" rx="1" />
+      <path d="M6 10H3M6 14H3" />
+      <path d="M21 10h-3M21 14h-3" />
+      <path d="M10 6V3M14 6V3" />
+      <path d="M10 21v-3M14 21v-3" />
+    </svg>
+  )
+}
+
+function IconDollar({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 6v12" />
+      <path d="M15 9.5c0-.8-.7-1.5-1.5-1.5H11c-.8 0-1.5.7-1.5 1.5s.7 1.5 1.5 1.5h2c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5H11c-.8 0-1.5-.7-1.5-1.5" />
+    </svg>
+  )
+}
+
+const ICONS: Record<string, React.FC<{ className?: string }>> = {
+  custom: IconLayers,
+  data: IconChart,
+  ai: IconChip,
+  roi: IconDollar,
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   EASE CURVES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+const EASE_FLUID = [0.32, 0.72, 0, 1] as const
+const EASE_SMOOTH = [0.22, 1, 0.36, 1] as const
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   DIFFERENTIATOR CARD
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
 function DifferentiatorCard({
   data,
   index,
@@ -71,284 +143,315 @@ function DifferentiatorCard({
   const liftY = useMotionValue(0)
 
   const springCfg = { stiffness: 120, damping: 18 }
-  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-6, 6]), springCfg)
-  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [6, -6]), springCfg)
+  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-5, 5]), springCfg)
+  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [5, -5]), springCfg)
   const springY = useSpring(liftY, springCfg)
 
-  const Icon = data.icon
+  const Icon = ICONS[data.id]
+  const isWide = data.grid.includes("col-span-12")
 
   return (
     <motion.div
       ref={cardRef}
-      style={{
-        rotateX,
-        rotateY,
-        y: springY,
-        transformPerspective: 900,
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(43,200,183,0.12)",
-        borderRadius: 24,
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
-        position: "relative",
-        overflow: "hidden",
-        padding: "clamp(24px, 2.5vw, 36px)",
-        cursor: "default",
-      }}
-      initial={{ opacity: 0, y: 50, scale: 0.94 }}
+      className={`${data.grid} group`}
+      initial={{ opacity: 0, y: 60, scale: 0.96, filter: "blur(8px)" }}
       animate={
         isParentInView
-          ? { opacity: 1, y: 0, scale: 1 }
-          : { opacity: 0, y: 50, scale: 0.94 }
+          ? { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
+          : { opacity: 0, y: 60, scale: 0.96, filter: "blur(8px)" }
       }
-      transition={{ duration: 0.7, delay: 0.1 + index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-      onMouseMove={(e) => {
-        const rect = cardRef.current?.getBoundingClientRect()
-        if (!rect) return
-        mouseX.set((e.clientX - rect.left) / rect.width * 2 - 1)
-        mouseY.set((e.clientY - rect.top) / rect.height * 2 - 1)
+      transition={{
+        duration: 0.8,
+        delay: 0.15 + index * 0.12,
+        ease: EASE_FLUID,
       }}
-      onMouseEnter={() => liftY.set(-6)}
-      onMouseLeave={() => { mouseX.set(0); mouseY.set(0); liftY.set(0) }}
+      style={{ perspective: 900 }}
     >
-      {/* Ambient teal glow — top right */}
-      <div
-        aria-hidden
+      {/* ── Double-Bezel Outer Shell ── */}
+      <motion.div
+        className="relative h-full p-[5px] rounded-[2rem] bg-white/[0.03] ring-1 ring-white/[0.08] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-white/[0.16] group-hover:bg-white/[0.05]"
         style={{
-          position: "absolute",
-          top: -60, right: -60,
-          width: 200, height: 200,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(43,200,183,0.10) 0%, transparent 70%)",
-          filter: "blur(32px)",
-          pointerEvents: "none",
+          rotateX,
+          rotateY,
+          y: springY,
+          transformStyle: "preserve-3d",
         }}
-      />
-
-      {/* Icon pill */}
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 44, height: 44,
-          borderRadius: 14,
-          background: "rgba(43,200,183,0.10)",
-          border: "1px solid rgba(43,200,183,0.24)",
-          marginBottom: 20,
-          flexShrink: 0,
+        onMouseMove={(e) => {
+          const rect = cardRef.current?.getBoundingClientRect()
+          if (!rect) return
+          mouseX.set((e.clientX - rect.left) / rect.width * 2 - 1)
+          mouseY.set((e.clientY - rect.top) / rect.height * 2 - 1)
+        }}
+        onMouseEnter={() => liftY.set(-8)}
+        onMouseLeave={() => {
+          mouseX.set(0)
+          mouseY.set(0)
+          liftY.set(0)
         }}
       >
-        <Icon style={{ width: 22, height: 22, color: "var(--teal-500)" }} strokeWidth={1.75} />
-      </div>
-
-      {/* Title */}
-      <h3
-        style={{
-          fontSize: "clamp(18px, 1.8vw, 22px)",
-          fontWeight: 800,
-          color: "white",
-          letterSpacing: "-0.03em",
-          lineHeight: 1.2,
-          margin: "0 0 14px",
-        }}
-      >
-        {data.title}
-      </h3>
-
-      {/* Teal underline */}
-      <div
-        style={{
-          height: 2,
-          background: "rgba(255,255,255,0.08)",
-          borderRadius: 1,
-          overflow: "hidden",
-          marginBottom: 18,
-        }}
-      >
-        <motion.div
-          style={{ height: "100%", background: "var(--teal-500)", borderRadius: 1, transformOrigin: "left" }}
-          initial={{ scaleX: 0 }}
-          animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
-          transition={{ duration: 1.2, delay: 0.3 + index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-        />
-      </div>
-
-      {/* Contrast comparison */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-        <span
-          style={{
-            fontSize: 13,
-            color: "rgba(255,255,255,0.28)",
-            textDecoration: "line-through",
-            textDecorationColor: "rgba(255,255,255,0.20)",
-            lineHeight: 1.4,
-          }}
+        {/* ── Inner Core ── */}
+        <div
+          className="relative h-full overflow-hidden rounded-[calc(2rem-5px)] bg-[#08080c] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)] transition-shadow duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_0_40px_rgba(43,200,183,0.06)]"
         >
-          {data.oldWay}
-        </span>
-        <span style={{ fontSize: 11, color: "rgba(43,200,183,0.50)", fontFamily: "monospace" }}>
-          ↓
-        </span>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "var(--teal-400)", lineHeight: 1.4 }}>
-          {data.newWay}
-        </span>
-      </div>
+          {/* Ambient top-right teal glow */}
+          <div
+            aria-hidden
+            className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none"
+            style={{
+              background: "radial-gradient(circle, rgba(43,200,183,0.10) 0%, transparent 70%)",
+              filter: "blur(40px)",
+            }}
+          />
 
-      {/* Ambient number */}
-      <div
-        aria-hidden
-        className="mono"
-        style={{
-          position: "absolute",
-          bottom: -20, right: 10,
-          fontSize: "clamp(80px, 10vw, 120px)",
-          fontWeight: 800,
-          color: "rgba(255,255,255,0.06)",
-          lineHeight: 1,
-          letterSpacing: "-0.06em",
-          userSelect: "none",
-          pointerEvents: "none",
-        }}
-      >
-        {data.num}
-      </div>
+          {/* Content padding */}
+          <div className={`relative z-10 h-full flex flex-col ${isWide ? "md:flex-row md:items-center md:justify-between gap-6 md:gap-10" : ""} p-6 md:p-8`}>
+            
+            {/* Left content */}
+            <div className="flex flex-col flex-1">
+              {/* Eyebrow + Icon row */}
+              <div className="flex items-center gap-3 mb-5">
+                {/* Icon pill — nested circular wrapper */}
+                <div className="w-10 h-10 rounded-xl bg-white/[0.04] ring-1 ring-white/[0.1] flex items-center justify-center flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-teal-500/30 group-hover:bg-teal-500/10">
+                  <Icon className="w-[18px] h-[18px] text-teal-400/80 transition-colors duration-500 group-hover:text-teal-400" />
+                </div>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-white/30 mono">
+                  {data.subtitle}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h3 className="text-[clamp(18px,1.8vw,26px)] font-extrabold text-white tracking-[-0.03em] leading-[1.15] mb-3">
+                {data.title}
+              </h3>
+
+              {/* Teal underline */}
+              <div className="h-[2px] bg-white/[0.06] rounded-full overflow-hidden mb-5 max-w-[120px]">
+                <motion.div
+                  className="h-full bg-teal-500 rounded-full origin-left"
+                  initial={{ scaleX: 0 }}
+                  animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
+                  transition={{ duration: 1.2, delay: 0.4 + index * 0.12, ease: EASE_SMOOTH }}
+                />
+              </div>
+
+              {/* Contrast comparison */}
+              <div className="flex flex-col gap-2">
+                <span className="text-[13px] text-white/25 line-through decoration-white/15 leading-relaxed">
+                  {data.oldWay}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-teal-500/50 mono">↓</span>
+                  <span className="text-[13px] font-semibold text-teal-400 leading-relaxed">
+                    {data.newWay}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Wide card right side — mini visual */}
+            {isWide && (
+              <div className="flex items-center gap-4 md:gap-6 flex-shrink-0">
+                <div className="hidden md:flex items-end gap-[6px] h-14">
+                  {[32, 48, 40, 64, 72, 56, 80, 88, 76, 92, 84, 96].map((h, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-[6px] rounded-full bg-teal-500/20"
+                      style={{ height: `${h}%` }}
+                      initial={{ scaleY: 0 }}
+                      animate={isInView ? { scaleY: 1 } : { scaleY: 0 }}
+                      transition={{
+                        duration: 0.6,
+                        delay: 0.6 + i * 0.04,
+                        ease: EASE_SMOOTH,
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="text-right">
+                  <div className="text-[28px] md:text-[36px] font-extrabold text-white tracking-[-0.04em] leading-none">
+                    4.8×
+                  </div>
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-white/25 mono mt-1">
+                    Avg. ROAS
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Giant ambient number */}
+          <div
+            aria-hidden
+            className="absolute bottom-[-16px] right-2 text-[clamp(80px,10vw,140px)] font-extrabold text-white/[0.04] leading-none tracking-[-0.06em] pointer-events-none select-none mono transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-[-4px] group-hover:text-white/[0.06]"
+          >
+            {data.num}
+          </div>
+        </div>
+      </motion.div>
     </motion.div>
   )
 }
 
-// ─── Main export ──────────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MAIN EXPORT
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
 export default function WhyMiduva() {
   const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" })
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  })
+
+  // Parallax speeds for background layers
+  const yOrb1 = useTransform(scrollYProgress, [0, 1], [0, -140])
+  const yOrb2 = useTransform(scrollYProgress, [0, 1], [0, -80])
+  const yOrb3 = useTransform(scrollYProgress, [0, 1], [0, -40])
+  const yWatermark = useTransform(scrollYProgress, [0, 1], [0, -60])
+  const yHeadline = useTransform(scrollYProgress, [0, 1], [0, -30])
 
   return (
     <section
+      ref={sectionRef}
       id="why-miduva"
-      style={{ background: "#0F2349", position: "relative", overflow: "hidden" }}
-      className="grain"
+      className="relative overflow-hidden bg-[#020204]"
     >
-      {/* Ambient blobs */}
+      {/* ═══════ GRAIN OVERLAY (section-scoped) ═══════ */}
       <div
         aria-hidden
+        className="absolute inset-0 pointer-events-none z-[1]"
         style={{
-          position: "absolute",
-          top: -160, left: -160,
-          width: 600, height: 600,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(43,200,183,0.09) 0%, transparent 60%)",
-          filter: "blur(80px)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          bottom: -140, right: -140,
-          width: 500, height: 500,
-          borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(43,200,183,0.06) 0%, transparent 60%)",
-          filter: "blur(80px)",
-          pointerEvents: "none",
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)",
+          backgroundSize: "3px 3px",
         }}
       />
 
-      {/* Teal top-edge seam */}
-      <div
+      {/* ═══════ PARALLAX BACKGROUND LAYERS ═══════ */}
+
+      {/* Giant watermark */}
+      <motion.div
         aria-hidden
-        style={{
-          position: "absolute",
-          top: 0, left: "50%",
-          transform: "translateX(-50%)",
-          width: "60%", height: 1,
-          background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.35), transparent)",
-          pointerEvents: "none",
-        }}
-      />
-
-      <div ref={sectionRef} className="relative z-10 max-w-6xl mx-auto px-6 py-20 md:py-28">
-
-        {/* Eyebrow */}
-        <motion.div
-          className="mono"
-          style={{
-            fontSize: 13,
-            letterSpacing: "0.22em",
-            textTransform: "uppercase",
-            color: "var(--teal-500)",
-            marginBottom: 24,
-          }}
-          initial={{ opacity: 0, y: 16 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute top-[10%] left-1/2 -translate-x-1/2 pointer-events-none select-none z-0"
+        style={{ y: yWatermark }}
+      >
+        <span
+          className="block text-[clamp(180px,22vw,380px)] font-extrabold tracking-[-0.06em] leading-none mono"
+          style={{ color: "rgba(255,255,255,0.015)" }}
         >
-          / why miduva
+          WHY
+        </span>
+      </motion.div>
+
+      {/* Orb 1 — large top-left teal */}
+      <motion.div
+        aria-hidden
+        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full pointer-events-none z-0"
+        style={{
+          y: yOrb1,
+          background: "radial-gradient(circle, rgba(43,200,183,0.07) 0%, transparent 60%)",
+          filter: "blur(80px)",
+        }}
+      />
+
+      {/* Orb 2 — mid-right navy */}
+      <motion.div
+        aria-hidden
+        className="absolute top-[30%] -right-24 w-[480px] h-[480px] rounded-full pointer-events-none z-0"
+        style={{
+          y: yOrb2,
+          background: "radial-gradient(circle, rgba(43,200,183,0.04) 0%, transparent 60%)",
+          filter: "blur(70px)",
+        }}
+      />
+
+      {/* Orb 3 — bottom-center subtle */}
+      <motion.div
+        aria-hidden
+        className="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] rounded-full pointer-events-none z-0"
+        style={{
+          y: yOrb3,
+          background: "radial-gradient(circle, rgba(43,200,183,0.05) 0%, transparent 55%)",
+          filter: "blur(90px)",
+        }}
+      />
+
+      {/* Subtle top edge hairline */}
+      <div
+        aria-hidden
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px pointer-events-none z-10"
+        style={{
+          background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.25), transparent)",
+        }}
+      />
+
+      {/* ═══════ CONTENT ═══════ */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-24 md:py-40">
+
+        {/* Eyebrow tag */}
+        <motion.div
+          className="inline-flex items-center rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium bg-white/[0.04] ring-1 ring-white/[0.1] text-teal-400 mb-8 mono"
+          initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+          animate={
+            isInView
+              ? { opacity: 1, y: 0, filter: "blur(0px)" }
+              : { opacity: 0, y: 20, filter: "blur(6px)" }
+          }
+          transition={{ duration: 0.7, ease: EASE_FLUID }}
+        >
+          Why Miduva
         </motion.div>
 
-        {/* Headline — cinematic word reveal */}
-        <div
-          className="mb-16 md:mb-20"
-          style={{
-            fontSize: "clamp(30px, 4vw, 52px)",
-            fontWeight: 800,
-            letterSpacing: "-0.04em",
-            color: "white",
-            lineHeight: 1.15,
-          }}
+        {/* Headline — cinematic word reveal with parallax */}
+        <motion.div
+          className="mb-20 md:mb-28"
+          style={{ y: yHeadline }}
         >
-          {PHRASES.map((phrase, i) => (
-            <span
-              key={i}
-              style={{
-                display: "inline-block",
-                overflow: "hidden",
-                marginRight: "0.28em",
-                verticalAlign: "bottom",
-                position: "relative",
-              }}
-            >
-              <motion.span
-                style={{
-                  display: "inline-block",
-                  position: "relative",
-                  ...(phrase.dim ? { color: "rgba(255,255,255,0.35)" } : {}),
-                }}
-                className={phrase.shine ? "shine" : ""}
-                initial={{ clipPath: "inset(0 0 100% 0)", y: 8 }}
-                animate={
-                  isInView
-                    ? { clipPath: "inset(0 0 0% 0)", y: 0 }
-                    : { clipPath: "inset(0 0 100% 0)", y: 8 }
-                }
-                transition={{ duration: 0.65, delay: 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+          <h2
+            className="text-[clamp(32px,5vw,56px)] font-extrabold tracking-[-0.04em] text-white leading-[1.1]"
+          >
+            {PHRASES.map((phrase, i) => (
+              <span
+                key={i}
+                className="inline-block overflow-hidden mr-[0.28em] align-bottom relative"
               >
-                {phrase.text}
+                <motion.span
+                  className={`inline-block relative ${phrase.shine ? "shine" : ""}`}
+                  style={phrase.dim ? { color: "rgba(255,255,255,0.30)" } : undefined}
+                  initial={{ clipPath: "inset(0 0 100% 0)", y: 12, filter: "blur(6px)" }}
+                  animate={
+                    isInView
+                      ? { clipPath: "inset(0 0 0% 0)", y: 0, filter: "blur(0px)" }
+                      : { clipPath: "inset(0 0 100% 0)", y: 12, filter: "blur(6px)" }
+                  }
+                  transition={{
+                    duration: 0.7,
+                    delay: 0.08 + i * 0.08,
+                    ease: EASE_FLUID,
+                  }}
+                >
+                  {phrase.text}
 
-                {/* Animated strikethrough on "services." */}
-                {phrase.strike && (
-                  <motion.span
-                    aria-hidden
-                    style={{
-                      position: "absolute",
-                      left: 0, right: 0,
-                      top: "52%",
-                      height: 2,
-                      background: "rgba(255,255,255,0.35)",
-                      transformOrigin: "left",
-                    }}
-                    initial={{ scaleX: 0 }}
-                    animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
-                    transition={{ duration: 0.4, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                )}
-              </motion.span>
-            </span>
-          ))}
-        </div>
+                  {/* Animated strikethrough */}
+                  {phrase.strike && (
+                    <motion.span
+                      aria-hidden
+                      className="absolute left-0 right-0 top-[52%] h-[2px] bg-white/25 origin-left"
+                      initial={{ scaleX: 0 }}
+                      animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
+                      transition={{ duration: 0.5, delay: 0.6, ease: EASE_SMOOTH }}
+                    />
+                  )}
+                </motion.span>
+              </span>
+            ))}
+          </h2>
+        </motion.div>
 
-        {/* Cards */}
+        {/* Asymmetrical Bento Grid */}
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5"
           style={{ perspective: "1200px" }}
         >
           {DIFFERENTIATORS.map((d, i) => (
@@ -360,7 +463,6 @@ export default function WhyMiduva() {
             />
           ))}
         </div>
-
       </div>
     </section>
   )
