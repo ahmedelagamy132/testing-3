@@ -202,7 +202,7 @@ function StepSlide({
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to right, #0F2349 0%, rgba(15,35,73,0.85) 25%, transparent 60%)",
+                "linear-gradient(to right, #020204 0%, rgba(2,2,4,0.92) 25%, transparent 60%)",
             }}
           />
           <div
@@ -210,7 +210,7 @@ function StepSlide({
               position: "absolute",
               inset: 0,
               background:
-                "linear-gradient(to top, #0F2349 0%, transparent 25%), linear-gradient(to bottom, #0F2349 0%, transparent 25%)",
+                "linear-gradient(to top, #020204 0%, transparent 25%), linear-gradient(to bottom, #020204 0%, transparent 25%)",
             }}
           />
         </motion.div>
@@ -299,7 +299,7 @@ export default function HowItWorks() {
         style={{
           position: "relative",
           height: `${STEPS.length * 100}vh`,
-          background: "#0F2349",
+          background: "#020204",
         }}
       >
         {/* Sticky viewport */}
@@ -309,7 +309,7 @@ export default function HowItWorks() {
             top: 0,
             height: "100vh",
             overflow: "hidden",
-            background: "#0F2349",
+            background: "#020204",
           }}
           className="grain"
         >
