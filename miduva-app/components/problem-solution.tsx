@@ -138,37 +138,45 @@ function ProblemCard({
   return (
     <div className={`relative group h-full ${className}`}>
       {/* ── Double-Bezel: Outer Shell ── */}
-      <div className="p-[6px] rounded-[2rem] ring-1 ring-black/[0.06] bg-black/[0.03] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-black/[0.12] group-hover:bg-black/[0.06] h-full">
+      <div className="p-[6px] rounded-[2rem] ring-1 ring-black/[0.06] dark:ring-white/[0.12] bg-black/[0.03] dark:bg-white/[0.05] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-black/[0.12] dark:group-hover:ring-white/[0.20] group-hover:bg-black/[0.06] dark:group-hover:bg-white/[0.08] h-full">
         {/* ── Double-Bezel: Inner Core ── */}
-        <div className="relative overflow-hidden rounded-[calc(2rem-6px)] bg-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_24px_48px_-12px_rgba(15,35,73,0.08)] h-full flex flex-col">
-          {/* Warm radial tint */}
+        <div className="relative overflow-hidden rounded-[calc(2rem-6px)] bg-white dark:bg-[#0e0e18] shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_24px_48px_-12px_rgba(15,35,73,0.08)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_24px_48px_-12px_rgba(0,0,0,0.5)] h-full flex flex-col">
+          {/* Radial tint — light:amber, dark:teal */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none dark:hidden"
             style={{
               background:
                 "radial-gradient(ellipse at 20% 0%, rgba(251,191,36,0.05) 0%, transparent 60%)",
             }}
             aria-hidden
           />
+          <div
+            className="absolute inset-0 pointer-events-none hidden dark:block"
+            style={{
+              background:
+                "radial-gradient(ellipse at 20% 0%, rgba(43,200,183,0.07) 0%, transparent 60%)",
+            }}
+            aria-hidden
+          />
 
           <div className="relative z-10 p-7 md:p-8 flex flex-col gap-5 h-full">
-            {/* Icon + Label row */}
+            {/* Icon + Label row — light:amber, dark:teal */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-400/[0.08] ring-1 ring-amber-400/20 text-amber-500 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-400/[0.08] dark:bg-teal-400/[0.08] ring-1 ring-amber-400/20 dark:ring-teal-400/20 text-amber-500 dark:text-teal-400 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105">
                 <Icon />
               </div>
-              <span className="mono text-[10px] uppercase tracking-[0.2em] text-amber-500/60 font-medium">
+              <span className="mono text-[10px] uppercase tracking-[0.2em] text-amber-500/60 dark:text-teal-400/60 font-medium">
                 {problem.label}
               </span>
             </div>
 
             {/* Title */}
-            <h3 className="text-[20px] md:text-[22px] font-bold tracking-[-0.03em] leading-[1.2] text-[#0B1B3A]">
+            <h3 className="text-[20px] md:text-[22px] font-bold tracking-[-0.03em] leading-[1.2] text-[var(--ink)]">
               {problem.title}
             </h3>
 
             {/* Detail */}
-            <p className="text-[13px] leading-[1.65] text-[#5A6B88]">
+            <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
               {problem.detail}
             </p>
 
@@ -177,12 +185,12 @@ function ProblemCard({
 
             {/* Decorative stat / accent for tall card */}
             {problem.id === "ads" && (
-              <div className="pt-4 mt-auto" style={{ borderTop: "1px solid rgba(0,0,0,0.04)" }}>
+              <div className="pt-4 mt-auto" style={{ borderTop: "1px solid var(--line)" }}>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[32px] md:text-[40px] font-extrabold tracking-[-0.04em] text-[#0B1B3A]/10">
+                  <span className="text-[32px] md:text-[40px] font-extrabold tracking-[-0.04em] text-[var(--ink)]/10">
                     01
                   </span>
-                  <span className="text-[11px] mono uppercase tracking-[0.14em] text-[#5A6B88]/40">
+                  <span className="text-[11px] mono uppercase tracking-[0.14em] text-[var(--muted)]/40">
                     of 3 traps
                   </span>
                 </div>
@@ -190,12 +198,20 @@ function ProblemCard({
             )}
           </div>
 
-          {/* Bottom stress line */}
+          {/* Bottom stress line — light:amber/red, dark:teal */}
           <div
-            className="absolute bottom-0 left-0 right-0 h-[1.5px] pointer-events-none"
+            className="absolute bottom-0 left-0 right-0 h-[1.5px] pointer-events-none dark:hidden"
             style={{
               background:
                 "linear-gradient(90deg, transparent 0%, rgba(251,191,36,0.15) 30%, rgba(239,68,68,0.1) 60%, transparent 100%)",
+            }}
+            aria-hidden
+          />
+          <div
+            className="absolute bottom-0 left-0 right-0 h-[1.5px] pointer-events-none hidden dark:block"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent 0%, rgba(43,200,183,0.18) 40%, rgba(43,200,183,0.08) 70%, transparent 100%)",
             }}
             aria-hidden
           />
@@ -393,8 +409,7 @@ export default function ProblemSolution() {
       {/* ── Tall scroll track ── */}
       <div
         ref={outerRef}
-        className="relative h-[300vh] md:h-[350vh] w-full"
-        style={{ background: "#F8F9FB" }}
+        className="relative h-[300vh] md:h-[350vh] w-full bg-[#F8F9FB] dark:bg-[#020204]"
       >
         <NoiseOverlay />
 
@@ -419,11 +434,11 @@ export default function ProblemSolution() {
             {/* Section header — fades with the bento */}
             <div className="mb-10 md:mb-12 text-center md:text-left">
               <div className="inline-flex mb-4">
-                <span className="mono text-[10px] uppercase tracking-[0.2em] text-[#2BC8B7] font-medium px-3 py-1 rounded-full bg-[#2BC8B7]/[0.06] ring-1 ring-[#2BC8B7]/15">
+                <span className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--teal-500)] font-medium px-3 py-1 rounded-full bg-[var(--teal-500)]/[0.06] ring-1 ring-[var(--teal-500)]/15">
                   / the problem
                 </span>
               </div>
-              <h2 className="text-[36px] md:text-[52px] lg:text-[64px] font-extrabold tracking-[-0.04em] text-[#0B1B3A] leading-[1.05]">
+              <h2 className="text-[36px] md:text-[52px] lg:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
                 Three traps that
                 <br className="hidden md:block" />
                 {" "}kill growth.
@@ -465,12 +480,11 @@ export default function ProblemSolution() {
           >
             <div className="w-full max-w-5xl mx-auto">
               {/* Double-Bezel Outer Shell */}
-              <div className="p-[6px] rounded-[2rem] bg-[#0F2349]/[0.08] ring-1 ring-[#0F2349]/10">
+              <div className="p-[6px] rounded-[2rem] bg-[#0F2349]/[0.08] dark:bg-white/[0.03] ring-1 ring-[#0F2349]/10 dark:ring-white/[0.08]">
                 {/* Double-Bezel Inner Core */}
                 <div
                   ref={solutionInnerRef}
-                  className="relative overflow-hidden rounded-[calc(2rem-6px)]"
-                  style={{ background: "#0F2349" }}
+                  className="relative overflow-hidden rounded-[calc(2rem-6px)] bg-[#0F2349] dark:bg-[#020204]"
                 >
                   {/* Teal glow — top left */}
                   <div
@@ -496,7 +510,7 @@ export default function ProblemSolution() {
                   <div className="relative z-10 px-8 py-12 md:px-14 md:py-16 lg:px-20 lg:py-20 flex flex-col gap-7 md:gap-8">
                     {/* Eyebrow */}
                     <div ref={eyebrowRef} className="inline-flex">
-                      <span className="mono text-[10px] uppercase tracking-[0.2em] text-[#2BC8B7] font-medium px-3 py-1 rounded-full bg-[#2BC8B7]/[0.08] ring-1 ring-[#2BC8B7]/15">
+                      <span className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--teal-500)] font-medium px-3 py-1 rounded-full bg-[var(--teal-500)]/[0.08] ring-1 ring-[var(--teal-500)]/15">
                         / the solution
                       </span>
                     </div>
@@ -548,11 +562,11 @@ export default function ProblemSolution() {
                       <a
                         href="#cta"
                         className="group/btn inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full text-[13px] font-semibold transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98]"
-                        style={{ background: "#2BC8B7", color: "#0F2349" }}
+                        style={{ background: "#2BC8B7", color: "#020204" }}
                       >
                         <span>See How It Works</span>
                         {/* Button-in-Button Trailing Icon */}
-                        <span className="w-8 h-8 rounded-full bg-[#0F2349]/10 flex items-center justify-center transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/btn:translate-x-1 group-hover/btn:-translate-y-[1px] group-hover/btn:scale-105">
+                        <span className="w-8 h-8 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/btn:translate-x-1 group-hover/btn:-translate-y-[1px] group-hover/btn:scale-105">
                           <IconArrowUpRight />
                         </span>
                       </a>

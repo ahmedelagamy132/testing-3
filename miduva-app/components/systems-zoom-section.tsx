@@ -140,7 +140,7 @@ function ZoomToFirstSystem() {
 
 	return (
 		<div ref={containerRef} className="relative h-[500vh] w-full">
-			<div className="sticky top-0 h-screen w-full overflow-hidden bg-white">
+			<div className="sticky top-0 h-screen w-full overflow-hidden bg-white dark:bg-[#020204]">
 
 				{/* Background zoom images — fade out as center takes over */}
 				<motion.div style={{ opacity: bgOpacity }} className="absolute inset-0">
@@ -194,13 +194,13 @@ function ZoomToFirstSystem() {
 						}}
 					>
 						<div className="inline-flex items-center gap-2 mb-5">
-							<span className="mono text-[11px] uppercase tracking-[0.22em] text-white/80 bg-[var(--navy-900)] px-2.5 py-1 rounded-full">
-								{system.num}
-							</span>
-							<span className="w-5 h-px bg-[var(--muted)]" />
-							<span className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--teal-500)] font-semibold">
-								{system.label}
-							</span>
+						<span className="mono text-[11px] uppercase tracking-[0.22em] text-white/80 bg-[#0F2349] dark:bg-[#020204] px-2.5 py-1 rounded-full">
+							{system.num}
+						</span>
+						<span className="w-5 h-px bg-[var(--muted)]" />
+						<span className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--teal-500)] font-semibold">
+							{system.label}
+						</span>
 						</div>
 						<h3
 							className="text-[32px] md:text-[52px] font-extrabold text-[var(--navy-900)] tracking-[-0.035em] leading-[1.05] mb-5"
@@ -326,7 +326,7 @@ function SystemsScrollReveal() {
 	}, []);
 
 	return (
-		<div ref={containerRef} className="relative w-full h-screen bg-white overflow-hidden">
+		<div ref={containerRef} className="relative w-full h-screen bg-white dark:bg-[#020204] overflow-hidden">
 			<div
 				aria-hidden="true"
 				className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.04),transparent_60%)]"
@@ -361,15 +361,15 @@ function SystemsScrollReveal() {
 								ref={(el) => { textRefs.current[localI] = el; }}
 								className="md:[direction:ltr] order-2 will-change-transform"
 							>
-								<div className="inline-flex items-center gap-2 mb-5">
-									<span className="mono text-[11px] uppercase tracking-[0.22em] text-white/80 bg-[var(--navy-900)] px-2.5 py-1 rounded-full">
-										{system.num}
-									</span>
-									<span className="w-5 h-px bg-[var(--muted)]" />
-									<span className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--teal-500)] font-semibold">
-										{system.label}
-									</span>
-								</div>
+							<div className="inline-flex items-center gap-2 mb-5">
+								<span className="mono text-[11px] uppercase tracking-[0.22em] text-white/80 bg-[#0F2349] dark:bg-[#020204] px-2.5 py-1 rounded-full">
+									{system.num}
+								</span>
+								<span className="w-5 h-px bg-[var(--muted)]" />
+								<span className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--teal-500)] font-semibold">
+									{system.label}
+								</span>
+							</div>
 								<h3
 									className="text-[32px] md:text-[52px] font-extrabold text-[var(--navy-900)] tracking-[-0.035em] leading-[1.05] mb-5"
 									style={{ whiteSpace: 'pre-line' }}
