@@ -56,10 +56,9 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
     { n: "Get Started",  h: "#cta"    },
   ]
 
-  // The header's clip-path is GSAP-driven from the hero's scroll timeline,
-  // so it stays in lockstep with the scan beam. Translate-y handles the
-  // cinematic footer reveal independently.
   const hiddenForFooter = isHidden
+  // Hide the nav during the intro animation; slide in once reveal completes
+  const hiddenForIntro = !heroRevealed
 
   const linkBase =
     "uppercase tracking-[0.14em] text-[11.5px] font-medium transition"
@@ -71,7 +70,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
     <header
       ref={ref}
       className={`fixed top-0 inset-x-0 z-40 px-3 transition-transform duration-500 will-change-transform ${
-        hiddenForFooter ? "-translate-y-[150%]" : "translate-y-0"
+        hiddenForFooter || hiddenForIntro ? "-translate-y-[150%]" : "translate-y-0"
       }`}
     >
       <nav

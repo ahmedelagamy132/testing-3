@@ -2,112 +2,71 @@
 
 import type React from "react"
 import Image from "next/image"
-import { useId, useLayoutEffect, useRef } from "react"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useEffect, useRef, useState } from "react"
 
 interface SvgMaskHeroProps {
   text?: string
+  onRevealComplete?: () => void
+  children?: React.ReactNode
+  // Kept for backward compatibility with existing call sites; unused.
   overlayColor?: string
   scrollLength?: number
   endScale?: number
-  onRevealComplete?: () => void
   onRevealReverse?: () => void
-  children?: React.ReactNode
+  scanTarget?: React.RefObject<HTMLElement | null>
 }
+
+type Phase = "intro" | "split" | "done"
+
+const LETTER_STAGGER_MS = 75
+const LETTER_RISE_MS = 600
+const HOLD_MS = 350
+const SPLIT_MS = 800
 
 export default function SvgMaskHero({
   text = "Miduva",
-  overlayColor = "#0b1220",
-  scrollLength = 2200,
-  endScale = 38,
   onRevealComplete,
-  onRevealReverse,
   children,
 }: SvgMaskHeroProps) {
-  const sectionRef = useRef<HTMLElement>(null)
-  const textGroupRef = useRef<SVGGElement>(null)
-  const fillRef = useRef<SVGRectElement>(null)
-  const contentRef = useRef<HTMLDivElement>(null)
+  const [phase, setPhase] = useState<Phase>("intro")
   const hintRef = useRef<HTMLDivElement>(null)
-  const maskId = `miduva-text-mask-${useId().replace(/:/g, "")}`
-  // Track whether we've already fired the reveal callback so onUpdate doesn't spam it
-  const revealFiredRef = useRef(false)
 
-  useLayoutEffect(() => {
-    const section = sectionRef.current
-    const textGroup = textGroupRef.current
-    const fillRect = fillRef.current
-    const content = contentRef.current
-    const hint = hintRef.current
-    if (!section || !textGroup || !fillRect || !content) return
+  useEffect(() => {
+    const cascadeEnd = (text.length - 1) * LETTER_STAGGER_MS + LETTER_RISE_MS
+    const splitAt = cascadeEnd + HOLD_MS
+    // Fire reveal slightly before split fully ends so nav transition feels live
+    const revealAt = splitAt + SPLIT_MS - 250
 
-    gsap.registerPlugin(ScrollTrigger)
-
-    gsap.set(textGroup, { svgOrigin: "800 450", scale: 1 })
-    gsap.set(content, { opacity: 0, y: 30 })
-    revealFiredRef.current = false
-
-    // Threshold (0–1) at which hero content starts appearing → nav should show
-    const NAV_THRESHOLD = 0.68
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: "top top",
-        end: `+=${scrollLength}`,
-        scrub: 0.4,
-        pin: true,
-        anticipatePin: 1,
-        onUpdate: (self) => {
-          if (self.progress >= NAV_THRESHOLD && !revealFiredRef.current) {
-            revealFiredRef.current = true
-            onRevealComplete?.()
-          } else if (self.progress < NAV_THRESHOLD && revealFiredRef.current) {
-            revealFiredRef.current = false
-            onRevealReverse?.()
-          }
-        },
-        onEnterBack: () => {
-          if (revealFiredRef.current) {
-            revealFiredRef.current = false
-            onRevealReverse?.()
-          }
-        },
-      },
-    })
-
-    // Phase 1 (0% → 70%): zoom the text-shaped hole until it covers the screen
-    tl.to(textGroup, { scale: endScale, ease: "power1.in", duration: 0.7 }, 0)
-    tl.to(fillRect, { opacity: 1, ease: "power1.in", duration: 0.7 }, 0)
-    // Phase 2 (70% → 100%): fade in the hero content over the revealed background
-    tl.to(content, { opacity: 1, y: 0, ease: "power2.out", duration: 0.3 }, 0.7)
-
-    let hintTween: gsap.core.Tween | null = null
-    if (hint) {
-      hintTween = gsap.to(hint, {
-        opacity: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: `+=${scrollLength * 0.1}`,
-          scrub: true,
-        },
-      })
-    }
+    const t1 = window.setTimeout(() => setPhase("split"), splitAt)
+    const t2 = window.setTimeout(() => {
+      setPhase("done")
+      onRevealComplete?.()
+    }, revealAt)
 
     return () => {
-      tl.scrollTrigger?.kill()
-      tl.kill()
-      hintTween?.scrollTrigger?.kill()
-      hintTween?.kill()
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
     }
-  }, [endScale, scrollLength, onRevealComplete, onRevealReverse])
+  }, [text, onRevealComplete])
+
+  // Fade scroll hint as the user scrolls
+  useEffect(() => {
+    if (phase !== "done") return
+    const hint = hintRef.current
+    if (!hint) return
+    const onScroll = () => {
+      const y = window.scrollY
+      const o = Math.max(0, 1 - y / 220)
+      hint.style.opacity = String(o)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [phase])
+
+  const letters = Array.from(text)
 
   return (
     <section
-      ref={sectionRef}
       style={{
         position: "relative",
         width: "100%",
@@ -116,7 +75,7 @@ export default function SvgMaskHero({
         backgroundColor: "#05081a",
       }}
     >
-      {/* Atmospheric backdrop — sits BEHIND the illustration to give it depth */}
+      {/* Atmospheric backdrop — sits BEHIND the illustration */}
       <div className="hero-backdrop" aria-hidden>
         <div className="hb-base" />
         <div className="hb-orb hb-orb-cyan" />
@@ -126,7 +85,7 @@ export default function SvgMaskHero({
         <div className="hb-conic" />
       </div>
 
-      {/* Background illustration — full-bleed cover, anchored to the right */}
+      {/* Background illustration */}
       <div className="hero-illustration" aria-hidden>
         <Image
           src="/hero-bg-image.png"
@@ -138,9 +97,75 @@ export default function SvgMaskHero({
         />
       </div>
 
-      {/* Vignette layered above the image: darkens the left for text legibility,
-          fades the image edges into the atmospheric backdrop */}
+      {/* Vignette for text legibility */}
       <div className="hb-vignette" aria-hidden />
+
+      {/* Hero content — fades in once the wordmark splits */}
+      <div className={`hero-content-wrap ${phase !== "intro" ? "in" : ""}`}>
+        {children}
+      </div>
+
+      {/* Intro overlay: solid dark "curtains" + letter cascade, then vertical split */}
+      {phase !== "done" && (
+        <div
+          className={`hero-intro ${phase === "split" ? "is-split" : ""}`}
+          aria-label={text}
+          role="img"
+        >
+          {/* Dark curtains that split open to reveal the hero */}
+          <div className="hero-curtain hero-curtain-top" aria-hidden />
+          <div className="hero-curtain hero-curtain-bottom" aria-hidden />
+
+          {/* Wordmark sits above the curtains; halves slide out with them */}
+          <div className="hero-wordmark">
+            <div className="hero-half hero-half-top" aria-hidden>
+              {letters.map((c, i) => (
+                <span
+                  key={`t-${i}`}
+                  className="hero-letter"
+                  style={{ animationDelay: `${i * LETTER_STAGGER_MS}ms` }}
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+            <div className="hero-half hero-half-bottom" aria-hidden>
+              {letters.map((c, i) => (
+                <span
+                  key={`b-${i}`}
+                  className="hero-letter"
+                  style={{ animationDelay: `${i * LETTER_STAGGER_MS}ms` }}
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Hairline that briefly traces the split line */}
+          <div className="hero-split-line" aria-hidden />
+        </div>
+      )}
+
+      {phase === "done" && (
+        <div
+          ref={hintRef}
+          className="scroll-hint hero-hint-in"
+          style={{ zIndex: 3, color: "rgba(255,255,255,0.55)" }}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+          >
+            <path d="M12 5v14M5 12l7 7 7-7" />
+          </svg>
+          scroll
+        </div>
+      )}
 
       <style jsx>{`
         .hero-backdrop {
@@ -150,31 +175,15 @@ export default function SvgMaskHero({
           overflow: hidden;
           pointer-events: none;
         }
-        .hero-illustration {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          pointer-events: none;
-          /* Mix the illustration with the glow behind it */
-          mix-blend-mode: screen;
-          filter: drop-shadow(0 0 60px rgba(0, 180, 255, 0.18))
-            drop-shadow(0 0 120px rgba(140, 70, 255, 0.12));
-          animation: hb-float 9s ease-in-out infinite alternate;
-        }
-        @keyframes hb-float {
-          from { transform: translateY(0); }
-          to { transform: translateY(-10px); }
-        }
         .hb-base {
           position: absolute;
           inset: 0;
-          background:
-            radial-gradient(
-              120% 90% at 75% 50%,
-              #0a1633 0%,
-              #060a1f 55%,
-              #03050f 100%
-            );
+          background: radial-gradient(
+            120% 90% at 75% 50%,
+            #0a1633 0%,
+            #060a1f 55%,
+            #03050f 100%
+          );
         }
         .hb-orb {
           position: absolute;
@@ -271,6 +280,170 @@ export default function SvgMaskHero({
               transparent 75%
             );
         }
+
+        .hero-illustration {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+          mix-blend-mode: screen;
+          filter: drop-shadow(0 0 60px rgba(0, 180, 255, 0.18))
+            drop-shadow(0 0 120px rgba(140, 70, 255, 0.12));
+          animation: hb-float 9s ease-in-out infinite alternate;
+        }
+
+        /* Hero content fades in as the split begins */
+        .hero-content-wrap {
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          opacity: 0;
+          transform: translateY(18px);
+          transition:
+            opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+            transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .hero-content-wrap.in {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* Intro overlay */
+        .hero-intro {
+          position: absolute;
+          inset: 0;
+          z-index: 4;
+          display: grid;
+          place-items: center;
+          pointer-events: none;
+          background: transparent;
+        }
+
+        /* Solid dark curtains — cover everything during intro,
+           split open along the vertical center to reveal the hero */
+        .hero-curtain {
+          position: absolute;
+          left: 0;
+          right: 0;
+          height: 50%;
+          background:
+            radial-gradient(
+              80% 100% at 50% 100%,
+              rgba(10, 22, 51, 1) 0%,
+              rgba(3, 5, 15, 1) 100%
+            );
+          will-change: transform;
+          transition: transform 0.85s cubic-bezier(0.7, 0, 0.2, 1);
+        }
+        .hero-curtain-top {
+          top: 0;
+          background:
+            radial-gradient(
+              80% 100% at 50% 100%,
+              rgba(10, 22, 51, 1) 0%,
+              rgba(3, 5, 15, 1) 100%
+            );
+        }
+        .hero-curtain-bottom {
+          bottom: 0;
+          background:
+            radial-gradient(
+              80% 100% at 50% 0%,
+              rgba(10, 22, 51, 1) 0%,
+              rgba(3, 5, 15, 1) 100%
+            );
+        }
+        .hero-intro.is-split .hero-curtain-top {
+          transform: translateY(-100%);
+        }
+        .hero-intro.is-split .hero-curtain-bottom {
+          transform: translateY(100%);
+        }
+
+        /* Hairline that briefly glows along the split seam */
+        .hero-split-line {
+          position: absolute;
+          top: 50%;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: linear-gradient(
+            to right,
+            transparent 0%,
+            rgba(0, 200, 255, 0.7) 30%,
+            rgba(140, 70, 255, 0.7) 70%,
+            transparent 100%
+          );
+          opacity: 0;
+          transform: scaleX(0.2);
+          transform-origin: center;
+          transition:
+            opacity 0.25s ease,
+            transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .hero-intro.is-split .hero-split-line {
+          opacity: 1;
+          transform: scaleX(1);
+        }
+
+        .hero-wordmark {
+          position: relative;
+          line-height: 1;
+          z-index: 2;
+        }
+        .hero-half {
+          font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+          font-weight: 900;
+          font-size: clamp(72px, 13vw, 200px);
+          letter-spacing: -0.05em;
+          color: #ffffff;
+          white-space: nowrap;
+          line-height: 1;
+          will-change: transform, opacity;
+          transition:
+            transform 0.8s cubic-bezier(0.7, 0, 0.25, 1),
+            opacity 0.55s ease 0.05s;
+        }
+        .hero-half-top {
+          clip-path: inset(0 0 50% 0);
+        }
+        .hero-half-bottom {
+          position: absolute;
+          inset: 0;
+          clip-path: inset(50% 0 0 0);
+        }
+        .hero-intro.is-split .hero-half-top {
+          transform: translateY(-70vh);
+          opacity: 0;
+        }
+        .hero-intro.is-split .hero-half-bottom {
+          transform: translateY(70vh);
+          opacity: 0;
+        }
+
+        .hero-letter {
+          display: inline-block;
+          opacity: 0;
+          transform: translateY(40%);
+          animation: hero-letter-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        @keyframes hero-letter-in {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .hero-hint-in {
+          opacity: 0;
+          animation: hero-hint-in 0.6s ease 0.1s forwards;
+        }
+        @keyframes hero-hint-in {
+          to {
+            opacity: 1;
+          }
+        }
+
         @keyframes hb-drift-a {
           from { transform: translate(0, 0) scale(1); }
           to { transform: translate(-4vw, 3vw) scale(1.08); }
@@ -287,93 +460,25 @@ export default function SvgMaskHero({
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
+        @keyframes hb-float {
+          from { transform: translateY(0); }
+          to { transform: translateY(-10px); }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .hb-orb,
-          .hb-conic {
+          .hb-conic,
+          .hero-illustration {
             animation: none;
+          }
+          .hero-letter {
+            animation-duration: 0.001s;
+          }
+          .hero-half {
+            transition-duration: 0.001s;
           }
         }
       `}</style>
-
-      {/* Dark overlay with a text-shaped hole. As the text scales up, the hole
-          grows until the entire overlay is "punched out" and the bg is fully visible. */}
-      <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 1600 900"
-        preserveAspectRatio="xMidYMid slice"
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 1,
-          pointerEvents: "none",
-        }}
-        aria-hidden
-      >
-        <defs>
-          <mask id={maskId} maskUnits="userSpaceOnUse">
-            <rect x="-2000" y="-2000" width="5600" height="4900" fill="white" />
-            <rect ref={fillRef} x="0" y="0" width="1600" height="900" fill="black" opacity="0" />
-            <g ref={textGroupRef}>
-              <text
-                x="800"
-                y="450"
-                textAnchor="middle"
-                dominantBaseline="central"
-                fill="black"
-                fontSize="260"
-                fontWeight={900}
-                letterSpacing="-10"
-                style={{
-                  fontFamily:
-                    "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
-                }}
-              >
-                {text}
-              </text>
-            </g>
-          </mask>
-        </defs>
-        <rect
-          x="-2000"
-          y="-2000"
-          width="5600"
-          height="4900"
-          fill={overlayColor}
-          mask={`url(#${maskId})`}
-        />
-      </svg>
-
-      {/* Hero content fades in over the revealed background */}
-      <div
-        ref={contentRef}
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 2,
-          willChange: "opacity, transform",
-        }}
-      >
-        {children}
-      </div>
-
-      <div
-        ref={hintRef}
-        className="scroll-hint"
-        style={{ zIndex: 3, color: "rgba(255,255,255,0.55)" }}
-      >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-        >
-          <path d="M12 5v14M5 12l7 7 7-7" />
-        </svg>
-        scroll
-      </div>
     </section>
   )
 }
