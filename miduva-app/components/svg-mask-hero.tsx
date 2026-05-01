@@ -28,37 +28,17 @@ export default function SvgMaskHero({
   onRevealComplete,
   children,
 }: SvgMaskHeroProps) {
-  const [phase, setPhase] = useState<Phase>("intro")
+  const [phase] = useState<Phase>("done")
   const hintRef = useRef<HTMLDivElement>(null)
 
-  // Lock scroll during the intro animation so users can't skip past it
+  // Signal nav immediately since intro animation is disabled
   useEffect(() => {
-    document.body.style.overflow = "hidden"
-    return () => { document.body.style.overflow = "" }
-  }, [])
-
-  useEffect(() => {
-    const cascadeEnd = (text.length - 1) * LETTER_STAGGER_MS + LETTER_RISE_MS
-    const splitAt = cascadeEnd + HOLD_MS
-    // Fire reveal slightly before split fully ends so nav transition feels live
-    const revealAt = splitAt + SPLIT_MS - 250
-
-    const t1 = window.setTimeout(() => setPhase("split"), splitAt)
-    const t2 = window.setTimeout(() => {
-      setPhase("done")
-      document.body.style.overflow = ""
-      onRevealComplete?.()
-    }, revealAt)
-
-    return () => {
-      window.clearTimeout(t1)
-      window.clearTimeout(t2)
-    }
-  }, [text, onRevealComplete])
+    onRevealComplete?.()
+  }, [onRevealComplete])
 
   // Fade scroll hint as the user scrolls
   useEffect(() => {
-    if (phase !== "done") return
+    // if (phase !== "done") return
     const hint = hintRef.current
     if (!hint) return
     const onScroll = () => {
@@ -84,12 +64,12 @@ export default function SvgMaskHero({
     >
       {/* Atmospheric backdrop — sits BEHIND the illustration */}
       <div className="hero-backdrop" aria-hidden>
-        <div className="hb-base" />
-        <div className="hb-orb hb-orb-cyan" />
+        {/* <div className="hb-base" /> */}
+        {/* <div className="hb-orb hb-orb-cyan" />
         <div className="hb-orb hb-orb-blue" />
-        <div className="hb-orb hb-orb-violet" />
-        <div className="hb-grid" />
-        <div className="hb-conic" />
+        <div className="hb-orb hb-orb-violet" /> */}
+        {/* <div className="hb-grid" /> */}
+        {/* <div className="hb-conic" /> */}
       </div>
 
       {/* Background illustration */}
@@ -105,31 +85,28 @@ export default function SvgMaskHero({
       </div>
 
       {/* Vignette for text legibility */}
-      <div className="hb-vignette" aria-hidden />
+      {/* <div className="hb-vignette" aria-hidden /> */}
 
       {/* Hero content — fades in once the wordmark splits */}
       <div
         className="hero-content-wrap"
         style={{
-          opacity: phase !== "intro" ? 1 : 0,
-          transform: phase !== "intro" ? "translateY(0)" : "translateY(18px)",
+          opacity: 1,
+          transform: "translateY(0)",
         }}
       >
         {children}
       </div>
 
       {/* Intro overlay: solid dark "curtains" + letter cascade, then vertical split */}
-      {phase !== "done" && (
+      {/* {phase !== "done" && (
         <div
           className={`hero-intro ${phase === "split" ? "is-split" : ""}`}
           aria-label={text}
           role="img"
         >
-          {/* Dark curtains that split open to reveal the hero */}
           <div className="hero-curtain hero-curtain-top" aria-hidden />
           <div className="hero-curtain hero-curtain-bottom" aria-hidden />
-
-          {/* Wordmark sits above the curtains; halves slide out with them */}
           <div className="hero-wordmark">
             <div className="hero-half hero-half-top" aria-hidden>
               {letters.map((c, i) => (
@@ -154,13 +131,11 @@ export default function SvgMaskHero({
               ))}
             </div>
           </div>
-
-          {/* Hairline that briefly traces the split line */}
           <div className="hero-split-line" aria-hidden />
         </div>
-      )}
+      )} */}
 
-      {phase === "done" && (
+      {/* {phase === "done" && ( */}
         <div
           ref={hintRef}
           className="scroll-hint hero-hint-in"
@@ -178,7 +153,7 @@ export default function SvgMaskHero({
           </svg>
           scroll
         </div>
-      )}
+      {/* )} */}
 
       <style jsx>{`
         .hero-backdrop {
@@ -299,9 +274,9 @@ export default function SvgMaskHero({
           inset: 0;
           z-index: 0;
           pointer-events: none;
-          mix-blend-mode: screen;
-          filter: drop-shadow(0 0 60px rgba(0, 180, 255, 0.18))
-            drop-shadow(0 0 120px rgba(140, 70, 255, 0.12));
+          /* mix-blend-mode: screen; */
+          /* filter: drop-shadow(0 0 60px rgba(0, 180, 255, 0.18))
+            drop-shadow(0 0 120px rgba(140, 70, 255, 0.12)); */
           animation: hb-float 9s ease-in-out infinite alternate;
         }
 

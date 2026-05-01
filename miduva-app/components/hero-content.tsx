@@ -26,8 +26,8 @@ export default function HeroContent() {
         inset: 0,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
-        padding: "0 clamp(24px, 5vw, 72px)",
+        justifyContent: "flex-start",
+        padding: "clamp(120px, 20vh, 200px) clamp(24px, 5vw, 72px) clamp(40px, 6vh, 80px)",
       }}
     >
       <div style={{ maxWidth: "clamp(280px, 42vw, 620px)" }}>

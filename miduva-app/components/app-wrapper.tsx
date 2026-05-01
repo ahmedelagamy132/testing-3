@@ -39,7 +39,7 @@ function MetaStrip() {
 
 export function AppWrapper() {
   const [theme, setTheme] = useState<"dark" | "light">("dark")
-  const [heroRevealed, setHeroRevealed] = useState(false)
+  const [heroRevealed, setHeroRevealed] = useState(true)
   const navRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
