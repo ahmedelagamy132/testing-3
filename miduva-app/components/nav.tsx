@@ -60,11 +60,15 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
   // Hide the nav during the intro animation; slide in once reveal completes
   const hiddenForIntro = !heroRevealed
 
+  const useWhite = !scrolled || theme === "dark"
+
   const linkBase =
     "uppercase tracking-[0.14em] text-[11.5px] font-medium transition"
-  const linkColor = scrolled
-    ? "text-[var(--muted)] hover:text-[var(--navy-900)]"
-    : "text-white/75 hover:text-white"
+  const linkColor = useWhite
+    ? "text-white/75 hover:text-white"
+    : "text-[var(--muted)] hover:text-[var(--navy-900)]"
+
+  const logoSrc = useWhite ? "/assets/miduva-logo-white.png" : "/assets/miduva-logo.png"
 
   return (
     <header
@@ -91,7 +95,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
 
           <a href="#" className="flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/miduva-logo-white.png" alt="Miduva" className="h-7 w-auto" />
+            <img src={logoSrc} alt="Miduva" className="h-7 w-auto" />
           </a>
 
           <div className="flex items-center justify-end gap-8">
@@ -106,9 +110,9 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle theme"
               className={`h-8 w-8 rounded-full flex items-center justify-center transition hover:text-[var(--teal-500)] ${
-                scrolled
-                  ? "text-[var(--navy-900)]"
-                  : "text-white/80 hover:text-white"
+                useWhite
+                  ? "text-white/80 hover:text-white"
+                  : "text-[var(--navy-900)]"
               }`}
             >
               {theme === "dark" ? (
@@ -128,14 +132,18 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
         <div className="lg:hidden flex items-center justify-between px-5 py-3">
           <a href="#" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/miduva-logo-white.png" alt="Miduva" className="h-7 w-auto" />
+            <img src={logoSrc} alt="Miduva" className="h-7 w-auto" />
           </a>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle theme"
-              className="h-9 w-9 rounded-lg border border-[var(--line)] flex items-center justify-center text-[var(--navy-900)]"
+              className={`h-9 w-9 rounded-lg border flex items-center justify-center transition ${
+                useWhite
+                  ? "border-white/20 text-white/80"
+                  : "border-[var(--line)] text-[var(--navy-900)]"
+              }`}
             >
               {theme === "dark" ? (
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -150,7 +158,11 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
             </button>
             <button
               onClick={() => setOpen(!open)}
-              className="p-2 rounded-lg border border-[var(--line)]"
+              className={`p-2 rounded-lg border transition ${
+                useWhite
+                  ? "border-white/20 text-white/80"
+                  : "border-[var(--line)] text-[var(--navy-900)]"
+              }`}
               aria-label="menu"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -99,35 +99,48 @@ export default function ParallaxSection() {
               </div>
             </div>
 
-            {/* Layer 4 — pipeline card */}
+            {/* Layer 4 — pipeline card, anchored bottom-right */}
             <div data-parallax-layer="4" className="parallax__layer">
               <div
                 style={{
-                  marginTop: "42vh",
+                  position: "absolute",
+                  bottom: 52,
+                  right: 52,
                   background: "var(--card)",
                   border: "1px solid var(--line)",
                   borderRadius: 20,
-                  padding: 20,
-                  width: 360,
-                  boxShadow: "0 40px 80px -30px rgba(15,35,73,.35)",
+                  padding: "18px 20px",
+                  width: 300,
+                  boxShadow: "0 32px 64px -24px rgba(15,35,73,.4), 0 0 0 1px rgba(255,255,255,0.04)",
+                  transform: "rotate(1.5deg)",
                 }}
               >
-                <div className="mono" style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)" }}>
-                  Pipeline · live
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                  <div className="mono" style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)" }}>
+                    Pipeline · live
+                  </div>
+                  <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                    <span style={{
+                      width: 7, height: 7, borderRadius: "50%",
+                      background: "var(--teal-500)",
+                      boxShadow: "0 0 0 3px rgba(0,198,160,0.25)",
+                      display: "inline-block",
+                    }} />
+                  </span>
                 </div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: "var(--navy-900)", letterSpacing: "-.02em", marginTop: 4 }}>
+                <div style={{ fontSize: 26, fontWeight: 800, color: "var(--navy-900)", letterSpacing: "-.02em", marginTop: 2 }}>
                   $482,120
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, fontSize: 12, color: "var(--teal-500)", fontWeight: 600 }}>
                   <span>▲ 21.4%</span>
                   <span style={{ color: "var(--muted)", fontWeight: 400 }}>vs last Q</span>
                 </div>
-                <div style={{ height: 1, background: "var(--line)", margin: "14px 0" }} />
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 56 }}>
+                <div style={{ height: 1, background: "var(--line)", margin: "12px 0" }} />
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 52 }}>
                   {bars.map((h, i) => (
                     <div
                       key={i}
-                      style={{ flex: 1, height: `${h * 0.85}%`, background: "var(--teal-500)", borderRadius: 2 }}
+                      style={{ flex: 1, height: `${h * 0.85}%`, background: "var(--teal-500)", borderRadius: 2, opacity: 0.7 + i * 0.025 }}
                     />
                   ))}
                 </div>

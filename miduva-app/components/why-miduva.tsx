@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import {
   motion,
   useMotionValue,
@@ -9,6 +9,18 @@ import {
   useInView,
   useScroll,
 } from "motion/react"
+
+function useIsDark() {
+  const [isDark, setIsDark] = useState(true)
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
+    check()
+    const observer = new MutationObserver(check)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+    return () => observer.disconnect()
+  }, [])
+  return isDark
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    DATA
@@ -130,10 +142,12 @@ function DifferentiatorCard({
   data,
   index,
   isParentInView,
+  isDark,
 }: {
   data: (typeof DIFFERENTIATORS)[number]
   index: number
   isParentInView: boolean
+  isDark: boolean
 }) {
   const cardRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(cardRef, { once: true, margin: "-60px" })
@@ -169,7 +183,7 @@ function DifferentiatorCard({
     >
       {/* ── Double-Bezel Outer Shell ── */}
       <motion.div
-        className="relative h-full p-[5px] rounded-[2rem] bg-white/[0.03] ring-1 ring-white/[0.08] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-white/[0.16] group-hover:bg-white/[0.05]"
+        className={`relative h-full p-[5px] rounded-[2rem] ring-1 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDark ? "bg-white/[0.03] ring-white/[0.08] group-hover:ring-white/[0.16] group-hover:bg-white/[0.05]" : "bg-[var(--chip)] ring-[var(--line)] group-hover:ring-[var(--teal-500)]/30 group-hover:bg-[var(--paper-2)]"}`}
         style={{
           rotateX,
           rotateY,
@@ -191,7 +205,7 @@ function DifferentiatorCard({
       >
         {/* ── Inner Core ── */}
         <div
-          className="relative h-full overflow-hidden rounded-[calc(2rem-5px)] bg-[#08080c] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)] transition-shadow duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_0_40px_rgba(43,200,183,0.06)]"
+          className={`relative h-full overflow-hidden rounded-[calc(2rem-5px)] transition-shadow duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDark ? "bg-[#08080c] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_0_40px_rgba(43,200,183,0.06)]" : "bg-[var(--card)] shadow-[inset_0_1px_1px_rgba(15,35,73,0.06)] group-hover:shadow-[inset_0_1px_1px_rgba(15,35,73,0.1),0_0_40px_rgba(43,200,183,0.06)]"}`}
         >
           {/* Ambient top-right teal glow */}
           <div
@@ -211,21 +225,21 @@ function DifferentiatorCard({
               {/* Eyebrow + Icon row */}
               <div className="flex items-center gap-3 mb-5">
                 {/* Icon pill — nested circular wrapper */}
-                <div className="w-10 h-10 rounded-xl bg-white/[0.04] ring-1 ring-white/[0.1] flex items-center justify-center flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-teal-500/30 group-hover:bg-teal-500/10">
+                <div className={`w-10 h-10 rounded-xl ring-1 flex items-center justify-center flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-teal-500/30 group-hover:bg-teal-500/10 ${isDark ? "bg-white/[0.04] ring-white/[0.1]" : "bg-[var(--chip)] ring-[var(--line)]"}`}>
                   <Icon className="w-[18px] h-[18px] text-teal-400/80 transition-colors duration-500 group-hover:text-teal-400" />
                 </div>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-white/30 mono">
+                <span className={`text-[10px] uppercase tracking-[0.2em] font-medium mono ${isDark ? "text-white/30" : "text-[var(--muted)]"}`}>
                   {data.subtitle}
                 </span>
               </div>
 
               {/* Title */}
-              <h3 className="text-[clamp(18px,1.8vw,26px)] font-extrabold text-white tracking-[-0.03em] leading-[1.15] mb-3">
+              <h3 className={`text-[clamp(18px,1.8vw,26px)] font-extrabold tracking-[-0.03em] leading-[1.15] mb-3 ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
                 {data.title}
               </h3>
 
               {/* Teal underline */}
-              <div className="h-[2px] bg-white/[0.06] rounded-full overflow-hidden mb-5 max-w-[120px]">
+              <div className={`h-[2px] rounded-full overflow-hidden mb-5 max-w-[120px] ${isDark ? "bg-white/[0.06]" : "bg-[var(--line)]"}`}>
                 <motion.div
                   className="h-full bg-teal-500 rounded-full origin-left"
                   initial={{ scaleX: 0 }}
@@ -236,7 +250,7 @@ function DifferentiatorCard({
 
               {/* Contrast comparison */}
               <div className="flex flex-col gap-2">
-                <span className="text-[13px] text-white/25 line-through decoration-white/15 leading-relaxed">
+                <span className={`text-[13px] line-through leading-relaxed ${isDark ? "text-white/25 decoration-white/15" : "text-[var(--muted)]/50 decoration-[var(--muted)]/30"}`}>
                   {data.oldWay}
                 </span>
                 <div className="flex items-center gap-2">
@@ -268,10 +282,10 @@ function DifferentiatorCard({
                   ))}
                 </div>
                 <div className="text-right">
-                  <div className="text-[28px] md:text-[36px] font-extrabold text-white tracking-[-0.04em] leading-none">
+                  <div className={`text-[28px] md:text-[36px] font-extrabold tracking-[-0.04em] leading-none ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
                     4.8×
                   </div>
-                  <div className="text-[10px] uppercase tracking-[0.18em] text-white/25 mono mt-1">
+                  <div className={`text-[10px] uppercase tracking-[0.18em] mono mt-1 ${isDark ? "text-white/25" : "text-[var(--muted)]"}`}>
                     Avg. ROAS
                   </div>
                 </div>
@@ -282,7 +296,7 @@ function DifferentiatorCard({
           {/* Giant ambient number */}
           <div
             aria-hidden
-            className="absolute bottom-[-16px] right-2 text-[clamp(80px,10vw,140px)] font-extrabold text-white/[0.04] leading-none tracking-[-0.06em] pointer-events-none select-none mono transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-[-4px] group-hover:text-white/[0.06]"
+            className={`absolute bottom-[-16px] right-2 text-[clamp(80px,10vw,140px)] font-extrabold leading-none tracking-[-0.06em] pointer-events-none select-none mono transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-[-4px] ${isDark ? "text-white/[0.04] group-hover:text-white/[0.06]" : "text-[var(--ink)]/[0.04] group-hover:text-[var(--ink)]/[0.06]"}`}
           >
             {data.num}
           </div>
@@ -299,6 +313,7 @@ function DifferentiatorCard({
 export default function WhyMiduva() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" })
+  const isDark = useIsDark()
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -316,7 +331,8 @@ export default function WhyMiduva() {
     <section
       ref={sectionRef}
       id="why-miduva"
-      className="relative overflow-hidden bg-[#020204]"
+      className="relative overflow-hidden"
+      style={{ background: isDark ? "#020204" : "var(--paper)" }}
     >
       {/* ═══════ GRAIN OVERLAY (section-scoped) ═══════ */}
       <div
@@ -338,7 +354,7 @@ export default function WhyMiduva() {
       >
         <span
           className="block text-[clamp(180px,22vw,380px)] font-extrabold tracking-[-0.06em] leading-none mono"
-          style={{ color: "rgba(255,255,255,0.015)" }}
+          style={{ color: isDark ? "rgba(255,255,255,0.015)" : "rgba(15,35,73,0.04)" }}
         >
           WHY
         </span>
@@ -391,7 +407,7 @@ export default function WhyMiduva() {
 
         {/* Eyebrow tag */}
         <motion.div
-          className="inline-flex items-center rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium bg-white/[0.04] ring-1 ring-white/[0.1] text-teal-400 mb-8 mono"
+          className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium ring-1 text-teal-400 mb-8 mono ${isDark ? "bg-white/[0.04] ring-white/[0.1]" : "bg-[var(--chip)] ring-[var(--line)]"}`}
           initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
           animate={
             isInView
@@ -409,7 +425,7 @@ export default function WhyMiduva() {
           style={{ y: yHeadline }}
         >
           <h2
-            className="text-[clamp(32px,5vw,56px)] font-extrabold tracking-[-0.04em] text-white leading-[1.1]"
+            className={`text-[clamp(32px,5vw,56px)] font-extrabold tracking-[-0.04em] leading-[1.1] ${isDark ? "text-white" : "text-[var(--ink)]"}`}
           >
             {PHRASES.map((phrase, i) => (
               <span
@@ -418,7 +434,7 @@ export default function WhyMiduva() {
               >
                 <motion.span
                   className={`inline-block relative ${phrase.shine ? "shine" : ""}`}
-                  style={phrase.dim ? { color: "rgba(255,255,255,0.30)" } : undefined}
+                  style={phrase.dim ? { color: isDark ? "rgba(255,255,255,0.30)" : "rgba(11,27,58,0.30)" } : undefined}
                   initial={{ clipPath: "inset(0 0 100% 0)", y: 12, filter: "blur(6px)" }}
                   animate={
                     isInView
@@ -437,7 +453,7 @@ export default function WhyMiduva() {
                   {phrase.strike && (
                     <motion.span
                       aria-hidden
-                      className="absolute left-0 right-0 top-[52%] h-[2px] bg-white/25 origin-left"
+                      className={`absolute left-0 right-0 top-[52%] h-[2px] origin-left ${isDark ? "bg-white/25" : "bg-[var(--ink)]/25"}`}
                       initial={{ scaleX: 0 }}
                       animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
                       transition={{ duration: 0.5, delay: 0.6, ease: EASE_SMOOTH }}
@@ -460,6 +476,7 @@ export default function WhyMiduva() {
               data={d}
               index={i}
               isParentInView={isInView}
+              isDark={isDark}
             />
           ))}
         </div>

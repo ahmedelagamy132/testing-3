@@ -1,8 +1,20 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "motion/react"
+
+function useIsDark() {
+  const [isDark, setIsDark] = useState(true)
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
+    check()
+    const observer = new MutationObserver(check)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+    return () => observer.disconnect()
+  }, [])
+  return isDark
+}
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const STEPS = [
@@ -49,10 +61,12 @@ function StepSlide({
   step,
   index,
   progress,
+  isDark,
 }: {
   step: (typeof STEPS)[number]
   index: number
   progress: ReturnType<typeof useScroll>["scrollYProgress"]
+  isDark: boolean
 }) {
   // Each slide is active during its quarter of the scroll range
   const slideStart = index / STEPS.length
@@ -130,7 +144,7 @@ function StepSlide({
             fontWeight: 800,
             lineHeight: 1.1,
             letterSpacing: "-0.03em",
-            color: "white",
+            color: isDark ? "white" : "var(--ink)",
             margin: "0 0 clamp(12px, 1.5vw, 24px) 0",
             maxWidth: 600,
           }}
@@ -143,7 +157,7 @@ function StepSlide({
           style={{
             fontSize: "clamp(15px, 1.2vw, 20px)",
             lineHeight: 1.7,
-            color: "rgba(255,255,255,0.55)",
+            color: isDark ? "rgba(255,255,255,0.55)" : "var(--muted)",
             margin: 0,
             maxWidth: 520,
           }}
@@ -201,16 +215,18 @@ function StepSlide({
             style={{
               position: "absolute",
               inset: 0,
-              background:
-                "linear-gradient(to right, #020204 0%, rgba(2,2,4,0.92) 25%, transparent 60%)",
+              background: isDark
+                ? "linear-gradient(to right, #020204 0%, rgba(2,2,4,0.92) 25%, transparent 60%)"
+                : "linear-gradient(to right, #F6F8FC 0%, rgba(246,248,252,0.92) 25%, transparent 60%)",
             }}
           />
           <div
             style={{
               position: "absolute",
               inset: 0,
-              background:
-                "linear-gradient(to top, #020204 0%, transparent 25%), linear-gradient(to bottom, #020204 0%, transparent 25%)",
+              background: isDark
+                ? "linear-gradient(to top, #020204 0%, transparent 25%), linear-gradient(to bottom, #020204 0%, transparent 25%)"
+                : "linear-gradient(to top, #F6F8FC 0%, transparent 25%), linear-gradient(to bottom, #F6F8FC 0%, transparent 25%)",
             }}
           />
         </motion.div>
@@ -234,17 +250,17 @@ function StepSlide({
             gap: 12,
             padding: "10px 20px",
             borderRadius: 100,
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.08)",
+            background: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,35,73,0.05)",
+            border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(15,35,73,0.1)",
             backdropFilter: "blur(12px)",
             fontSize: 13,
             letterSpacing: "0.15em",
             textTransform: "uppercase",
-            color: "rgba(255,255,255,0.5)",
+            color: isDark ? "rgba(255,255,255,0.5)" : "var(--muted)",
           }}
         >
           <span style={{ color: "var(--teal-500)" }}>{step.num}</span>
-          <span style={{ width: 1, height: 12, background: "rgba(255,255,255,0.15)" }} />
+          <span style={{ width: 1, height: 12, background: isDark ? "rgba(255,255,255,0.15)" : "rgba(15,35,73,0.15)" }} />
           <span>0{STEPS.length}</span>
         </div>
       </motion.div>
@@ -253,7 +269,7 @@ function StepSlide({
 }
 
 // ─── Progress Bar ─────────────────────────────────────────────────────────────
-function ProgressBar({ progress }: { progress: ReturnType<typeof useScroll>["scrollYProgress"] }) {
+function ProgressBar({ progress, isDark }: { progress: ReturnType<typeof useScroll>["scrollYProgress"], isDark: boolean }) {
   const scaleX = useTransform(progress, [0, 1], [0, 1])
 
   return (
@@ -265,7 +281,7 @@ function ProgressBar({ progress }: { progress: ReturnType<typeof useScroll>["scr
         right: 0,
         height: 3,
         zIndex: 100,
-        background: "rgba(255,255,255,0.06)",
+        background: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,35,73,0.1)",
       }}
     >
       <motion.div
@@ -288,10 +304,12 @@ export default function HowItWorks() {
     target: sectionRef,
     offset: ["start start", "end end"],
   })
+  const isDark = useIsDark()
+  const bg = isDark ? "#020204" : "var(--paper)"
 
   return (
     <>
-      <ProgressBar progress={scrollYProgress} />
+      <ProgressBar progress={scrollYProgress} isDark={isDark} />
 
       <section
         ref={sectionRef}
@@ -299,7 +317,7 @@ export default function HowItWorks() {
         style={{
           position: "relative",
           height: `${STEPS.length * 100}vh`,
-          background: "#020204",
+          background: bg,
         }}
       >
         {/* Sticky viewport */}
@@ -309,7 +327,7 @@ export default function HowItWorks() {
             top: 0,
             height: "100vh",
             overflow: "hidden",
-            background: "#020204",
+            background: bg,
           }}
           className="grain"
         >
@@ -374,7 +392,7 @@ export default function HowItWorks() {
                 fontSize: "clamp(24px, 3vw, 42px)",
                 fontWeight: 800,
                 letterSpacing: "-0.04em",
-                color: "white",
+                color: isDark ? "white" : "var(--ink)",
                 lineHeight: 1.1,
                 margin: 0,
               }}
@@ -386,7 +404,7 @@ export default function HowItWorks() {
 
           {/* Slides */}
           {STEPS.map((step, i) => (
-            <StepSlide key={step.id} step={step} index={i} progress={scrollYProgress} />
+            <StepSlide key={step.id} step={step} index={i} progress={scrollYProgress} isDark={isDark} />
           ))}
         </div>
       </section>
