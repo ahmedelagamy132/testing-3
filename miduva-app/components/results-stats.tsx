@@ -24,6 +24,17 @@ function useCountUp(target: number, duration = 1900, started: boolean) {
   return count
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
+  }, [])
+  return isMobile
+}
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const STATS = [
   {
@@ -78,7 +89,7 @@ function StatItem({
         {/* Animated number — blurs in as it counts */}
         <motion.span
           style={{
-            fontSize: "clamp(72px, 11vw, 136px)",
+            fontSize: "clamp(56px, 12vw, 136px)",
             fontWeight: 800,
             letterSpacing: "-0.05em",
             color: "var(--navy-900)",
@@ -101,7 +112,7 @@ function StatItem({
         {/* Suffix — pulses teal when count lands */}
         <motion.span
           style={{
-            fontSize: "clamp(36px, 5.5vw, 72px)",
+            fontSize: "clamp(28px, 6vw, 72px)",
             fontWeight: 800,
             letterSpacing: "-0.04em",
             fontFamily: "var(--font-jakarta)",
@@ -166,6 +177,7 @@ function StatItem({
 export default function ResultsStats() {
   const sectionRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" })
+  const isMobile = useIsMobile()
 
   return (
     <section
@@ -227,25 +239,18 @@ export default function ResultsStats() {
           </p>
         </motion.div>
 
-        {/* Stats — 3-column, divided */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: 0,
-          }}
-          className="grid-cols-1 md:grid-cols-3"
-        >
+        {/* Stats — 3-column on desktop, stacked on mobile */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
           {STATS.map((stat, i) => (
             <div
               key={stat.id}
-              style={{
+              style={isMobile ? {
+                padding: "32px 0",
+                borderBottom: i < STATS.length - 1 ? "1px solid var(--line)" : "none",
+              } : {
                 paddingRight: i < STATS.length - 1 ? "clamp(24px, 4vw, 64px)" : 0,
                 paddingLeft: i > 0 ? "clamp(24px, 4vw, 64px)" : 0,
-                borderRight:
-                  i < STATS.length - 1
-                    ? "1px solid var(--line)"
-                    : "none",
+                borderRight: i < STATS.length - 1 ? "1px solid var(--line)" : "none",
               }}
             >
               <StatItem stat={stat} started={isInView} />
