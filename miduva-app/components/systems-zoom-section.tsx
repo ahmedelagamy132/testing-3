@@ -100,7 +100,7 @@ function SystemText({ system }: { system: System }) {
 	return (
 		<>
 			<div className="inline-flex items-center gap-2 mb-5">
-				<span className="mono text-[11px] uppercase tracking-[0.22em] text-white/80 bg-[var(--navy-900)] px-2.5 py-1 rounded-full">
+				<span className="mono text-[11px] uppercase tracking-[0.22em] text-white bg-[#0F2349] dark:bg-white dark:text-[#0F2349] px-2.5 py-1 rounded-full">
 					{system.num}
 				</span>
 				<span className="w-5 h-px bg-[var(--muted)]" />
