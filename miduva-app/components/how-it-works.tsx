@@ -16,6 +16,17 @@ function useIsDark() {
   return isDark
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768)
+    check()
+    window.addEventListener("resize", check)
+    return () => window.removeEventListener("resize", check)
+  }, [])
+  return isMobile
+}
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const STEPS = [
   {
@@ -62,11 +73,13 @@ function StepSlide({
   index,
   progress,
   isDark,
+  isMobile,
 }: {
   step: (typeof STEPS)[number]
   index: number
   progress: ReturnType<typeof useScroll>["scrollYProgress"]
   isDark: boolean
+  isMobile?: boolean
 }) {
   // Each slide is active during its quarter of the scroll range
   const slideStart = index / STEPS.length
@@ -94,99 +107,20 @@ function StepSlide({
         position: "absolute",
         inset: 0,
         display: "flex",
-        alignItems: "center",
+        alignItems: isMobile ? "flex-end" : "center",
         justifyContent: "center",
         pointerEvents: "none",
       }}
     >
-      {/* ── Left: Text ── */}
-      <motion.div
-        style={{
-          position: "relative",
-          zIndex: 20,
-          width: "50%",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          padding: "clamp(40px, 6vw, 120px)",
-          y: textY,
-          opacity: textOpacity,
-        }}
-      >
-        {/* Giant number */}
-        <motion.div
-          style={{
-            scale: numScale,
-            opacity: numOpacity,
-          }}
-          className="mono"
-        >
-          <div
-            style={{
-              fontSize: "clamp(64px, 10vw, 160px)",
-              fontWeight: 800,
-              lineHeight: 1,
-              letterSpacing: "-0.04em",
-              color: "var(--teal-500)",
-              marginBottom: "clamp(16px, 2vw, 32px)",
-              textShadow: "0 0 60px rgba(43,200,183,0.25)",
-            }}
-          >
-            {step.num}
-          </div>
-        </motion.div>
-
-        {/* Title */}
-        <h3
-          style={{
-            fontSize: "clamp(28px, 3.5vw, 56px)",
-            fontWeight: 800,
-            lineHeight: 1.1,
-            letterSpacing: "-0.03em",
-            color: isDark ? "white" : "var(--ink)",
-            margin: "0 0 clamp(12px, 1.5vw, 24px) 0",
-            maxWidth: 600,
-          }}
-        >
-          {step.title}
-        </h3>
-
-        {/* Description */}
-        <p
-          style={{
-            fontSize: "clamp(15px, 1.2vw, 20px)",
-            lineHeight: 1.7,
-            color: isDark ? "rgba(255,255,255,0.55)" : "var(--muted)",
-            margin: 0,
-            maxWidth: 520,
-          }}
-        >
-          {step.description}
-        </p>
-
-        {/* Accent line */}
-        <div
-          style={{
-            marginTop: "clamp(24px, 3vw, 48px)",
-            width: 60,
-            height: 3,
-            borderRadius: 2,
-            background: "var(--teal-500)",
-            boxShadow: "0 0 20px rgba(43,200,183,0.4)",
-          }}
-        />
-      </motion.div>
-
-      {/* ── Right: Image ── */}
+      {/* ── Background Image ── */}
       <motion.div
         style={{
           position: "absolute",
-          right: 0,
+          right: isMobile ? undefined : 0,
           top: 0,
-          width: "55%",
+          width: isMobile ? "100%" : "55%",
           height: "100%",
-          x: imageX,
+          x: isMobile ? undefined : imageX,
           opacity: imageOpacity,
           overflow: "hidden",
         }}
@@ -206,38 +140,142 @@ function StepSlide({
             unoptimized
             style={{
               objectFit: "cover",
-              objectPosition: "center",
+              objectPosition: isMobile ? "center top" : "center",
             }}
           />
 
-          {/* Gradient overlays for seamless blending */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: isDark
-                ? "linear-gradient(to right, #020204 0%, rgba(2,2,4,0.92) 25%, transparent 60%)"
-                : "linear-gradient(to right, #F6F8FC 0%, rgba(246,248,252,0.92) 25%, transparent 60%)",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              background: isDark
-                ? "linear-gradient(to top, #020204 0%, transparent 25%), linear-gradient(to bottom, #020204 0%, transparent 25%)"
-                : "linear-gradient(to top, #F6F8FC 0%, transparent 25%), linear-gradient(to bottom, #F6F8FC 0%, transparent 25%)",
-            }}
-          />
+          {/* Desktop: side gradient blending */}
+          {!isMobile && (
+            <>
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: isDark
+                    ? "linear-gradient(to right, #020204 0%, rgba(2,2,4,0.92) 25%, transparent 60%)"
+                    : "linear-gradient(to right, #F6F8FC 0%, rgba(246,248,252,0.92) 25%, transparent 60%)",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: isDark
+                    ? "linear-gradient(to top, #020204 0%, transparent 25%), linear-gradient(to bottom, #020204 0%, transparent 25%)"
+                    : "linear-gradient(to top, #F6F8FC 0%, transparent 25%), linear-gradient(to bottom, #F6F8FC 0%, transparent 25%)",
+                }}
+              />
+            </>
+          )}
+
+          {/* Mobile: heavy bottom-to-top gradient for text legibility */}
+          {isMobile && (
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: isDark
+                  ? "linear-gradient(to top, rgba(2,2,4,0.98) 0%, rgba(2,2,4,0.85) 35%, rgba(2,2,4,0.4) 65%, rgba(2,2,4,0.15) 100%)"
+                  : "linear-gradient(to top, rgba(246,248,252,0.98) 0%, rgba(246,248,252,0.85) 35%, rgba(246,248,252,0.4) 65%, rgba(246,248,252,0.15) 100%)",
+              }}
+            />
+          )}
         </motion.div>
+      </motion.div>
+
+      {/* ── Text ── */}
+      <motion.div
+        style={{
+          position: "relative",
+          zIndex: 20,
+          width: isMobile ? "100%" : "50%",
+          height: isMobile ? "auto" : "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: isMobile ? "flex-end" : "center",
+          padding: isMobile
+            ? "24px 24px 100px"
+            : "clamp(40px, 6vw, 120px)",
+          y: textY,
+          opacity: textOpacity,
+        }}
+      >
+        {/* Giant number */}
+        <motion.div
+          style={{
+            scale: numScale,
+            opacity: numOpacity,
+          }}
+          className="mono"
+        >
+          <div
+            style={{
+              fontSize: isMobile
+                ? "clamp(48px, 14vw, 80px)"
+                : "clamp(64px, 10vw, 160px)",
+              fontWeight: 800,
+              lineHeight: 1,
+              letterSpacing: "-0.04em",
+              color: "var(--teal-500)",
+              marginBottom: isMobile ? 12 : "clamp(16px, 2vw, 32px)",
+              textShadow: "0 0 60px rgba(43,200,183,0.25)",
+            }}
+          >
+            {step.num}
+          </div>
+        </motion.div>
+
+        {/* Title */}
+        <h3
+          style={{
+            fontSize: isMobile
+              ? "clamp(24px, 7vw, 36px)"
+              : "clamp(28px, 3.5vw, 56px)",
+            fontWeight: 800,
+            lineHeight: 1.1,
+            letterSpacing: "-0.03em",
+            color: isDark ? "white" : "var(--ink)",
+            margin: "0 0 clamp(12px, 1.5vw, 24px) 0",
+            maxWidth: isMobile ? "100%" : 600,
+          }}
+        >
+          {step.title}
+        </h3>
+
+        {/* Description */}
+        <p
+          style={{
+            fontSize: isMobile
+              ? "clamp(14px, 4vw, 16px)"
+              : "clamp(15px, 1.2vw, 20px)",
+            lineHeight: 1.7,
+            color: isDark ? "rgba(255,255,255,0.75)" : "var(--muted)",
+            margin: 0,
+            maxWidth: isMobile ? "100%" : 520,
+          }}
+        >
+          {step.description}
+        </p>
+
+        {/* Accent line */}
+        <div
+          style={{
+            marginTop: isMobile ? 20 : "clamp(24px, 3vw, 48px)",
+            width: 60,
+            height: 3,
+            borderRadius: 2,
+            background: "var(--teal-500)",
+            boxShadow: "0 0 20px rgba(43,200,183,0.4)",
+          }}
+        />
       </motion.div>
 
       {/* Step indicator pill */}
       <motion.div
         style={{
           position: "absolute",
-          bottom: "clamp(32px, 4vw, 64px)",
-          left: "clamp(40px, 6vw, 120px)",
+          bottom: isMobile ? 24 : "clamp(32px, 4vw, 64px)",
+          left: isMobile ? 24 : "clamp(40px, 6vw, 120px)",
           zIndex: 30,
           opacity: textOpacity,
         }}
@@ -305,6 +343,7 @@ export default function HowItWorks() {
     offset: ["start start", "end end"],
   })
   const isDark = useIsDark()
+  const isMobile = useIsMobile()
   const bg = isDark ? "#020204" : "var(--paper)"
 
   return (
@@ -371,8 +410,15 @@ export default function HowItWorks() {
               left: 0,
               right: 0,
               zIndex: 50,
-              padding: "clamp(32px, 4vw, 64px) clamp(40px, 6vw, 120px)",
+              padding: isMobile
+                ? "24px 24px 20px"
+                : "clamp(32px, 4vw, 64px) clamp(40px, 6vw, 120px)",
               pointerEvents: "none",
+              background: isMobile
+                ? isDark
+                  ? "linear-gradient(to bottom, #020204 0%, rgba(2,2,4,0.9) 60%, transparent 100%)"
+                  : "linear-gradient(to bottom, #F6F8FC 0%, rgba(246,248,252,0.9) 60%, transparent 100%)"
+                : undefined,
             }}
           >
             <div
@@ -389,7 +435,9 @@ export default function HowItWorks() {
             </div>
             <h2
               style={{
-                fontSize: "clamp(24px, 3vw, 42px)",
+                fontSize: isMobile
+                  ? "clamp(20px, 5.5vw, 28px)"
+                  : "clamp(24px, 3vw, 42px)",
                 fontWeight: 800,
                 letterSpacing: "-0.04em",
                 color: isDark ? "white" : "var(--ink)",
@@ -404,7 +452,7 @@ export default function HowItWorks() {
 
           {/* Slides */}
           {STEPS.map((step, i) => (
-            <StepSlide key={step.id} step={step} index={i} progress={scrollYProgress} isDark={isDark} />
+            <StepSlide key={step.id} step={step} index={i} progress={scrollYProgress} isDark={isDark} isMobile={isMobile} />
           ))}
         </div>
       </section>

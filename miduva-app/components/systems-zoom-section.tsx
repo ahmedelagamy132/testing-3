@@ -437,6 +437,30 @@ function SystemsSection() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
+/*  MOBILE FALLBACK — simple stacked layout (no scroll animation)              */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function MobileSystemsSection() {
+	return (
+		<div className="md:hidden bg-white dark:bg-[#020204] py-12 px-6">
+			{SYSTEMS.map((system) => (
+				<div key={system.id} className="mb-16 last:mb-0">
+					<div className="overflow-hidden rounded-[24px] border border-[var(--line)] mb-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)]">
+						<img
+							src={system.imageUrl}
+							alt={system.label}
+							className="w-full h-[240px] sm:h-[300px] object-cover"
+							loading="lazy"
+							decoding="async"
+						/>
+					</div>
+					<SystemText system={system} />
+				</div>
+			))}
+		</div>
+	);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
 /*  EXPORT                                                                      */
 /* ─────────────────────────────────────────────────────────────────────────── */
 export default function SystemsZoomSection() {
@@ -451,7 +475,7 @@ export default function SystemsZoomSection() {
 					<div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">
 						/ our systems
 					</div>
-					<h2 className="text-[48px] md:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.02]">
+					<h2 className="text-[32px] sm:text-[44px] md:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.02]">
 						Three systems.
 						<br />
 						<span className="text-[var(--teal-500)]">One growth machine.</span>
@@ -459,7 +483,13 @@ export default function SystemsZoomSection() {
 				</div>
 			</div>
 
-			<SystemsSection />
+			{/* Desktop: animated zoom scroll */}
+			<div className="hidden md:block">
+				<SystemsSection />
+			</div>
+
+			{/* Mobile: simple stacked cards */}
+			<MobileSystemsSection />
 		</section>
 	);
 }

@@ -21,6 +21,7 @@ export default function HeroContent() {
 
   return (
     <div
+      className="hero-section"
       style={{
         position: "absolute",
         inset: 0,
@@ -30,7 +31,7 @@ export default function HeroContent() {
         padding: "clamp(120px, 20vh, 200px) clamp(24px, 5vw, 72px) clamp(40px, 6vh, 80px)",
       }}
     >
-      <div style={{ maxWidth: "clamp(280px, 42vw, 620px)" }}>
+      <div className="hero-content-wrapper" style={{ maxWidth: "clamp(280px, 42vw, 620px)" }}>
         <h1
           style={{
             fontFamily:
@@ -104,6 +105,7 @@ export default function HeroContent() {
 
         {/* CTA Buttons */}
         <div
+          className="hero-cta-group"
           style={{
             marginTop: "clamp(24px, 4vh, 44px)",
             display: "flex",
@@ -179,6 +181,17 @@ export default function HeroContent() {
           background: rgba(255, 255, 255, 0.12);
           border-color: rgba(255, 255, 255, 0.32);
           transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+          .hero-section {
+            align-items: center !important;
+          }
+          .hero-content-wrapper {
+            text-align: center !important;
+          }
+          .hero-cta-group {
+            justify-content: center !important;
+          }
         }
       `}</style>
     </div>
