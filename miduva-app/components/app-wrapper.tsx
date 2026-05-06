@@ -8,7 +8,7 @@ import Dashboard from "./dashboard"
 import Services from "./services"
 import ParallaxSection from "./parallax-section"
 import SystemRibbon from "./system-ribbon"
-import TrustedLogos from "./trusted-logos"
+
 import SystemsZoomSection from "./systems-zoom-section"
 import ProblemSolution from "./problem-solution"
 import HowItWorks from "./how-it-works"
@@ -81,7 +81,6 @@ export function AppWrapper() {
         <Services />
 
         <SystemRibbon />
-        <TrustedLogos />
 
         <FreeOffer />
       </main>
