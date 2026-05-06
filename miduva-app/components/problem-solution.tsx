@@ -348,24 +348,7 @@ export default function ProblemSolution() {
         },
       })
 
-      /* ── Phase 1: Bento Reveal (0% → 22%) ── */
-      tl.to(
-        card1Ref.current,
-        { opacity: 1, y: 0, scale: 1, duration: 0.10, ease: easeCustom },
-        0
-      )
-      tl.to(
-        card2Ref.current,
-        { opacity: 1, y: 0, scale: 1, duration: 0.10, ease: easeCustom },
-        0.05
-      )
-      tl.to(
-        card3Ref.current,
-        { opacity: 1, y: 0, scale: 1, duration: 0.10, ease: easeCustom },
-        0.10
-      )
-
-      /* ── Phase 2: Parallax Drift (22% → 48%) ── */
+      /* ── Phase 1: Parallax Drift (0% → 26%) ── */
       tl.to(
         card1Ref.current,
         { y: "-4vh", duration: 0.18, ease: "none" },
@@ -527,7 +510,7 @@ export default function ProblemSolution() {
                 ref={card1Ref}
                 className="md:row-span-2 will-change-transform"
               >
-                <ProblemCard problem={PROBLEMS[0]} />
+                <ProblemCard problem={PROBLEMS[0]} index={0} />
               </div>
 
               {/* Trap 02 */}
@@ -535,7 +518,7 @@ export default function ProblemSolution() {
                 ref={card2Ref}
                 className="will-change-transform"
               >
-                <ProblemCard problem={PROBLEMS[1]} />
+                <ProblemCard problem={PROBLEMS[1]} index={1} />
               </div>
 
               {/* Trap 03 */}
@@ -543,7 +526,7 @@ export default function ProblemSolution() {
                 ref={card3Ref}
                 className="will-change-transform"
               >
-                <ProblemCard problem={PROBLEMS[2]} />
+                <ProblemCard problem={PROBLEMS[2]} index={2} />
               </div>
             </div>
           </div>
