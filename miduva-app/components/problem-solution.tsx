@@ -1,11 +1,30 @@
 "use client"
 
-import { useRef, useLayoutEffect } from "react"
+import { useRef, useState, useLayoutEffect, useEffect } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "motion/react"
 
 /* ─── Register GSAP plugin ─── */
 gsap.registerPlugin(ScrollTrigger)
+
+/* ─── Dark-mode hook ─── */
+function useIsDark() {
+  const [isDark, setIsDark] = useState(true)
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
+    check()
+    const observer = new MutationObserver(check)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+    return () => observer.disconnect()
+  }, [])
+  return isDark
+}
 
 /* ─── Data ─── */
 const PROBLEMS = [
@@ -125,7 +144,7 @@ function NoiseOverlay() {
   )
 }
 
-/* ─── Problem Card (Double-Bezel) ─── */
+/* ─── Problem Card (WhyMiduva Style) ─── */
 function ProblemCard({
   problem,
   className = "",
@@ -133,90 +152,131 @@ function ProblemCard({
   problem: (typeof PROBLEMS)[0]
   className?: string
 }) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  const isDark = useIsDark()
   const Icon = problem.icon === "alert" ? IconAlert : IconClose
 
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
+  const liftY = useMotionValue(0)
+
+  const springCfg = { stiffness: 120, damping: 18 }
+  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-5, 5]), springCfg)
+  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [5, -5]), springCfg)
+  const springY = useSpring(liftY, springCfg)
+
+  const num = problem.label.replace("Trap ", "")
+
   return (
-    <div className={`relative group h-full ${className}`}>
-      {/* ── Double-Bezel: Outer Shell ── */}
-      <div className="p-[6px] rounded-[2rem] ring-1 ring-black/[0.06] dark:ring-white/[0.12] bg-black/[0.03] dark:bg-white/[0.05] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-black/[0.12] dark:group-hover:ring-white/[0.20] group-hover:bg-black/[0.06] dark:group-hover:bg-white/[0.08] h-full">
-        {/* ── Double-Bezel: Inner Core ── */}
-        <div className="relative overflow-hidden rounded-[calc(2rem-6px)] bg-white dark:bg-[#0e0e18] shadow-[inset_0_1px_1px_rgba(255,255,255,0.6),0_24px_48px_-12px_rgba(15,35,73,0.08)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_24px_48px_-12px_rgba(0,0,0,0.5)] h-full flex flex-col">
-          {/* Radial tint — light:amber, dark:teal */}
+    <div className={`relative group h-full ${className}`} style={{ perspective: 900 }}>
+      {/* ── Double-Bezel Outer Shell ── */}
+      <motion.div
+        ref={cardRef}
+        className={`relative h-full p-[5px] rounded-[2rem] ring-1 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          isDark
+            ? "bg-white/[0.03] ring-white/[0.08] group-hover:ring-white/[0.16] group-hover:bg-white/[0.05]"
+            : "bg-[var(--chip)] ring-[var(--line)] group-hover:ring-[var(--teal-500)]/30 group-hover:bg-[var(--paper-2)]"
+        }`}
+        style={{
+          rotateX,
+          rotateY,
+          y: springY,
+          transformStyle: "preserve-3d",
+        }}
+        onMouseMove={(e) => {
+          const rect = cardRef.current?.getBoundingClientRect()
+          if (!rect) return
+          mouseX.set((e.clientX - rect.left) / rect.width * 2 - 1)
+          mouseY.set((e.clientY - rect.top) / rect.height * 2 - 1)
+        }}
+        onMouseEnter={() => liftY.set(-8)}
+        onMouseLeave={() => {
+          mouseX.set(0)
+          mouseY.set(0)
+          liftY.set(0)
+        }}
+      >
+        {/* ── Inner Core ── */}
+        <div
+          className={`relative h-full overflow-hidden rounded-[calc(2rem-5px)] transition-shadow duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            isDark
+              ? "bg-[#08080c] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_0_40px_rgba(43,200,183,0.06)]"
+              : "bg-[var(--card)] shadow-[inset_0_1px_1px_rgba(15,35,73,0.06)] group-hover:shadow-[inset_0_1px_1px_rgba(15,35,73,0.1),0_0_40px_rgba(43,200,183,0.06)]"
+          }`}
+        >
+          {/* Ambient top-right teal glow */}
           <div
-            className="absolute inset-0 pointer-events-none dark:hidden"
-            style={{
-              background:
-                "radial-gradient(ellipse at 20% 0%, rgba(251,191,36,0.05) 0%, transparent 60%)",
-            }}
             aria-hidden
-          />
-          <div
-            className="absolute inset-0 pointer-events-none hidden dark:block"
+            className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none"
             style={{
-              background:
-                "radial-gradient(ellipse at 20% 0%, rgba(43,200,183,0.07) 0%, transparent 60%)",
+              background: "radial-gradient(circle, rgba(43,200,183,0.10) 0%, transparent 70%)",
+              filter: "blur(40px)",
             }}
-            aria-hidden
           />
 
-          <div className="relative z-10 p-7 md:p-8 flex flex-col gap-5 h-full">
-            {/* Icon + Label row — light:amber, dark:teal */}
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-amber-400/[0.08] dark:bg-teal-400/[0.08] ring-1 ring-amber-400/20 dark:ring-teal-400/20 text-amber-500 dark:text-teal-400 transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-105">
-                <Icon />
+          <div className="relative z-10 p-6 md:p-8 flex flex-col h-full">
+            {/* Icon + Label row */}
+            <div className="flex items-center gap-3 mb-5">
+              <div
+                className={`w-10 h-10 rounded-xl ring-1 flex items-center justify-center flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-teal-500/30 group-hover:bg-teal-500/10 ${
+                  isDark ? "bg-white/[0.04] ring-white/[0.1]" : "bg-[var(--chip)] ring-[var(--line)]"
+                }`}
+              >
+                <Icon className="w-[18px] h-[18px] text-teal-400/80 transition-colors duration-500 group-hover:text-teal-400" />
               </div>
-              <span className="mono text-[10px] uppercase tracking-[0.2em] text-amber-500/60 dark:text-teal-400/60 font-medium">
+              <span
+                className={`text-[10px] uppercase tracking-[0.2em] font-medium mono ${
+                  isDark ? "text-white/30" : "text-[var(--muted)]"
+                }`}
+              >
                 {problem.label}
               </span>
             </div>
 
             {/* Title */}
-            <h3 className="text-[20px] md:text-[22px] font-bold tracking-[-0.03em] leading-[1.2] text-[var(--ink)]">
+            <h3
+              className={`text-[20px] md:text-[22px] font-extrabold tracking-[-0.03em] leading-[1.2] mb-3 ${
+                isDark ? "text-white" : "text-[var(--ink)]"
+              }`}
+            >
               {problem.title}
             </h3>
 
+            {/* Teal underline */}
+            <div
+              className={`h-[2px] rounded-full overflow-hidden mb-5 max-w-[120px] ${
+                isDark ? "bg-white/[0.06]" : "bg-[var(--line)]"
+              }`}
+            >
+              <div className="h-full bg-teal-500 rounded-full origin-left scale-x-100" />
+            </div>
+
             {/* Detail */}
-            <p className="text-[13px] leading-[1.65] text-[var(--muted)]">
+            <p
+              className={`text-[13px] leading-[1.65] ${
+                isDark ? "text-white/50" : "text-[var(--muted)]"
+              }`}
+            >
               {problem.detail}
             </p>
 
-            {/* Spacer for tall card */}
+            {/* Spacer */}
             <div className="flex-1 min-h-[20px]" />
-
-            {/* Decorative stat / accent for tall card */}
-            {problem.id === "ads" && (
-              <div className="pt-4 mt-auto" style={{ borderTop: "1px solid var(--line)" }}>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[32px] md:text-[40px] font-extrabold tracking-[-0.04em] text-[var(--ink)]/10">
-                    01
-                  </span>
-                  <span className="text-[11px] mono uppercase tracking-[0.14em] text-[var(--muted)]/40">
-                    of 3 traps
-                  </span>
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Bottom stress line — light:amber/red, dark:teal */}
+          {/* Giant ambient number */}
           <div
-            className="absolute bottom-0 left-0 right-0 h-[1.5px] pointer-events-none dark:hidden"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent 0%, rgba(251,191,36,0.15) 30%, rgba(239,68,68,0.1) 60%, transparent 100%)",
-            }}
             aria-hidden
-          />
-          <div
-            className="absolute bottom-0 left-0 right-0 h-[1.5px] pointer-events-none hidden dark:block"
-            style={{
-              background:
-                "linear-gradient(90deg, transparent 0%, rgba(43,200,183,0.18) 40%, rgba(43,200,183,0.08) 70%, transparent 100%)",
-            }}
-            aria-hidden
-          />
+            className={`absolute bottom-[-16px] right-2 text-[clamp(80px,10vw,140px)] font-extrabold leading-none tracking-[-0.06em] pointer-events-none select-none mono transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-[-4px] ${
+              isDark
+                ? "text-white/[0.04] group-hover:text-white/[0.06]"
+                : "text-[var(--ink)]/[0.04] group-hover:text-[var(--ink)]/[0.06]"
+            }`}
+          >
+            {num}
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
