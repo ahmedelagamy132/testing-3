@@ -414,7 +414,7 @@ export default function ProblemSolution() {
         <NoiseOverlay />
 
         {/* ── Sticky viewport ── */}
-        <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+        <div className="sticky top-0 h-screen w-full overflow-y-auto md:overflow-hidden flex items-center justify-center">
           {/* Ambient background glow */}
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] pointer-events-none"
@@ -432,7 +432,7 @@ export default function ProblemSolution() {
             className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-8"
           >
             {/* Section header — fades with the bento */}
-            <div className="mb-10 md:mb-12 text-center md:text-left">
+            <div className="mb-4 md:mb-10 text-center md:text-left">
               <div className="inline-flex mb-4">
                 <span className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--teal-500)] font-medium px-3 py-1 rounded-full bg-[var(--teal-500)]/[0.06] ring-1 ring-[var(--teal-500)]/15">
                   / the problem
