@@ -56,11 +56,12 @@ export function AppWrapper() {
       <Nav ref={navRef} theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} />
       <main>
         <SvgMaskHero
+          theme={theme}
           onRevealComplete={onRevealComplete}
           onRevealReverse={onRevealReverse}
           scanTarget={navRef}
         >
-          <HeroContent />
+          <HeroContent theme={theme} />
         </SvgMaskHero>
         <SystemsZoomSection />
         <ProblemSolution />

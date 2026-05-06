@@ -14,6 +14,7 @@ interface SvgMaskHeroProps {
   endScale?: number
   onRevealReverse?: () => void
   scanTarget?: React.RefObject<HTMLElement | null>
+  theme?: "dark" | "light"
 }
 
 type Phase = "intro" | "split" | "done"
@@ -27,6 +28,7 @@ export default function SvgMaskHero({
   text = "Miduva",
   onRevealComplete,
   children,
+  theme = "dark",
 }: SvgMaskHeroProps) {
   const [phase] = useState<Phase>("done")
   const hintRef = useRef<HTMLDivElement>(null)
@@ -59,7 +61,7 @@ export default function SvgMaskHero({
         width: "100%",
         height: "100vh",
         overflow: "hidden",
-        backgroundColor: "#05081a",
+        backgroundColor: theme === "dark" ? "#05081a" : "#f4f6fb",
       }}
     >
       {/* Atmospheric backdrop — sits BEHIND the illustration */}
@@ -75,7 +77,7 @@ export default function SvgMaskHero({
       {/* Background illustration */}
       <div className="hero-illustration" aria-hidden>
         <Image
-          src="/hero-bg-image.png"
+          src={theme === "dark" ? "/assets/system-dark.png" : "/assets/system-light.png"}
           alt=""
           fill
           priority
@@ -139,7 +141,7 @@ export default function SvgMaskHero({
         <div
           ref={hintRef}
           className="scroll-hint hero-hint-in"
-          style={{ zIndex: 3, color: "rgba(255,255,255,0.55)" }}
+          style={{ zIndex: 3, color: theme === "dark" ? "rgba(255,255,255,0.55)" : "rgba(15,35,73,0.55)" }}
         >
           <svg
             width="18"

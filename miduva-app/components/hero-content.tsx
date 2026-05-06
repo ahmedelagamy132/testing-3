@@ -4,7 +4,11 @@ import { useState, useEffect } from "react"
 
 const phrases = ["generate leads.", "drive sales.", "scale your business."]
 
-export default function HeroContent() {
+interface HeroContentProps {
+  theme?: "dark" | "light"
+}
+
+export default function HeroContent({ theme = "dark" }: HeroContentProps) {
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
 
@@ -29,6 +33,8 @@ export default function HeroContent() {
         flexDirection: "column",
         justifyContent: "flex-start",
         padding: "clamp(120px, 20vh, 200px) clamp(24px, 5vw, 72px) clamp(40px, 6vh, 80px)",
+        ["--btn-secondary-hover-bg" as any]: theme === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+        ["--btn-secondary-hover-border" as any]: theme === "dark" ? "rgba(255, 255, 255, 0.32)" : "var(--navy-300)",
       }}
     >
       <div className="hero-content-wrapper" style={{ maxWidth: "clamp(280px, 42vw, 620px)" }}>
@@ -41,7 +47,7 @@ export default function HeroContent() {
             lineHeight: 1.05,
             letterSpacing: "-0.03em",
             margin: 0,
-            color: "#fff",
+            color: theme === "dark" ? "#fff" : "var(--navy-900)",
           }}
         >
           We build custom growth systems.
@@ -56,25 +62,25 @@ export default function HeroContent() {
             lineHeight: 1.2,
             letterSpacing: "-0.01em",
             marginTop: 12,
-            color: "rgba(255,255,255,0.55)",
+            color: theme === "dark" ? "rgba(255,255,255,0.55)" : "var(--muted)",
           }}
         >
           Engineered to{" "}
           <span
             className={`phrase-wrap inline-block ${visible ? "p-in" : "p-out"}`}
-            style={{ color: "rgba(255,255,255,0.9)" }}
+            style={{ color: theme === "dark" ? "rgba(255,255,255,0.9)" : "var(--navy-700)" }}
           >
             {phrases[idx]}
           </span>
         </p>
 
-        <div
-          style={{
-            marginTop: "clamp(20px, 3.5vh, 40px)",
-            height: 1,
-            background: "rgba(255,255,255,0.15)",
-          }}
-        />
+          <div
+            style={{
+              marginTop: "clamp(20px, 3.5vh, 40px)",
+              height: 1,
+              background: theme === "dark" ? "rgba(255,255,255,0.15)" : "var(--line)",
+            }}
+          />
 
         <p
           style={{
@@ -84,7 +90,7 @@ export default function HeroContent() {
             letterSpacing: "0.2em",
             lineHeight: 1.7,
             textTransform: "uppercase",
-            color: "rgba(255,255,255,0.45)",
+            color: theme === "dark" ? "rgba(255,255,255,0.45)" : "var(--muted)",
             margin: "16px 0 0",
           }}
         >
@@ -95,7 +101,7 @@ export default function HeroContent() {
           style={{
             fontSize: "clamp(12px, 0.9vw, 14px)",
             lineHeight: 1.75,
-            color: "rgba(255,255,255,0.6)",
+            color: theme === "dark" ? "rgba(255,255,255,0.6)" : "var(--muted)",
             margin: "10px 0 0",
           }}
         >
@@ -151,9 +157,9 @@ export default function HeroContent() {
               gap: 8,
               padding: "clamp(10px,1.1vh,14px) clamp(20px,2vw,32px)",
               borderRadius: 999,
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.18)",
-              color: "rgba(255,255,255,0.85)",
+              background: theme === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
+              border: theme === "dark" ? "1px solid rgba(255,255,255,0.18)" : "1px solid var(--line)",
+              color: theme === "dark" ? "rgba(255,255,255,0.85)" : "var(--navy-700)",
               fontFamily:
                 "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
               fontWeight: 500,
@@ -178,8 +184,8 @@ export default function HeroContent() {
           box-shadow: 0 0 42px rgba(0, 180, 255, 0.55);
         }
         .hero-btn-secondary:hover {
-          background: rgba(255, 255, 255, 0.12);
-          border-color: rgba(255, 255, 255, 0.32);
+          background: var(--btn-secondary-hover-bg);
+          border-color: var(--btn-secondary-hover-border);
           transform: translateY(-2px);
         }
         @media (max-width: 768px) {
