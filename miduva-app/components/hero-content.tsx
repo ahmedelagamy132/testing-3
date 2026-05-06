@@ -1,14 +1,25 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import type { HeroData } from "@/lib/sanity/types"
 
-const phrases = ["generate leads.", "drive sales.", "scale your business."]
+const DEFAULT_PHRASES = ["generate leads.", "drive sales.", "scale your business."]
 
 interface HeroContentProps {
   theme?: "dark" | "light"
+  data?: HeroData
 }
 
-export default function HeroContent({ theme = "dark" }: HeroContentProps) {
+export default function HeroContent({ theme = "dark", data }: HeroContentProps) {
+  const phrases    = data?.phrases?.length ? data.phrases : DEFAULT_PHRASES
+  const headline   = data?.headline    ?? "We build custom growth systems."
+  const tagline    = data?.tagline     ?? "A system that learns, adapts, and accelerates your growth."
+  const body       = data?.body        ?? "No generic services. We design tailored systems using ads, funnels, automation, and data — engineered end-to-end, owned by you."
+  const primaryLabel  = data?.primaryCta?.label  ?? "Get Started"
+  const primaryHref   = data?.primaryCta?.href   ?? "#get-started"
+  const secondaryLabel = data?.secondaryCta?.label ?? "See Our Work"
+  const secondaryHref  = data?.secondaryCta?.href  ?? "#case-studies"
+
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
 
@@ -50,7 +61,7 @@ export default function HeroContent({ theme = "dark" }: HeroContentProps) {
             color: theme === "dark" ? "#fff" : "var(--navy-900)",
           }}
         >
-          We build custom growth systems.
+          {headline}
         </h1>
 
         <p
@@ -94,7 +105,7 @@ export default function HeroContent({ theme = "dark" }: HeroContentProps) {
             margin: "16px 0 0",
           }}
         >
-          A system that learns, adapts, and accelerates your growth.
+          {tagline}
         </p>
 
         <p
@@ -105,8 +116,7 @@ export default function HeroContent({ theme = "dark" }: HeroContentProps) {
             margin: "10px 0 0",
           }}
         >
-          No generic services. We design tailored systems using ads, funnels,
-          automation, and data — engineered end-to-end, owned by you.
+          {body}
         </p>
 
         {/* CTA Buttons */}
@@ -121,7 +131,7 @@ export default function HeroContent({ theme = "dark" }: HeroContentProps) {
         >
           {/* Primary */}
           <a
-            href="#get-started"
+            href={primaryHref}
             className="hero-btn-primary"
             style={{
               display: "inline-flex",
@@ -141,7 +151,7 @@ export default function HeroContent({ theme = "dark" }: HeroContentProps) {
               transition: "transform 0.18s ease, box-shadow 0.18s ease",
             }}
           >
-            Get Started
+            {primaryLabel}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
@@ -149,7 +159,7 @@ export default function HeroContent({ theme = "dark" }: HeroContentProps) {
 
           {/* Secondary */}
           <a
-            href="#case-studies"
+            href={secondaryHref}
             className="hero-btn-secondary"
             style={{
               display: "inline-flex",
@@ -170,7 +180,7 @@ export default function HeroContent({ theme = "dark" }: HeroContentProps) {
               transition: "background 0.18s ease, border-color 0.18s ease, transform 0.18s ease",
             }}
           >
-            See Our Work
+            {secondaryLabel}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>

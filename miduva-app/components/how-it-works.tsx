@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "motion/react"
+import type { HowItWorksData } from "@/lib/sanity/types"
 
 function useIsDark() {
   const [isDark, setIsDark] = useState(true)
@@ -28,14 +29,22 @@ function useIsMobile() {
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-const STEPS = [
+type Step = {
+  id: string
+  num: string
+  title: string
+  description: string
+  imageUrl: string
+}
+
+const DEFAULT_STEPS: Step[] = [
   {
     id: "analyze",
     num: "01",
     title: "Analyze Your Business",
     description:
       "We audit your channels, funnels, and conversion gaps to build a complete picture of where you stand and where the biggest opportunities hide.",
-    image:
+    imageUrl:
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop",
   },
   {
@@ -44,7 +53,7 @@ const STEPS = [
     title: "Build a Custom Strategy",
     description:
       "A system blueprint tailored to your market, audience, and goals — no templates, no guesswork, just a clear plan for growth.",
-    image:
+    imageUrl:
       "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2670&auto=format&fit=crop",
   },
   {
@@ -53,7 +62,7 @@ const STEPS = [
     title: "Launch & Optimize the System",
     description:
       "Everything goes live and gets tuned until it performs. We test, iterate, and refine until every metric is moving in the right direction.",
-    image:
+    imageUrl:
       "https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?q=80&w=2670&auto=format&fit=crop",
   },
   {
@@ -62,10 +71,10 @@ const STEPS = [
     title: "Scale Your Results",
     description:
       "More traffic, better conversions, automated follow-up — compounding returns that grow your business while you focus on what you do best.",
-    image:
+    imageUrl:
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop",
   },
-] as const
+]
 
 // ─── Step Slide ───────────────────────────────────────────────────────────────
 function StepSlide({
@@ -74,30 +83,27 @@ function StepSlide({
   progress,
   isDark,
   isMobile,
+  totalSteps,
 }: {
-  step: (typeof STEPS)[number]
+  step: Step
   index: number
   progress: ReturnType<typeof useScroll>["scrollYProgress"]
   isDark: boolean
   isMobile?: boolean
+  totalSteps: number
 }) {
-  // Each slide is active during its quarter of the scroll range
-  const slideStart = index / STEPS.length
-  const slideEnd = (index + 1) / STEPS.length
+  const slideStart = index / totalSteps
+  const slideEnd = (index + 1) / totalSteps
 
-  // Map global progress to local 0-1 for this slide
   const local = useTransform(progress, [slideStart, slideEnd], [0, 1])
 
-  // Text comes in from bottom
   const textY = useTransform(local, [0, 0.3, 0.7, 1], [120, 0, 0, -120])
   const textOpacity = useTransform(local, [0, 0.15, 0.85, 1], [0, 1, 1, 0])
 
-  // Image comes in from right with parallax
   const imageX = useTransform(local, [0, 0.3, 0.7, 1], [200, 0, 0, -200])
   const imageScale = useTransform(local, [0, 0.3, 0.7, 1], [1.15, 1, 1, 1.15])
   const imageOpacity = useTransform(local, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
 
-  // Number scale / opacity
   const numScale = useTransform(local, [0, 0.25, 0.75, 1], [0.6, 1, 1, 0.6])
   const numOpacity = useTransform(local, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
 
@@ -132,9 +138,8 @@ function StepSlide({
             scale: imageScale,
           }}
         >
-          {/* Image */}
           <Image
-            src={step.image}
+            src={step.imageUrl}
             alt={step.title}
             fill
             unoptimized
@@ -144,7 +149,6 @@ function StepSlide({
             }}
           />
 
-          {/* Desktop: side gradient blending */}
           {!isMobile && (
             <>
               <div
@@ -168,7 +172,6 @@ function StepSlide({
             </>
           )}
 
-          {/* Mobile: heavy bottom-to-top gradient for text legibility */}
           {isMobile && (
             <div
               style={{
@@ -299,7 +302,7 @@ function StepSlide({
         >
           <span style={{ color: "var(--teal-500)" }}>{step.num}</span>
           <span style={{ width: 1, height: 12, background: isDark ? "rgba(255,255,255,0.15)" : "rgba(15,35,73,0.15)" }} />
-          <span>0{STEPS.length}</span>
+          <span>0{totalSteps}</span>
         </div>
       </motion.div>
     </div>
@@ -336,7 +339,11 @@ function ProgressBar({ progress, isDark }: { progress: ReturnType<typeof useScro
 }
 
 // ─── Main export ──────────────────────────────────────────────────────────────
-export default function HowItWorks() {
+export default function HowItWorks({ data }: { data?: HowItWorksData }) {
+  const eyebrow  = data?.eyebrow  ?? "/ how it works"
+  const headline = data?.headline ?? "From audit to scale —"
+  const steps: Step[] = data?.steps?.length ? (data.steps as Step[]) : DEFAULT_STEPS
+
   const sectionRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -355,7 +362,7 @@ export default function HowItWorks() {
         id="how-it-works"
         style={{
           position: "relative",
-          height: `${STEPS.length * 100}vh`,
+          height: `${steps.length * 100}vh`,
           background: bg,
         }}
       >
@@ -431,7 +438,7 @@ export default function HowItWorks() {
                 marginBottom: 12,
               }}
             >
-              / how it works
+              {eyebrow}
             </div>
             <h2
               style={{
@@ -445,14 +452,22 @@ export default function HowItWorks() {
                 margin: 0,
               }}
             >
-              From audit to scale —{" "}
+              {headline}{" "}
               <span className="shine">four steps.</span>
             </h2>
           </div>
 
           {/* Slides */}
-          {STEPS.map((step, i) => (
-            <StepSlide key={step.id} step={step} index={i} progress={scrollYProgress} isDark={isDark} isMobile={isMobile} />
+          {steps.map((step, i) => (
+            <StepSlide
+              key={step.id}
+              step={step}
+              index={i}
+              progress={scrollYProgress}
+              isDark={isDark}
+              isMobile={isMobile}
+              totalSteps={steps.length}
+            />
           ))}
         </div>
       </section>

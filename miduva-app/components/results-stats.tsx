@@ -176,7 +176,7 @@ function StatItem({
 // ─── Main export ──────────────────────────────────────────────────────────────
 export default function ResultsStats() {
   const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" })
+  const isInView = useInView(sectionRef, { once: true, margin: "-20% 0px" })
   const isMobile = useIsMobile()
 
   return (

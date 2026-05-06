@@ -1,39 +1,39 @@
 "use client"
 
-import { forwardRef, useState, useEffect, useRef } from "react"
+import { forwardRef, useState, useEffect } from "react"
+import type { NavData } from "@/lib/sanity/types"
+
+const DEFAULT_LEFT = [
+  { n: "Services",     h: "#services"    },
+  { n: "Systems",      h: "#systems"     },
+  { n: "How it Works", h: "#how-it-works"},
+]
+const DEFAULT_RIGHT = [
+  { n: "Case Studies", h: "#cases"  },
+  { n: "About",        h: "#about"  },
+  { n: "Get Started",  h: "#cta"    },
+]
 
 interface NavProps {
   theme: "dark" | "light"
   setTheme: (t: "dark" | "light") => void
   heroRevealed?: boolean
+  data?: NavData
 }
 
 const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
-  { theme, setTheme, heroRevealed = true },
+  { theme, setTheme, heroRevealed = true, data },
   ref,
 ) {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
 
-  // Capture the scroll position at the moment the hero finishes revealing.
-  // Any scroll beyond that point should pill the nav.
-  const baselineRef = useRef<number | null>(null)
-  useEffect(() => {
-    if (heroRevealed) {
-      baselineRef.current = window.scrollY
-      setScrolled(false)
-    } else {
-      baselineRef.current = null
-      setScrolled(false)
-    }
-  }, [heroRevealed])
-
   useEffect(() => {
     const on = () => {
       const scrollPosition = window.scrollY
-      const baseline = baselineRef.current
-      setScrolled(baseline !== null && scrollPosition - baseline > 4)
+      // Only expand when at the very top of the page (hero section)
+      setScrolled(scrollPosition > 4)
 
       const windowHeight = window.innerHeight
       const docHeight = document.documentElement.scrollHeight
@@ -41,20 +41,13 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
       // Hide navigation when scrolled into the last ~50% of the viewport (during the cinematic footer reveal)
       setIsHidden(docHeight - (scrollPosition + windowHeight) < windowHeight * 0.5)
     }
+    on()
     window.addEventListener("scroll", on, { passive: true })
     return () => window.removeEventListener("scroll", on)
   }, [])
 
-  const leftItems = [
-    { n: "Services",     h: "#services"    },
-    { n: "Systems",      h: "#systems"     },
-    { n: "How it Works", h: "#how-it-works"},
-  ]
-  const rightItems = [
-    { n: "Case Studies", h: "#cases"  },
-    { n: "About",        h: "#about"  },
-    { n: "Get Started",  h: "#cta"    },
-  ]
+  const leftItems = data?.leftLinks?.map((l) => ({ n: l.label, h: l.href })) ?? DEFAULT_LEFT
+  const rightItems = data?.rightLinks?.map((l) => ({ n: l.label, h: l.href })) ?? DEFAULT_RIGHT
 
   const hiddenForFooter = isHidden
   // Hide the nav during the intro animation; slide in once reveal completes

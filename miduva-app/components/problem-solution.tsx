@@ -234,7 +234,7 @@ function ProblemCard({
             }}
           />
 
-          <div className="relative z-10 p-6 md:p-8 flex flex-col h-full">
+          <div className="relative z-10 p-5 md:p-6 lg:p-8 flex flex-col h-full">
             {/* Icon + Label row */}
             <div className="flex items-center gap-3 mb-5">
               <div
@@ -472,7 +472,7 @@ export default function ProblemSolution() {
         <NoiseOverlay />
 
         {/* ── Sticky viewport ── */}
-        <div className="sticky top-0 h-screen w-full overflow-y-auto md:overflow-hidden flex items-center justify-center">
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex items-start lg:items-center justify-center pt-20 md:pt-24 lg:pt-0">
           {/* Ambient background glow */}
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] pointer-events-none"
@@ -490,13 +490,13 @@ export default function ProblemSolution() {
             className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-8"
           >
             {/* Section header — fades with the bento */}
-            <div className="mb-4 md:mb-10 text-center md:text-left">
-              <div className="inline-flex mb-4">
+            <div className="mb-4 md:mb-6 lg:mb-10 text-center md:text-left">
+              <div className="inline-flex mb-3 md:mb-4">
                 <span className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--teal-500)] font-medium px-3 py-1 rounded-full bg-[var(--teal-500)]/[0.06] ring-1 ring-[var(--teal-500)]/15">
                   / the problem
                 </span>
               </div>
-              <h2 className="text-[36px] md:text-[52px] lg:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
+              <h2 className="text-[32px] md:text-[42px] lg:text-[56px] xl:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
                 Three traps that
                 <br className="hidden md:block" />
                 {" "}kill growth.
@@ -504,7 +504,7 @@ export default function ProblemSolution() {
             </div>
 
             {/* Asymmetrical Bento */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 auto-rows-[1fr]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 auto-rows-[1fr]">
               {/* Trap 01 — tall hero card */}
               <div
                 ref={card1Ref}
