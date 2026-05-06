@@ -82,7 +82,7 @@ export default function SvgMaskHero({
           fill
           priority
           unoptimized
-          style={{ objectFit: "contain", objectPosition: "center right" }}
+          style={{ objectFit: "cover", objectPosition: "center" }}
         />
       </div>
 

@@ -83,7 +83,9 @@ export function AppWrapper() {
 
         <SystemRibbon />
 
-        <FreeOffer />
+        <div className="h-12 md:h-20" />
+
+        <FreeOffer theme={theme} />
       </main>
       <CinematicFooter />
     </div>

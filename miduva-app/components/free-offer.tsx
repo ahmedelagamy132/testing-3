@@ -10,15 +10,16 @@ const INCLUDES = [
   "Expert Recommendations",
 ]
 
-export default function FreeOffer() {
+export default function FreeOffer({ theme = "light" }: { theme?: "dark" | "light" }) {
   const sectionRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" })
+  const isDark = theme === "dark"
 
   return (
     <section
       id="cta"
       style={{
-        background: "#0F2349",
+        background: isDark ? "#020204" : "#0F2349",
         position: "relative",
         overflow: "hidden",
         minHeight: "100vh",
@@ -38,7 +39,7 @@ export default function FreeOffer() {
           width: 1000,
           height: 600,
           borderRadius: "50%",
-          background: "radial-gradient(ellipse, rgba(43,200,183,0.16) 0%, transparent 60%)",
+          background: `radial-gradient(ellipse, rgba(43,200,183,${isDark ? "0.20" : "0.16"}) 0%, transparent 60%)`,
           filter: "blur(72px)",
           pointerEvents: "none",
         }}
@@ -51,7 +52,7 @@ export default function FreeOffer() {
           position: "absolute",
           inset: 0,
           backgroundImage:
-            "linear-gradient(rgba(43,200,183,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(43,200,183,0.03) 1px, transparent 1px)",
+            `linear-gradient(rgba(43,200,183,${isDark ? "0.04" : "0.03"}) 1px, transparent 1px), linear-gradient(90deg, rgba(43,200,183,${isDark ? "0.04" : "0.03"}) 1px, transparent 1px)`,
           backgroundSize: "80px 80px",
           pointerEvents: "none",
         }}
@@ -67,7 +68,7 @@ export default function FreeOffer() {
           transform: "translateX(-50%)",
           width: "70%",
           height: 1,
-          background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.40), transparent)",
+          background: `linear-gradient(90deg, transparent, rgba(43,200,183,${isDark ? "0.45" : "0.40"}), transparent)`,
           pointerEvents: "none",
         }}
       />
@@ -142,8 +143,8 @@ export default function FreeOffer() {
                 gap: 8,
                 padding: "9px 18px",
                 borderRadius: 100,
-                background: "rgba(43,200,183,0.07)",
-                border: "1px solid rgba(43,200,183,0.20)",
+                background: isDark ? "rgba(43,200,183,0.10)" : "rgba(43,200,183,0.07)",
+                border: isDark ? "1px solid rgba(43,200,183,0.25)" : "1px solid rgba(43,200,183,0.20)",
                 fontSize: 13,
                 fontWeight: 500,
                 color: "rgba(255,255,255,0.72)",
@@ -184,7 +185,7 @@ export default function FreeOffer() {
                 position: "absolute",
                 inset: -12,
                 borderRadius: 100,
-                background: "rgba(43,200,183,0.25)",
+                background: isDark ? "rgba(43,200,183,0.30)" : "rgba(43,200,183,0.25)",
                 filter: "blur(20px)",
                 pointerEvents: "none",
               }}

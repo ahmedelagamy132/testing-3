@@ -60,7 +60,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
   // Hide the nav during the intro animation; slide in once reveal completes
   const hiddenForIntro = !heroRevealed
 
-  const useWhite = !scrolled || theme === "dark"
+  const useWhite = theme === "dark"
 
   const linkBase =
     "uppercase tracking-[0.14em] text-[11.5px] font-medium transition"

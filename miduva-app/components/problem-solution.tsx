@@ -8,6 +8,7 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
+  useInView,
 } from "motion/react"
 
 /* ─── Register GSAP plugin ─── */
@@ -147,12 +148,16 @@ function NoiseOverlay() {
 /* ─── Problem Card (WhyMiduva Style) ─── */
 function ProblemCard({
   problem,
+  index,
   className = "",
 }: {
   problem: (typeof PROBLEMS)[0]
+  index: number
   className?: string
 }) {
-  const cardRef = useRef<HTMLDivElement>(null)
+  const entranceRef = useRef<HTMLDivElement>(null)
+  const hoverRef = useRef<HTMLDivElement>(null)
+  const isInView = useInView(entranceRef, { once: true, margin: "-60px" })
   const isDark = useIsDark()
   const Icon = problem.icon === "alert" ? IconAlert : IconClose
 
@@ -168,10 +173,25 @@ function ProblemCard({
   const num = problem.label.replace("Trap ", "")
 
   return (
-    <div className={`relative group h-full ${className}`} style={{ perspective: 900 }}>
+    <motion.div
+      ref={entranceRef}
+      className={`relative group h-full ${className}`}
+      style={{ perspective: 900 }}
+      initial={{ opacity: 0, y: 60, scale: 0.96, filter: "blur(8px)" }}
+      animate={
+        isInView
+          ? { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
+          : { opacity: 0, y: 60, scale: 0.96, filter: "blur(8px)" }
+      }
+      transition={{
+        duration: 0.8,
+        delay: 0.15 + index * 0.12,
+        ease: [0.32, 0.72, 0, 1],
+      }}
+    >
       {/* ── Double-Bezel Outer Shell ── */}
       <motion.div
-        ref={cardRef}
+        ref={hoverRef}
         className={`relative h-full p-[5px] rounded-[2rem] ring-1 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${
           isDark
             ? "bg-white/[0.03] ring-white/[0.08] group-hover:ring-white/[0.16] group-hover:bg-white/[0.05]"
@@ -184,7 +204,7 @@ function ProblemCard({
           transformStyle: "preserve-3d",
         }}
         onMouseMove={(e) => {
-          const rect = cardRef.current?.getBoundingClientRect()
+          const rect = hoverRef.current?.getBoundingClientRect()
           if (!rect) return
           mouseX.set((e.clientX - rect.left) / rect.width * 2 - 1)
           mouseY.set((e.clientY - rect.top) / rect.height * 2 - 1)
@@ -277,7 +297,7 @@ function ProblemCard({
           </div>
         </div>
       </motion.div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -308,11 +328,6 @@ export default function ProblemSolution() {
       ]
 
       /* ── Initial states ── */
-      gsap.set(cards, {
-        opacity: 0,
-        y: 60,
-        scale: 0.96,
-      })
       gsap.set(solutionRef.current, {
         scale: 0.65,
         opacity: 0,
