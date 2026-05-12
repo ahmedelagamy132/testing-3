@@ -1,0 +1,23 @@
+# Dependencies (reinstalled inside Docker)
+node_modules
+
+# Build output (rebuilt inside Docker)
+.next
+
+# Local database & uploads (mounted as Docker volumes in production)
+payload.db
+payload.db-shm
+payload.db-wal
+public/media
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Dev tooling
+.git
+.gitignore
+.claude
+*.md
+README*

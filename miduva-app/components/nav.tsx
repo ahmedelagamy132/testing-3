@@ -1,7 +1,7 @@
 "use client"
 
 import { forwardRef, useState, useEffect } from "react"
-import type { NavData } from "@/lib/sanity/types"
+import type { NavData } from "@/lib/types"
 
 const DEFAULT_LEFT = [
   { n: "Services",     h: "#services"    },
@@ -9,9 +9,9 @@ const DEFAULT_LEFT = [
   { n: "How it Works", h: "#how-it-works"},
 ]
 const DEFAULT_RIGHT = [
-  { n: "Case Studies", h: "#cases"  },
-  { n: "About",        h: "#about"  },
-  { n: "Get Started",  h: "#cta"    },
+  { n: "Case Studies", h: "#results"     },
+  { n: "About",        h: "#why-miduva"  },
+  { n: "Get Started",  h: "#cta"         },
 ]
 
 interface NavProps {
@@ -46,8 +46,12 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
     return () => window.removeEventListener("scroll", on)
   }, [])
 
-  const leftItems = data?.leftLinks?.map((l) => ({ n: l.label, h: l.href })) ?? DEFAULT_LEFT
-  const rightItems = data?.rightLinks?.map((l) => ({ n: l.label, h: l.href })) ?? DEFAULT_RIGHT
+  const leftItems = data?.leftLinks?.length
+    ? data.leftLinks.map((l) => ({ n: l.label, h: l.href }))
+    : DEFAULT_LEFT
+  const rightItems = data?.rightLinks?.length
+    ? data.rightLinks.map((l) => ({ n: l.label, h: l.href }))
+    : DEFAULT_RIGHT
 
   const hiddenForFooter = isHidden
   // Hide the nav during the intro animation; slide in once reveal completes
@@ -62,6 +66,17 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
     : "text-[var(--muted)] hover:text-[var(--navy-900)]"
 
   const logoSrc = useWhite ? "/assets/miduva-logo-white.png" : "/assets/miduva-logo.png"
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.startsWith("#")) return
+    e.preventDefault()
+    const id = href.replace("#", "")
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" })
+      setOpen(false)
+    }
+  }
 
   return (
     <header
@@ -81,7 +96,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
           <ul className={`flex items-center justify-start gap-8 ${linkBase} ${linkColor}`}>
             {leftItems.map((i) => (
               <li key={i.n}>
-                <a href={i.h}>{i.n}</a>
+                <a href={i.h} onClick={(e) => handleNavClick(e, i.h)}>{i.n}</a>
               </li>
             ))}
           </ul>
@@ -95,7 +110,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
             <ul className={`flex items-center gap-8 ${linkBase} ${linkColor}`}>
               {rightItems.map((i) => (
                 <li key={i.n}>
-                  <a href={i.h}>{i.n}</a>
+                  <a href={i.h} onClick={(e) => handleNavClick(e, i.h)}>{i.n}</a>
                 </li>
               ))}
             </ul>
@@ -168,7 +183,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
         {open && (
           <div className="lg:hidden px-5 pb-5 border-t border-[var(--line)] pt-3 space-y-3">
             {[...leftItems, ...rightItems].map((i) => (
-              <a key={i.n} href={i.h} className="block text-[var(--muted)] text-sm">
+              <a key={i.n} href={i.h} onClick={(e) => handleNavClick(e, i.h)} className="block text-[var(--muted)] text-sm">
                 {i.n}
               </a>
             ))}

@@ -45,7 +45,7 @@ const DEFAULT_SYSTEMS: System[] = [
 		label: 'Smart Automation System',
 		title: 'Sales & follow-ups\nrunning 24/7.',
 		description:
-			'CRM workflows, AI agents, and email sequences that close deals while you sleep — no extra hires.',
+			'CRM workflows, AI agents, and email sequences that close deals while you sleep, no extra hires.',
 		imageUrl:
 			'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1600&auto=format&fit=crop',
 	},
@@ -78,7 +78,6 @@ const T = {
 	S1_CARD_END:     3.8,
 	S1_TEXT_IN:      3.9,
 	S1_EXIT:         4.3,
-	S1_GONE:         4.8,
 	DOT1_ACTIVE:     3,
 	S2_ENTER:        4.8,
 	S2_SETTLED:      5.6,
@@ -97,35 +96,51 @@ type Side = 'left' | 'right';
 /* ─────────────────────────────────────────────────────────────────────────── */
 function SystemText({ system }: { system: System }) {
 	return (
-		<>
-			<div className="inline-flex items-center gap-2 mb-5">
-				<span className="mono text-[11px] uppercase tracking-[0.22em] text-white bg-[#0F2349] dark:bg-white dark:text-[#0F2349] px-2.5 py-1 rounded-full">
-					{system.num}
-				</span>
-				<span className="w-5 h-px bg-[var(--muted)]" />
-				<span className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--teal-500)] font-semibold">
+		<div className="relative">
+			{/* Ghost number — upper-right architectural anchor, in open space above heading */}
+			<span
+				aria-hidden="true"
+				className="mono pointer-events-none absolute -bottom-4 right-0 select-none text-[9rem] font-extrabold leading-none text-black/[0.07] dark:text-white/[0.14]"
+				style={{ letterSpacing: '-0.04em' }}
+			>
+				{system.num}
+			</span>
+
+			{/* Eyebrow */}
+			<div className="relative flex items-center gap-3 mb-6">
+				<span className="h-px w-8 flex-none bg-[#0F2349]/20 dark:bg-white/20" />
+				<span className="mono text-[13px] font-semibold uppercase tracking-[0.18em] text-[#0F2349]/55 dark:text-white/50">
 					{system.label}
 				</span>
 			</div>
+
+			{/* Heading */}
 			<h3
-				className="text-[32px] md:text-[52px] font-extrabold text-[var(--navy-900)] tracking-[-0.035em] leading-[1.05] mb-5"
+				className="mb-5 text-[36px] font-extrabold leading-[1.03] tracking-[-0.04em] text-[var(--navy-900)] md:text-[58px]"
 				style={{ whiteSpace: 'pre-line' }}
 			>
 				{system.title}
 			</h3>
-			<p className="text-[15px] md:text-[17px] text-[var(--muted)] leading-[1.7] mb-7 max-w-[480px]">
+
+			{/* Description */}
+			<p className="mb-8 max-w-[420px] text-[15px] leading-[1.78] text-[var(--muted)] dark:text-white/55 md:text-[16.5px]">
 				{system.description}
 			</p>
+
+			{/* CTA */}
 			<a
 				href="#cta"
-				className="inline-flex items-center gap-2 text-[13px] font-semibold text-[var(--teal-500)] hover:text-[var(--navy-900)] transition-colors group/cta"
+				className="group/btn inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full text-[13px] font-semibold text-white bg-[#0F2349] dark:bg-white dark:text-[#050E1E] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--teal-500)] focus-visible:ring-offset-2"
 			>
-				<span className="px-5 py-2.5 rounded-full border border-[var(--teal-500)]/40 bg-[var(--teal-500)]/10 backdrop-blur-sm group-hover/cta:bg-[var(--teal-500)]/25 transition-colors">
-					Explore Your System
+				<span>Explore Your System</span>
+				<span className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/btn:translate-x-1 group-hover/btn:-translate-y-[1px] group-hover/btn:scale-105">
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+						<path d="M7 17 17 7" />
+						<path d="M7 7h10v10" />
+					</svg>
 				</span>
-				<span className="transition-transform group-hover/cta:translate-x-1">→</span>
 			</a>
-		</>
+		</div>
 	);
 }
 
@@ -193,6 +208,14 @@ function SystemsSection({ systems }: { systems: System[] }) {
 
 	React.useLayoutEffect(() => {
 		gsap.registerPlugin(ScrollTrigger);
+
+		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			gsap.set([s1GridImgRef.current, s1GridTextRef.current], { opacity: 1, x: 0 });
+			imgRefs.current.forEach((el) => el && gsap.set(el, { opacity: 1, scale: 1, x: 0, y: 0 }));
+			textRefs.current.forEach((el) => el && gsap.set(el, { opacity: 1, x: 0, y: 0 }));
+			dotRefs.current.forEach((el) => el && gsap.set(el, { opacity: 1, scale: 1 }));
+			return;
+		}
 
 		const ctx = gsap.context(() => {
 
@@ -353,12 +376,14 @@ function SystemsSection({ systems }: { systems: System[] }) {
 				})}
 
 				{/* ── Dot indicators ── */}
-				<div className="absolute right-6 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-3 z-20">
-					{systems.map((_, i) => (
+				<div className="absolute right-6 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-3 z-20" role="tablist" aria-label="Systems">
+					{systems.map((system, i) => (
 						<div
 							key={i}
 							ref={(el) => { dotRefs.current[i] = el; }}
 							className="h-2 w-2 rounded-full bg-[var(--teal-500)] will-change-transform"
+							role="tab"
+							aria-label={system.label}
 						/>
 					))}
 				</div>
@@ -376,7 +401,7 @@ function MobileSystemsSection({ systems }: { systems: System[] }) {
 		<div className="md:hidden bg-white dark:bg-[#020204] py-12 px-6">
 			{systems.map((system) => (
 				<div key={system.id} className="mb-16 last:mb-0">
-					<div className="overflow-hidden rounded-[24px] border border-[var(--line)] mb-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)]">
+					<div className="overflow-hidden rounded-[28px] border border-[var(--line)] mb-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)]">
 						<img
 							src={system.imageUrl}
 							alt={system.label}
@@ -405,19 +430,14 @@ export default function SystemsZoomSection({ data }: { data?: SystemsSectionData
 
 	return (
 		<section id="systems">
-			<div className="relative flex h-[50vh] items-center justify-center overflow-hidden">
-				<div
-					aria-hidden="true"
-					className="pointer-events-none absolute -top-1/2 left-1/2 h-[120vmin] w-[120vmin] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.1),transparent_50%)] blur-[30px]"
-				/>
+			<div className="relative flex h-[50vh] items-center justify-center overflow-hidden bg-white dark:bg-[#020204]">
 				<div className="text-center px-6">
 					<div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">
 						{eyebrow}
 					</div>
 					<h2 className="text-[32px] sm:text-[44px] md:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.02]">
 						{headline}
-						<br />
-						<span className="text-[var(--teal-500)]">{headlineAccent}</span>
+						<span className="block text-[var(--teal-500)]">{headlineAccent}</span>
 					</h2>
 				</div>
 			</div>

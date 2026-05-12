@@ -66,12 +66,11 @@ export default function SvgMaskHero({
     >
       {/* Atmospheric backdrop — sits BEHIND the illustration */}
       <div className="hero-backdrop" aria-hidden>
-        {/* <div className="hb-base" /> */}
-        {/* <div className="hb-orb hb-orb-cyan" />
+        <div className="hb-base" />
+        <div className="hb-orb hb-orb-cyan" />
         <div className="hb-orb hb-orb-blue" />
-        <div className="hb-orb hb-orb-violet" /> */}
-        {/* <div className="hb-grid" /> */}
-        {/* <div className="hb-conic" /> */}
+        <div className="hb-orb hb-orb-violet" />
+        <div className="hb-grid" />
       </div>
 
       {/* Background illustration */}
@@ -450,6 +449,21 @@ export default function SvgMaskHero({
         @keyframes hb-float {
           from { transform: translateY(0); }
           to { transform: translateY(-10px); }
+        }
+
+        /* Desktop: illustration takes over — hide the orb backdrop */
+        .hb-base,
+        .hb-orb,
+        .hb-grid {
+          display: none;
+        }
+
+        @media (max-width: 768px) {
+          /* Swap: hide illustration, show animated orb backdrop instead */
+          .hero-illustration { display: none; }
+          .hb-base  { display: block; }
+          .hb-orb   { display: block; }
+          .hb-grid  { display: block; }
         }
 
         @media (prefers-reduced-motion: reduce) {

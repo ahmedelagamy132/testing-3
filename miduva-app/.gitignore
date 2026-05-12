@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# payload cms
+payload.db
+payload.db-shm
+payload.db-wal
+payload-types.ts
+
+# uploaded media (persisted as Docker volume in production)
+/public/media/
+
+.vercel

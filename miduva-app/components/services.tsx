@@ -8,60 +8,63 @@ import {
   TextStaggerHover,
   useHoverSliderContext,
 } from "@/components/blocks/animated-slideshow"
+import type { ServicesData } from "@/lib/types"
 
-const SLIDES = [
+// ─── Local slide type ─────────────────────────────────────────────────────────
+type Slide = {
+  id: string
+  title: string
+  items: string[]
+  imageUrl: string
+}
+
+const DEFAULT_SLIDES: Slide[] = [
   {
     id: "growth-marketing",
     title: "Growth & Marketing",
-    count: 7,
     items: ["Paid Ads", "Social Media Ads", "Retargeting", "SEO", "Content Marketing", "AI Visibility (GEO)", "Advanced Growth Strategies"],
     imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=900&auto=format&fit=crop",
   },
   {
     id: "conversion-funnels",
     title: "Conversion & Funnels",
-    count: 6,
     items: ["Landing Pages", "Sales Funnels", "CRO", "A/B Testing", "UX Optimization", "Personalization Systems"],
     imageUrl: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=900&auto=format&fit=crop",
   },
   {
     id: "websites-dev",
     title: "Websites & Development",
-    count: 6,
     items: ["Landing Pages", "E-Commerce", "Performance Optimization", "CMS", "Web Apps", "SaaS Development"],
     imageUrl: "https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=900&auto=format&fit=crop",
   },
   {
     id: "ecommerce",
     title: "E-Commerce",
-    count: 5,
     items: ["Shopify", "WooCommerce", "Custom Platforms", "Marketing Integration", "Conversion Optimization"],
     imageUrl: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=900&auto=format&fit=crop",
   },
   {
     id: "ai-automation",
     title: "AI & Automation",
-    count: 7,
     items: ["WhatsApp & Website Chatbots", "CRM Automation", "Email Automation", "Lead Management", "AI Sales Agents", "n8n Workflows", "Custom AI"],
     imageUrl: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?q=80&w=900&auto=format&fit=crop",
   },
   {
     id: "data-analytics",
     title: "Data & Analytics",
-    count: 6,
     items: ["GA4 / Meta Setup", "Conversion Tracking", "Dashboards", "Reporting", "Attribution Modeling", "Revenue Forecasting"],
     imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=900&auto=format&fit=crop",
   },
 ]
 
-function ActiveOverlay() {
+function ActiveOverlay({ slides }: { slides: Slide[] }) {
   const { activeSlide } = useHoverSliderContext()
-  const slide = SLIDES[activeSlide]
+  const slide = slides[activeSlide] ?? slides[0]
 
   return (
     <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/75 via-black/20 to-transparent p-5">
       <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.18em] text-white/50">
-        {slide.count} services
+        {slide.items.length} services
       </p>
       <AnimatePresence mode="wait">
         <motion.div
@@ -89,23 +92,33 @@ function ActiveOverlay() {
   )
 }
 
-export default function Services() {
+export default function Services({ data }: { data?: ServicesData }) {
+  const eyebrow      = data?.eyebrow      ?? "/ what we do"
+  const headline     = data?.headline     ?? "Everything you need"
+  const headlineAccent = data?.headlineAccent ?? "to grow."
+  const ctaLabel     = data?.ctaLabel     ?? "Book a free strategy call"
+  const ctaHref      = data?.ctaHref      ?? "#cta"
+
+  const slides: Slide[] = data?.categories?.length
+    ? (data.categories as Slide[])
+    : DEFAULT_SLIDES
+
   return (
     <section id="services" className="py-20 md:py-28">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="mb-14">
-          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">/ what we do</div>
+          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">{eyebrow}</div>
           <h2 className="text-[52px] md:text-[72px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.02]">
-            Everything you need<br />
-            <span className="text-[var(--teal-500)]">to grow.</span>
+            {headline}<br />
+            <span className="text-[var(--teal-500)]">{headlineAccent}</span>
           </h2>
         </div>
 
         <HoverSlider className="flex flex-wrap items-center justify-between gap-10 lg:gap-16">
           {/* Left — service titles */}
           <div className="flex flex-col space-y-1 flex-1 min-w-0">
-            {SLIDES.map((slide, index) => (
+            {slides.map((slide, index) => (
               <TextStaggerHover
                 key={slide.id}
                 index={index}
@@ -116,10 +129,10 @@ export default function Services() {
 
             <div className="pt-8">
               <a
-                href="#cta"
+                href={ctaHref}
                 className="inline-flex items-center gap-2.5 text-[13px] font-semibold text-[var(--navy-900)] hover:text-[var(--teal-500)] transition-colors"
               >
-                Book a free strategy call
+                {ctaLabel}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
                   <path d="M5 12h14M13 5l7 7-7 7"/>
                 </svg>
@@ -130,7 +143,7 @@ export default function Services() {
           {/* Right — stacked images */}
           <div className="relative w-full lg:w-[380px] xl:w-[440px] flex-shrink-0" style={{ aspectRatio: "3/4" }}>
             <HoverSliderImageWrap className="size-full rounded-[28px] overflow-hidden">
-              {SLIDES.map((slide, index) => (
+              {slides.map((slide, index) => (
                 <HoverSliderImage
                   key={slide.id}
                   index={index}
@@ -143,7 +156,7 @@ export default function Services() {
                 />
               ))}
             </HoverSliderImageWrap>
-            <ActiveOverlay />
+            <ActiveOverlay slides={slides} />
           </div>
         </HoverSlider>
       </div>

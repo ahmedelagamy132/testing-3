@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react"
 import Image from "next/image"
 import { motion, useScroll, useTransform } from "motion/react"
-import type { HowItWorksData } from "@/lib/sanity/types"
+import type { HowItWorksData } from "@/lib/types"
 
 function useIsDark() {
   const [isDark, setIsDark] = useState(true)

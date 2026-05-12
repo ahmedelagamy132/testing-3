@@ -1,6 +1,29 @@
+"use client"
+
+import { useRef, useState, useEffect } from "react"
+
 const bars = [42, 58, 51, 64, 72, 69, 81, 88, 83, 92, 97, 104]
 
 export default function Dashboard() {
+  const chartRef = useRef<HTMLDivElement>(null)
+  const [chartVisible, setChartVisible] = useState(false)
+
+  useEffect(() => {
+    const el = chartRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setChartVisible(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.2 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <div className="relative mx-auto max-w-7xl dash-fade-y">
       <div className="dash-fade-x -mr-16 pl-16 lg:-mr-56 lg:pl-56" style={{ perspective: "1200px" }}>
@@ -130,7 +153,7 @@ export default function Dashboard() {
                             <span className="inline-flex items-center gap-1"><span className="h-1.5 w-2.5 rounded-sm bg-[var(--teal-300)]"/>Nurture</span>
                           </div>
                         </div>
-                        <div className="relative h-36 flex items-stretch gap-1.5 pl-6">
+                        <div ref={chartRef} className="relative h-36 flex items-stretch gap-1.5 pl-6">
                           <div className="absolute left-0 inset-y-0 flex flex-col justify-between mono text-[9px] text-[var(--muted)] py-1">
                             <span>1.2k</span><span>800</span><span>400</span><span>0</span>
                           </div>
@@ -140,7 +163,7 @@ export default function Dashboard() {
                           {bars.map((h, i) => (
                             <div
                               key={i}
-                              className="relative flex-1 flex flex-col justify-end gap-px bar-grow"
+                              className={`relative flex-1 flex flex-col justify-end gap-px ${chartVisible ? "bar-grow" : ""}`}
                               style={{ animationDelay: `${0.6 + i * 0.05}s` }}
                             >
                               <div className="w-full rounded-sm bg-[var(--teal-300)]" style={{ height: `${h * 0.3}%` }}/>

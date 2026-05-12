@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from "react"
 import { motion, useInView } from "motion/react"
-import type { ResultsData } from "@/lib/sanity/types"
+import type { ResultsData } from "@/lib/types"
 
 // ─── Count-up hook (ease-out cubic, RAF-driven) ───────────────────────────────
 function useCountUp(target: number, duration = 1900, started: boolean) {

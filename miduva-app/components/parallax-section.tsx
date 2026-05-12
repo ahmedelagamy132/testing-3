@@ -1,8 +1,9 @@
 "use client"
 
 import { useRef, useEffect } from "react"
+import type { ParallaxData } from "@/lib/types"
 
-export default function ParallaxSection() {
+export default function ParallaxSection({ data }: { data?: ParallaxData }) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -39,6 +40,15 @@ export default function ParallaxSection() {
       if (raf) cancelAnimationFrame(raf)
     }
   }, [])
+
+  const eyebrow         = data?.eyebrow         ?? "The Miduva Difference"
+  const headline        = data?.headline        ?? "Built as a"
+  const description     = data?.description     ?? "Not a one-off campaign, not a template. A connected machine — ads → funnels → automation → data — tuned for your business."
+  const pipelineLabel   = data?.pipelineLabel   ?? "Pipeline · live"
+  const pipelineValue   = data?.pipelineValue   ?? "$482,120"
+  const pipelineDelta   = data?.pipelineDelta   ?? "▲ 21.4%"
+  const bottomLabel     = data?.bottomLabel     ?? "Eight modules · one OS"
+  const bottomDesc      = data?.bottomDescription ?? "Every lever connected, every number visible, every dollar accounted for."
 
   const bars = [42, 58, 51, 64, 72, 69, 81, 88, 83, 92, 97, 104]
 
@@ -87,14 +97,14 @@ export default function ParallaxSection() {
                   className="mono"
                   style={{ fontSize: 13, letterSpacing: ".22em", textTransform: "uppercase", color: "var(--teal-500)", marginBottom: 18 }}
                 >
-                  The Miduva Difference
+                  {eyebrow}
                 </div>
                 <h2 className="parallax__title">
-                  Built as a<br />
+                  {headline}<br />
                   <em>system.</em>
                 </h2>
                 <div style={{ marginTop: 22, maxWidth: 620, marginInline: "auto", color: "var(--muted)", fontSize: 18, lineHeight: 1.55 }}>
-                  Not a one-off campaign, not a template. A connected machine — ads → funnels → automation → data — tuned for your business.
+                  {description}
                 </div>
               </div>
             </div>
@@ -117,7 +127,7 @@ export default function ParallaxSection() {
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
                   <div className="mono" style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)" }}>
-                    Pipeline · live
+                    {pipelineLabel}
                   </div>
                   <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
                     <span style={{
@@ -129,10 +139,10 @@ export default function ParallaxSection() {
                   </span>
                 </div>
                 <div style={{ fontSize: 26, fontWeight: 800, color: "var(--navy-900)", letterSpacing: "-.02em", marginTop: 2 }}>
-                  $482,120
+                  {pipelineValue}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, fontSize: 12, color: "var(--teal-500)", fontWeight: 600 }}>
-                  <span>▲ 21.4%</span>
+                  <span>{pipelineDelta}</span>
                   <span style={{ color: "var(--muted)", fontWeight: 400 }}>vs last Q</span>
                 </div>
                 <div style={{ height: 1, background: "var(--line)", margin: "12px 0" }} />
@@ -159,10 +169,10 @@ export default function ParallaxSection() {
           />
         </svg>
         <div className="mono" style={{ fontSize: 11, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--muted)" }}>
-          Eight modules · one OS
+          {bottomLabel}
         </div>
         <div style={{ fontSize: 22, fontWeight: 700, color: "var(--navy-900)", maxWidth: 560, letterSpacing: "-.02em" }}>
-          Every lever connected, every number visible, every dollar accounted for.
+          {bottomDesc}
         </div>
       </section>
     </div>

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { motion } from "motion/react"
 
 const MODULES = [
   {
@@ -54,39 +55,75 @@ const MODULES = [
 ]
 
 function ModuleVisual({ type, color }: { type: string; color: string }) {
-  const c = color === "teal" ? "#2BC8B7" : "#1E3A6E"
-  const cLight = color === "teal" ? "#8EE5DB" : "#2A4A86"
-  const cFade = color === "teal" ? "rgba(43,200,183,0.12)" : "rgba(30,58,110,0.10)"
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (type !== "rings") return
+    let timer: ReturnType<typeof setTimeout>
+    const target = 94
+    let n = 0
+    const step = () => {
+      if (n < target) {
+        const remaining = target - n
+        n += remaining > 30 ? 3 : remaining > 10 ? 2 : 1
+        if (n > target) n = target
+        setCount(n)
+        const delay = remaining > 30 ? 25 : remaining > 10 ? 40 : 70
+        timer = setTimeout(step, delay)
+      } else {
+        timer = setTimeout(() => { n = 0; setCount(0); timer = setTimeout(step, 300) }, 2000)
+      }
+    }
+    timer = setTimeout(step, 600)
+    return () => clearTimeout(timer)
+  }, [type])
+
+  const c = color === "teal" ? "#2BC8B7" : "#4A7BC4"
+  const cLight = color === "teal" ? "#8EE5DB" : "#7EB0E8"
+  const cFade = color === "teal" ? "rgba(43,200,183,0.12)" : "rgba(74,123,196,0.15)"
 
   switch (type) {
     case "bars":
       return (
         <svg viewBox="0 0 120 60" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-          {[20, 35, 28, 50, 42, 58, 48, 68, 55, 75, 62, 82].map((h, i) => (
-            <rect
-              key={i}
-              x={6 + i * 9.5}
-              y={60 - h * 0.6}
-              width="6"
-              height={h * 0.6}
-              rx="3"
-              fill={i % 3 === 0 ? c : i % 3 === 1 ? cLight : cFade}
-              className="transition-all duration-500"
-            >
-              <animate
-                attributeName="height"
-                values={`${h * 0.3};${h * 0.6};${h * 0.5};${h * 0.6}`}
-                dur={`${2 + i * 0.2}s`}
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="y"
-                values={`${60 - h * 0.3};${60 - h * 0.6};${60 - h * 0.5};${60 - h * 0.6}`}
-                dur={`${2 + i * 0.2}s`}
-                repeatCount="indefinite"
-              />
-            </rect>
-          ))}
+          <defs>
+            <linearGradient id="bgrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={c} stopOpacity="1" />
+              <stop offset="100%" stopColor={cLight} stopOpacity="0.4" />
+            </linearGradient>
+            <filter id="bglow">
+              <feGaussianBlur stdDeviation="1.2" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+          {[20, 35, 28, 50, 42, 58, 48, 68, 55, 75, 62, 82].map((h, i) => {
+            const bright = i % 3 === 0
+            const vals = [h * 0.48, h * 0.62, h * 0.54, h * 0.60, h * 0.50, h * 0.62]
+            const hStr = vals.map(v => v.toFixed(1)).join(";")
+            const yStr = vals.map(v => (60 - v).toFixed(1)).join(";")
+            const dur = `${3.8 + i * 0.22}s`
+            return (
+              <g key={i}>
+                <rect
+                  x={6 + i * 9.5} y={60 - h * 0.6} width="6" height={h * 0.6} rx="3"
+                  fill={bright ? "url(#bgrad)" : i % 3 === 1 ? cLight : cFade}
+                  filter={bright ? "url(#bglow)" : undefined}
+                  opacity={bright ? 1 : 0.65}
+                >
+                  <animate attributeName="height" values={hStr} dur={dur} repeatCount="indefinite" />
+                  <animate attributeName="y" values={yStr} dur={dur} repeatCount="indefinite" />
+                </rect>
+                {bright && (
+                  <rect x={6 + i * 9.5} y={60 - h * 0.6} width="6" height="2.5" rx="1.25"
+                    fill={c} filter="url(#bglow)">
+                    <animate attributeName="y" values={yStr} dur={dur} repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="1;0.5;1" dur={`${2.8 + i * 0.15}s`} repeatCount="indefinite" />
+                  </rect>
+                )}
+              </g>
+            )
+          })}
+          <line x1="6" y1="59.5" x2="114" y2="59.5" stroke={c} strokeWidth="0.4" opacity="0.2" />
         </svg>
       )
     case "funnel":
@@ -173,29 +210,45 @@ function ModuleVisual({ type, color }: { type: string; color: string }) {
     case "nodes":
       return (
         <svg viewBox="0 0 120 60" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="nglow">
+              <feGaussianBlur stdDeviation="1.2" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
+          {/* Edges */}
+          <line x1="20" y1="20" x2="50" y2="15" stroke={c} strokeWidth="0.8" opacity="0.2" />
+          <line x1="50" y1="15" x2="80" y2="25" stroke={c} strokeWidth="0.8" opacity="0.2" />
+          <line x1="20" y1="20" x2="35" y2="45" stroke={c} strokeWidth="0.8" opacity="0.2" />
+          <line x1="50" y1="15" x2="65" y2="40" stroke={c} strokeWidth="0.8" opacity="0.2" />
+          <line x1="80" y1="25" x2="95" y2="50" stroke={c} strokeWidth="0.8" opacity="0.2" />
+          <line x1="35" y1="45" x2="65" y2="40" stroke={c} strokeWidth="0.8" opacity="0.2" />
+          <line x1="65" y1="40" x2="95" y2="50" stroke={c} strokeWidth="0.8" opacity="0.2" />
+          {/* Data packets — 3 packets on the main trunk */}
           {[
-            { x: 20, y: 20 },
-            { x: 50, y: 15 },
-            { x: 80, y: 25 },
-            { x: 35, y: 45 },
-            { x: 65, y: 40 },
-            { x: 95, y: 50 },
+            { path: "M20,20 L50,15 L80,25", dur: "3.5s", begin: "0s"   },
+            { path: "M50,15 L65,40 L95,50",  dur: "4.0s", begin: "1.2s" },
+            { path: "M20,20 L35,45 L65,40",  dur: "3.8s", begin: "2.4s" },
+          ].map((e, i) => (
+            <circle key={i} r="1.8" fill={c} filter="url(#nglow)">
+              <animateMotion dur={e.dur} begin={e.begin} repeatCount="indefinite" path={e.path} />
+              <animate attributeName="opacity" values="0;0.8;0.8;0" dur={e.dur} begin={e.begin}
+                repeatCount="indefinite" keyTimes="0;0.08;0.88;1" />
+            </circle>
+          ))}
+          {/* Nodes */}
+          {[
+            { x: 20, y: 20 }, { x: 50, y: 15 }, { x: 80, y: 25 },
+            { x: 35, y: 45 }, { x: 65, y: 40 }, { x: 95, y: 50 },
           ].map((p, i) => (
             <g key={i}>
-              <circle cx={p.x} cy={p.y} r="4" fill={cFade} />
-              <circle cx={p.x} cy={p.y} r="2.5" fill={c}>
-                <animate attributeName="r" values="2.5;3.5;2.5" dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
-                <animate attributeName="opacity" values="1;0.6;1" dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
+              <circle cx={p.x} cy={p.y} r="6" fill={cFade} />
+              <circle cx={p.x} cy={p.y} r="3" fill={c} filter="url(#nglow)">
+                <animate attributeName="r" values="3;4.2;3" dur={`${1.8 + i * 0.35}s`} repeatCount="indefinite" />
+                <animate attributeName="opacity" values="1;0.55;1" dur={`${1.8 + i * 0.35}s`} repeatCount="indefinite" />
               </circle>
             </g>
           ))}
-          <line x1="20" y1="20" x2="50" y2="15" stroke={c} strokeWidth="0.8" opacity="0.3" />
-          <line x1="50" y1="15" x2="80" y2="25" stroke={c} strokeWidth="0.8" opacity="0.3" />
-          <line x1="20" y1="20" x2="35" y2="45" stroke={c} strokeWidth="0.8" opacity="0.3" />
-          <line x1="50" y1="15" x2="65" y2="40" stroke={c} strokeWidth="0.8" opacity="0.3" />
-          <line x1="80" y1="25" x2="95" y2="50" stroke={c} strokeWidth="0.8" opacity="0.3" />
-          <line x1="35" y1="45" x2="65" y2="40" stroke={c} strokeWidth="0.8" opacity="0.3" />
-          <line x1="65" y1="40" x2="95" y2="50" stroke={c} strokeWidth="0.8" opacity="0.3" />
         </svg>
       )
     case "grid":
@@ -232,64 +285,88 @@ function ModuleVisual({ type, color }: { type: string; color: string }) {
     case "rings":
       return (
         <svg viewBox="0 0 120 60" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="rglow">
+              <feGaussianBlur stdDeviation="2" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+          </defs>
           {[28, 22, 16].map((r, i) => (
-            <circle
-              key={i}
-              cx="60"
-              cy="30"
-              r={r}
-              fill="none"
+            <circle key={i} cx="60" cy="30" r={r} fill="none"
               stroke={i === 0 ? c : cLight}
-              strokeWidth="1.5"
+              strokeWidth={i === 0 ? 1.8 : 1.2}
               opacity={0.3 + i * 0.2}
               strokeDasharray={`${2 * Math.PI * r * 0.75} ${2 * Math.PI * r * 0.25}`}
               strokeLinecap="round"
+              filter={i === 0 ? "url(#rglow)" : undefined}
             >
-              <animateTransform
-                attributeName="transform"
-                type="rotate"
+              <animateTransform attributeName="transform" type="rotate"
                 from={`${i % 2 === 0 ? 0 : 360} 60 30`}
                 to={`${i % 2 === 0 ? 360 : 0} 60 30`}
-                dur={`${8 + i * 4}s`}
-                repeatCount="indefinite"
+                dur={`${8 + i * 4}s`} repeatCount="indefinite"
               />
             </circle>
           ))}
-          <text x="60" y="34" textAnchor="middle" fill={c} fontSize="10" fontWeight="700" fontFamily="monospace">
-            94
+          {/* Indicator dot orbiting the outer ring */}
+          <circle cx="60" cy="2" r="3" fill={c} filter="url(#rglow)">
+            <animateTransform attributeName="transform" type="rotate"
+              from="0 60 30" to="360 60 30" dur="8s" repeatCount="indefinite"
+            />
+            <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite" />
+          </circle>
+          {/* Live counter */}
+          <text x="60" y="35" textAnchor="middle" fill={c} fontSize="14" fontWeight="700"
+            fontFamily="monospace" filter="url(#rglow)">
+            {String(count).padStart(2, "0")}
+          </text>
+          <text x="60" y="44" textAnchor="middle" fill={cLight} fontSize="5" fontFamily="monospace" opacity="0.7">
+            SCORE
           </text>
         </svg>
       )
-    case "spark":
+    case "spark": {
+      const sp = "M8 48 L18 38 L28 42 L38 28 L48 32 L58 18 L68 22 L78 12 L88 16 L98 8 L108 10 L112 6"
       return (
         <svg viewBox="0 0 120 60" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
           <defs>
             <linearGradient id="sgrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={c} stopOpacity="0.3" />
+              <stop offset="0%" stopColor={c} stopOpacity="0.35" />
               <stop offset="100%" stopColor={c} stopOpacity="0" />
             </linearGradient>
+            <filter id="sglow">
+              <feGaussianBlur stdDeviation="2.5" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
           </defs>
-          <path
-            d="M8 48 L18 38 L28 42 L38 28 L48 32 L58 18 L68 22 L78 12 L88 16 L98 8 L108 10 L112 6"
-            fill="none"
-            stroke={c}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.6"
-          />
-          <path
-            d="M8 48 L18 38 L28 42 L38 28 L48 32 L58 18 L68 22 L78 12 L88 16 L98 8 L108 10 L112 6 L112 60 L8 60 Z"
-            fill="url(#sgrad)"
-            opacity="0.15"
-          />
+          <path d={sp} fill="none" stroke={c} strokeWidth="1.5"
+            strokeLinecap="round" strokeLinejoin="round" opacity="0.45" />
+          <path d={`${sp} L112 60 L8 60 Z`} fill="url(#sgrad)" opacity="0.2" />
+          {/* Static data-point dots */}
           {[38, 42, 28, 32, 18, 22, 12, 16, 8, 10].map((y, i) => (
-            <circle key={i} cx={18 + i * 10} cy={y} r="2.5" fill={c} opacity="0.8">
-              <animate attributeName="r" values="2.5;3.5;2.5" dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
+            <circle key={i} cx={18 + i * 10} cy={y} r="2" fill={c} opacity="0.5">
+              <animate attributeName="r" values="2;3;2" dur={`${2 + i * 0.3}s`} repeatCount="indefinite" />
             </circle>
           ))}
+          {/* Glowing tracer outer */}
+          <circle r="5" fill={c} filter="url(#sglow)">
+            <animateMotion dur="4s" repeatCount="indefinite" path={sp} />
+            <animate attributeName="opacity" values="0;0.7;0.7;0" dur="4s" repeatCount="indefinite"
+              keyTimes="0;0.06;0.9;1" />
+          </circle>
+          {/* Tracer inner bright core */}
+          <circle r="2.5" fill={c}>
+            <animateMotion dur="4s" repeatCount="indefinite" path={sp} />
+            <animate attributeName="opacity" values="0;1;1;0" dur="4s" repeatCount="indefinite"
+              keyTimes="0;0.06;0.9;1" />
+          </circle>
+          <circle r="1" fill="#fff">
+            <animateMotion dur="4s" repeatCount="indefinite" path={sp} />
+            <animate attributeName="opacity" values="0;0.9;0.9;0" dur="4s" repeatCount="indefinite"
+              keyTimes="0;0.06;0.9;1" />
+          </circle>
         </svg>
       )
+    }
     default:
       return null
   }
@@ -309,16 +386,14 @@ function ModuleCard({
   const accent = isTeal ? "var(--teal-500)" : "var(--navy-700)"
   const accentGlow = isTeal
     ? "rgba(43,200,183,0.18)"
-    : "rgba(30,58,110,0.14)"
+    : "rgba(74,123,196,0.18)"
   const accentBorder = isTeal
     ? "rgba(43,200,183,0.35)"
-    : "rgba(30,58,110,0.25)"
-
-  const spanClass = span === 2 ? "sm:col-span-2" : "col-span-1"
+    : "rgba(74,123,196,0.38)"
 
   return (
     <div
-      className={`group relative ${spanClass} rounded-2xl overflow-hidden transition-all duration-500`}
+      className="group relative rounded-2xl overflow-hidden transition-all duration-500 h-full"
       style={{
         background: "var(--card)",
         border: `1px solid ${hovered ? accentBorder : "var(--line)"}`,
@@ -348,7 +423,7 @@ function ModuleCard({
         }}
       />
 
-      <div className="relative p-5 lg:p-6 flex flex-col h-full min-h-[160px]">
+      <div className="relative p-5 lg:p-6 flex flex-col h-full min-h-[220px]">
         {/* Top: Icon + Title row */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-3">
@@ -357,11 +432,11 @@ function ModuleCard({
               style={{
                 width: 36,
                 height: 36,
-                background: isTeal ? "var(--teal-50)" : "rgba(30,58,110,0.08)",
+                background: isTeal ? "var(--teal-50)" : "rgba(74,123,196,0.10)",
                 boxShadow: hovered
                   ? isTeal
                     ? "0 0 16px rgba(43,200,183,0.25)"
-                    : "0 0 16px rgba(30,58,110,0.15)"
+                    : "0 0 16px rgba(74,123,196,0.20)"
                   : "none",
               }}
             >
@@ -371,7 +446,7 @@ function ModuleCard({
                   width: 8,
                   height: 8,
                   background: accent,
-                  boxShadow: isTeal ? `0 0 10px ${accentGlow}` : "none",
+                  boxShadow: `0 0 10px ${accentGlow}`,
                 }}
               />
               {isTeal && (
@@ -400,7 +475,7 @@ function ModuleCard({
           <span
             className="mono text-[10px] font-bold px-2 py-1 rounded-md transition-colors duration-300"
             style={{
-              background: hovered ? (isTeal ? "var(--teal-50)" : "rgba(30,58,110,0.08)") : "transparent",
+              background: hovered ? (isTeal ? "var(--teal-50)" : "rgba(74,123,196,0.12)") : "transparent",
               color: accent,
             }}
           >
@@ -408,19 +483,20 @@ function ModuleCard({
           </span>
         </div>
 
+        {/* SVG Visual — full-width, prominent */}
+        <div className="w-full h-20 sm:h-24 my-3 opacity-70 group-hover:opacity-100 transition-opacity duration-500">
+          <ModuleVisual type={visual} color={color} />
+        </div>
+
         {/* Description */}
-        <p className="text-[12.5px] text-[var(--muted)] leading-relaxed mb-4 max-w-[280px]">
+        <p className="text-[12.5px] text-[var(--muted)] leading-relaxed max-w-[280px]">
           {desc}
         </p>
 
-        {/* Bottom: Visual + CTA */}
-        <div className="mt-auto flex items-end justify-between gap-4">
-          <div className="flex-1 h-10 opacity-70 group-hover:opacity-100 transition-opacity duration-500">
-            <ModuleVisual type={visual} color={color} />
-          </div>
-
+        {/* CTA */}
+        <div className="mt-auto pt-3 flex items-center justify-end">
           <div
-            className="flex items-center gap-1.5 text-[11px] font-semibold transition-all duration-300 flex-shrink-0"
+            className="flex items-center gap-1.5 text-[11px] font-semibold transition-all duration-300"
             style={{
               color: hovered ? accent : "var(--muted)",
               transform: hovered ? "translateX(2px)" : "translateX(0)",
@@ -442,7 +518,13 @@ export default function SystemRibbon() {
     <section id="systems" className="mt-16 md:mt-20">
       {/* Header */}
       <div className="max-w-6xl mx-auto px-6">
-        <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
+        <motion.div
+          className="flex items-end justify-between flex-wrap gap-4 mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
           <div>
             <div className="mono text-[11px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-2">
               / growth os
@@ -464,14 +546,23 @@ export default function SystemRibbon() {
               <path d="M5 12h14M13 5l7 7-7 7" />
             </svg>
           </a>
-        </div>
+        </motion.div>
       </div>
 
       {/* Bento grid */}
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {MODULES.map((m, i) => (
-            <ModuleCard key={i} {...m} index={i} />
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.5, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className={m.span === 2 ? "sm:col-span-2" : "col-span-1"}
+            >
+              <ModuleCard {...m} index={i} />
+            </motion.div>
           ))}
         </div>
       </div>

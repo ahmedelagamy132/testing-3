@@ -396,25 +396,25 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
 
           {/* ── Bento Grid (Problems) ── */}
           <div ref={bentoRef} className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-8">
-            <div className="mb-4 md:mb-10 text-center md:text-left">
-              <div className="inline-flex mb-4">
+            <div className="mb-5 md:mb-6 text-center md:text-left">
+              <div className="inline-flex mb-3">
                 <span className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--teal-500)] font-medium px-3 py-1 rounded-full bg-[var(--teal-500)]/[0.06] ring-1 ring-[var(--teal-500)]/15">
                   {problemEyebrow}
                 </span>
               </div>
-              <h2 className="text-[36px] md:text-[52px] lg:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
+              <h2 className="text-[32px] md:text-[44px] lg:text-[56px] font-extrabold tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
                 {problemHeadline}
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 auto-rows-[1fr]">
-              <div ref={card1Ref} className="md:row-span-2 will-change-transform">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 md:h-[420px] lg:h-[460px]">
+              <div ref={card1Ref} className="h-full md:row-span-2 will-change-transform">
                 <ProblemCard problem={problems[0]} index={0} />
               </div>
-              <div ref={card2Ref} className="will-change-transform">
+              <div ref={card2Ref} className="h-full will-change-transform">
                 <ProblemCard problem={problems[1]} index={1} />
               </div>
-              <div ref={card3Ref} className="will-change-transform">
+              <div ref={card3Ref} className="h-full will-change-transform">
                 <ProblemCard problem={problems[2]} index={2} />
               </div>
             </div>

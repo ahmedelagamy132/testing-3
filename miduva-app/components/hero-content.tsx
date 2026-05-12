@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import type { HeroData } from "@/lib/sanity/types"
+import type { HeroData } from "@/lib/types"
 
 const DEFAULT_PHRASES = ["generate leads.", "drive sales.", "scale your business."]
 
@@ -204,9 +204,17 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
           }
           .hero-content-wrapper {
             text-align: center !important;
+            max-width: calc(100vw - 48px) !important;
           }
           .hero-cta-group {
             justify-content: center !important;
+            flex-wrap: nowrap !important;
+            gap: 8px !important;
+          }
+          .hero-btn-primary,
+          .hero-btn-secondary {
+            flex: 1;
+            justify-content: center;
           }
         }
       `}</style>

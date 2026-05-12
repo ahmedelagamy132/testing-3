@@ -51,6 +51,11 @@ html.dark {
   --teal-50: rgba(43, 200, 183, 0.10);
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
 html, body {
   background: var(--paper);
   color: var(--ink);
@@ -151,6 +156,21 @@ html.dark .grain {
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-8px); }
+}
+
+/* ─── FAQ section ─── */
+.faq-trigger {
+  outline: none;
+}
+.faq-trigger:focus-visible {
+  outline: 2px solid var(--teal-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .faq-answer-panel {
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .shine {
