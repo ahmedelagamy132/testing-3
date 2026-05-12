@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import type { SystemsSectionData } from '@/lib/sanity/types';
+import type { SystemsSectionData } from '@/lib/types';
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  DATA                                                                        */
@@ -76,8 +76,7 @@ const BG_MAX_SCALES = [5, 6, 5, 6, 8, 9];
 const T = {
 	ZOOM_END:        3,
 	S1_CARD_END:     3.8,
-	S1_CROSSFADE:    3.6,
-	S1_TEXT_IN:      3.75,
+	S1_TEXT_IN:      3.9,
 	S1_EXIT:         4.3,
 	S1_GONE:         4.8,
 	DOT1_ACTIVE:     3,
@@ -215,7 +214,7 @@ function SystemsSection({ systems }: { systems: System[] }) {
 			});
 
 			gsap.set(dotRefs.current, { scale: 1, opacity: 0.3 });
-			gsap.set(s1GridImgRef.current,  { opacity: 0, x: '-12%' });
+			gsap.set(s1GridImgRef.current,  { opacity: 0 });
 			gsap.set(s1GridTextRef.current, { opacity: 0, x: 50 });
 
 			bgRefs.current.forEach((el, i) => {
@@ -244,13 +243,10 @@ function SystemsSection({ systems }: { systems: System[] }) {
 				duration:     T.S1_CARD_END - T.ZOOM_END,
 			}, T.ZOOM_END);
 
-			tl.to(s1OverlayRef.current,  { opacity: 0, ease: 'none', duration: 0.4 }, T.S1_CROSSFADE);
-			tl.to(s1GridImgRef.current,  { opacity: 1, ease: 'none', duration: 0.4 }, T.S1_CROSSFADE);
+			tl.to(s1GridTextRef.current, { opacity: 1, x: 0, ease: 'none', duration: 0.35 }, T.S1_TEXT_IN);
 
-			tl.to(s1GridTextRef.current, { opacity: 1, x: 0, ease: 'none', duration: 0.45 }, T.S1_TEXT_IN);
-
-			tl.to(s1GridImgRef.current, {
-				opacity: 0, scale: 0.88, x: '-20%', y: '-6vh',
+			tl.to(s1OverlayRef.current, {
+				opacity: 0, scale: 0.88, x: s1XShift - colWidth * 0.2, y: '-6vh',
 				ease: 'none', duration: 0.5,
 			}, T.S1_EXIT);
 			tl.to(s1GridTextRef.current, {

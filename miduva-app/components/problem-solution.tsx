@@ -10,6 +10,7 @@ import {
   useTransform,
   useInView,
 } from "motion/react"
+import type { ProblemSolutionData, ProblemCard as ProblemCardData } from "@/lib/types"
 
 /* ─── Register GSAP plugin ─── */
 gsap.registerPlugin(ScrollTrigger)
@@ -27,29 +28,38 @@ function useIsDark() {
   return isDark
 }
 
-/* ─── Data ─── */
-const PROBLEMS = [
+/* ─── Default Data ─── */
+const DEFAULT_PROBLEMS: ProblemCardData[] = [
   {
     id: "ads",
+    num: "01",
     label: "Trap 01",
     title: "Traffic that goes nowhere",
     detail: "You're buying clicks. Not customers. Your ad spend is a leaky bucket.",
-    icon: "close" as const,
+    icon: "close",
   },
   {
     id: "traffic",
+    num: "02",
     label: "Trap 02",
     title: "Visitors that bounce",
     detail: "People land, scan, leave. No funnel. No follow-up. No revenue.",
-    icon: "alert" as const,
+    icon: "alert",
   },
   {
     id: "leads",
+    num: "03",
     label: "Trap 03",
     title: "Leads that go cold",
     detail: "Hot prospects slip through the cracks. No system to catch them.",
-    icon: "close" as const,
+    icon: "close",
   },
+]
+
+const DEFAULT_BULLETS = [
+  "Ads engineered to attract ready buyers",
+  "Funnels built to convert, not decorate",
+  "Automation that nurtures while you sleep",
 ]
 
 /* ─── Custom ease reference ─── */
@@ -145,13 +155,13 @@ function NoiseOverlay() {
   )
 }
 
-/* ─── Problem Card (WhyMiduva Style) ─── */
+/* ─── Problem Card ─── */
 function ProblemCard({
   problem,
   index,
   className = "",
 }: {
-  problem: (typeof PROBLEMS)[0]
+  problem: ProblemCardData
   index: number
   className?: string
 }) {
@@ -234,7 +244,7 @@ function ProblemCard({
             }}
           />
 
-          <div className="relative z-10 p-5 md:p-6 lg:p-8 flex flex-col h-full">
+          <div className="relative z-10 p-6 md:p-8 flex flex-col h-full">
             {/* Icon + Label row */}
             <div className="flex items-center gap-3 mb-5">
               <div
@@ -245,7 +255,7 @@ function ProblemCard({
                 <Icon className="w-[18px] h-[18px] text-teal-400/80 transition-colors duration-500 group-hover:text-teal-400" />
               </div>
               <span
-                className={`text-[10px] uppercase tracking-[0.2em] font-medium mono ${
+                className={`text-[13px] uppercase tracking-[0.2em] font-semibold mono ${
                   isDark ? "text-white/30" : "text-[var(--muted)]"
                 }`}
               >
@@ -280,7 +290,6 @@ function ProblemCard({
               {problem.detail}
             </p>
 
-            {/* Spacer */}
             <div className="flex-1 min-h-[20px]" />
           </div>
 
@@ -302,7 +311,19 @@ function ProblemCard({
 }
 
 /* ─── Main Section ─── */
-export default function ProblemSolution() {
+export default function ProblemSolution({ data }: { data?: ProblemSolutionData }) {
+  const problemEyebrow    = data?.problemEyebrow  ?? "/ the problem"
+  const problemHeadline   = data?.problemHeadline ?? "Three traps that kill growth."
+  const problems          = data?.problems?.length ? data.problems : DEFAULT_PROBLEMS
+
+  const solutionHeadline  = data?.solution?.headline       ?? "One system."
+  const solutionAccent    = data?.solution?.headlineAccent ?? "Zero gaps."
+  const solutionSub       = data?.solution?.subheadline    ?? "We build the machine that fixes all three traps."
+  const bullets           = data?.solution?.bullets?.length ? data.solution.bullets : DEFAULT_BULLETS
+  const ctaLabel          = data?.solution?.ctaLabel ?? "See How It Works"
+  const ctaHref           = data?.solution?.ctaHref  ?? "#cta"
+  const bottomNote        = data?.solution?.bottomNote ?? "One connected machine. End-to-end."
+
   const outerRef = useRef<HTMLDivElement>(null)
   const bentoRef = useRef<HTMLDivElement>(null)
   const card1Ref = useRef<HTMLDivElement>(null)
@@ -318,7 +339,6 @@ export default function ProblemSolution() {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      const cards = [card1Ref.current, card2Ref.current, card3Ref.current]
       const solutionEls = [
         eyebrowRef.current,
         headlineRef.current,
@@ -327,18 +347,9 @@ export default function ProblemSolution() {
         ctaRef.current,
       ]
 
-      /* ── Initial states ── */
-      gsap.set(solutionRef.current, {
-        scale: 0.65,
-        opacity: 0,
-        y: "35vh",
-      })
-      gsap.set(solutionEls, {
-        opacity: 0,
-        y: 24,
-      })
+      gsap.set(solutionRef.current, { scale: 0.65, opacity: 0, y: "35vh" })
+      gsap.set(solutionEls, { opacity: 0, y: 24 })
 
-      /* ── Scroll-driven timeline ── */
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: outerRef.current,
@@ -348,282 +359,120 @@ export default function ProblemSolution() {
         },
       })
 
-      /* ── Phase 1: Parallax Drift (0% → 26%) ── */
-      tl.to(
-        card1Ref.current,
-        { y: "-4vh", duration: 0.18, ease: "none" },
-        0.22
-      )
-      tl.to(
-        card2Ref.current,
-        { y: "-10vh", duration: 0.18, ease: "none" },
-        0.22
-      )
-      tl.to(
-        card3Ref.current,
-        { y: "-16vh", duration: 0.18, ease: "none" },
-        0.22
-      )
-      tl.to(
-        solutionRef.current,
-        { y: "8vh", scale: 0.82, opacity: 0.25, duration: 0.18, ease: "none" },
-        0.22
-      )
+      tl.to(card1Ref.current, { y: "-4vh",  duration: 0.18, ease: "none" }, 0.22)
+      tl.to(card2Ref.current, { y: "-10vh", duration: 0.18, ease: "none" }, 0.22)
+      tl.to(card3Ref.current, { y: "-16vh", duration: 0.18, ease: "none" }, 0.22)
+      tl.to(solutionRef.current, { y: "8vh", scale: 0.82, opacity: 0.25, duration: 0.18, ease: "none" }, 0.22)
 
-      /* ── Phase 3: THE EXPLOSION (48% → 75%) ── */
-      tl.to(
-        card1Ref.current,
-        {
-          x: "-38vw",
-          y: "-32vh",
-          rotate: -14,
-          scale: 0.52,
-          opacity: 0,
-          duration: 0.20,
-          ease: easeCustom,
-        },
-        0.48
-      )
-      tl.to(
-        card2Ref.current,
-        {
-          x: "40vw",
-          y: "-22vh",
-          rotate: 11,
-          scale: 0.52,
-          opacity: 0,
-          duration: 0.20,
-          ease: easeCustom,
-        },
-        0.51
-      )
-      tl.to(
-        card3Ref.current,
-        {
-          x: "32vw",
-          y: "28vh",
-          rotate: -9,
-          scale: 0.52,
-          opacity: 0,
-          duration: 0.20,
-          ease: easeCustom,
-        },
-        0.54
-      )
-      tl.to(
-        solutionRef.current,
-        {
-          scale: 1,
-          opacity: 1,
-          y: 0,
-          duration: 0.22,
-          ease: easeCustom,
-        },
-        0.50
-      )
+      tl.to(card1Ref.current, { x: "-38vw", y: "-32vh", rotate: -14, scale: 0.52, opacity: 0, duration: 0.20, ease: easeCustom }, 0.48)
+      tl.to(card2Ref.current, { x: "40vw",  y: "-22vh", rotate: 11,  scale: 0.52, opacity: 0, duration: 0.20, ease: easeCustom }, 0.51)
+      tl.to(card3Ref.current, { x: "32vw",  y: "28vh",  rotate: -9,  scale: 0.52, opacity: 0, duration: 0.20, ease: easeCustom }, 0.54)
+      tl.to(solutionRef.current, { scale: 1, opacity: 1, y: 0, duration: 0.22, ease: easeCustom }, 0.50)
 
-      /* ── Phase 4: Solution Content Reveal (75% → 100%) ── */
-      tl.to(
-        eyebrowRef.current,
-        { opacity: 1, y: 0, duration: 0.06, ease: easeCustom },
-        0.75
-      )
-      tl.to(
-        headlineRef.current,
-        { opacity: 1, y: 0, duration: 0.08, ease: easeCustom },
-        0.78
-      )
-      tl.to(
-        subheadRef.current,
-        { opacity: 1, y: 0, duration: 0.07, ease: easeCustom },
-        0.82
-      )
-      tl.to(
-        bulletsRef.current,
-        { opacity: 1, y: 0, duration: 0.07, ease: easeCustom },
-        0.86
-      )
-      tl.to(
-        ctaRef.current,
-        { opacity: 1, y: 0, duration: 0.06, ease: easeCustom },
-        0.91
-      )
+      tl.to(eyebrowRef.current,  { opacity: 1, y: 0, duration: 0.06, ease: easeCustom }, 0.75)
+      tl.to(headlineRef.current, { opacity: 1, y: 0, duration: 0.08, ease: easeCustom }, 0.78)
+      tl.to(subheadRef.current,  { opacity: 1, y: 0, duration: 0.07, ease: easeCustom }, 0.82)
+      tl.to(bulletsRef.current,  { opacity: 1, y: 0, duration: 0.07, ease: easeCustom }, 0.86)
+      tl.to(ctaRef.current,      { opacity: 1, y: 0, duration: 0.06, ease: easeCustom }, 0.91)
     }, outerRef)
 
     return () => ctx.revert()
   }, [])
 
-  const bullets = [
-    "Ads engineered to attract ready buyers",
-    "Funnels built to convert, not decorate",
-    "Automation that nurtures while you sleep",
-  ]
-
   return (
-    <section
-      id="problem-solution"
-      className="relative"
-    >
-      {/* ── Tall scroll track ── */}
+    <section id="problem-solution" className="relative">
       <div
         ref={outerRef}
         className="relative h-[300vh] md:h-[350vh] w-full bg-[#F8F9FB] dark:bg-[#020204]"
       >
         <NoiseOverlay />
 
-        {/* ── Sticky viewport ── */}
         <div className="sticky top-0 h-screen w-full overflow-hidden flex items-start lg:items-center justify-center pt-20 md:pt-24 lg:pt-0">
-          {/* Ambient background glow */}
           <div
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(ellipse, rgba(43,200,183,0.06) 0%, transparent 70%)",
-              filter: "blur(60px)",
-            }}
+            style={{ background: "radial-gradient(ellipse, rgba(43,200,183,0.06) 0%, transparent 70%)", filter: "blur(60px)" }}
             aria-hidden
           />
 
           {/* ── Bento Grid (Problems) ── */}
-          <div
-            ref={bentoRef}
-            className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-8"
-          >
-            {/* Section header — fades with the bento */}
-            <div className="mb-4 md:mb-6 lg:mb-10 text-center md:text-left">
-              <div className="inline-flex mb-3 md:mb-4">
+          <div ref={bentoRef} className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-8">
+            <div className="mb-4 md:mb-10 text-center md:text-left">
+              <div className="inline-flex mb-4">
                 <span className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--teal-500)] font-medium px-3 py-1 rounded-full bg-[var(--teal-500)]/[0.06] ring-1 ring-[var(--teal-500)]/15">
-                  / the problem
+                  {problemEyebrow}
                 </span>
               </div>
-              <h2 className="text-[32px] md:text-[42px] lg:text-[56px] xl:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
-                Three traps that
-                <br className="hidden md:block" />
-                {" "}kill growth.
+              <h2 className="text-[36px] md:text-[52px] lg:text-[64px] font-extrabold tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
+                {problemHeadline}
               </h2>
             </div>
 
-            {/* Asymmetrical Bento */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 auto-rows-[1fr]">
-              {/* Trap 01 — tall hero card */}
-              <div
-                ref={card1Ref}
-                className="md:row-span-2 will-change-transform"
-              >
-                <ProblemCard problem={PROBLEMS[0]} index={0} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 auto-rows-[1fr]">
+              <div ref={card1Ref} className="md:row-span-2 will-change-transform">
+                <ProblemCard problem={problems[0]} index={0} />
               </div>
-
-              {/* Trap 02 */}
-              <div
-                ref={card2Ref}
-                className="will-change-transform"
-              >
-                <ProblemCard problem={PROBLEMS[1]} index={1} />
+              <div ref={card2Ref} className="will-change-transform">
+                <ProblemCard problem={problems[1]} index={1} />
               </div>
-
-              {/* Trap 03 */}
-              <div
-                ref={card3Ref}
-                className="will-change-transform"
-              >
-                <ProblemCard problem={PROBLEMS[2]} index={2} />
+              <div ref={card3Ref} className="will-change-transform">
+                <ProblemCard problem={problems[2]} index={2} />
               </div>
             </div>
           </div>
 
-          {/* ── Solution Overlay (appears on top after explosion) ── */}
+          {/* ── Solution Overlay ── */}
           <div
             ref={solutionRef}
             className="absolute inset-0 z-20 flex items-center justify-center p-6 md:p-12 lg:p-20 will-change-transform"
           >
             <div className="w-full max-w-5xl mx-auto">
-              {/* Double-Bezel Outer Shell */}
               <div className="p-[6px] rounded-[2rem] bg-[#0F2349]/[0.08] dark:bg-white/[0.03] ring-1 ring-[#0F2349]/10 dark:ring-white/[0.08]">
-                {/* Double-Bezel Inner Core */}
                 <div
                   ref={solutionInnerRef}
                   className="relative overflow-hidden rounded-[calc(2rem-6px)] bg-[#0F2349] dark:bg-[#020204]"
                 >
-                  {/* Teal glow — top left */}
-                  <div
-                    className="absolute -top-24 -left-24 w-96 h-96 rounded-full pointer-events-none"
-                    style={{
-                      background:
-                        "radial-gradient(circle, rgba(43,200,183,0.18) 0%, transparent 65%)",
-                      filter: "blur(52px)",
-                    }}
-                    aria-hidden
-                  />
-                  {/* Teal glow — bottom right */}
-                  <div
-                    className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full pointer-events-none"
-                    style={{
-                      background:
-                        "radial-gradient(circle, rgba(43,200,183,0.13) 0%, transparent 65%)",
-                      filter: "blur(44px)",
-                    }}
-                    aria-hidden
-                  />
+                  <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(43,200,183,0.18) 0%, transparent 65%)", filter: "blur(52px)" }} aria-hidden />
+                  <div className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(43,200,183,0.13) 0%, transparent 65%)", filter: "blur(44px)" }} aria-hidden />
 
                   <div className="relative z-10 px-8 py-12 md:px-14 md:py-16 lg:px-20 lg:py-20 flex flex-col gap-7 md:gap-8">
-                    {/* Eyebrow */}
                     <div ref={eyebrowRef} className="inline-flex">
                       <span className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--teal-500)] font-medium px-3 py-1 rounded-full bg-[var(--teal-500)]/[0.08] ring-1 ring-[var(--teal-500)]/15">
                         / the solution
                       </span>
                     </div>
 
-                    {/* Headline */}
-                    <p
-                      ref={headlineRef}
-                      className="text-[28px] md:text-[44px] lg:text-[56px] font-extrabold tracking-[-0.035em] leading-[1.08] text-white max-w-4xl"
-                    >
-                      One system.{" "}
-                      <span className="shine">Zero gaps.</span>
+                    <p ref={headlineRef} className="text-[28px] md:text-[44px] lg:text-[56px] font-extrabold tracking-[-0.035em] leading-[1.08] text-white max-w-4xl">
+                      {solutionHeadline}{" "}
+                      <span className="shine">{solutionAccent}</span>
                     </p>
 
-                    {/* Subhead */}
-                    <p
-                      ref={subheadRef}
-                      className="text-[15px] md:text-[16px] leading-[1.6] text-white/40 max-w-2xl -mt-2 md:-mt-3"
-                    >
-                      We build the machine that fixes all three traps.
+                    <p ref={subheadRef} className="text-[15px] md:text-[16px] leading-[1.6] text-white/40 max-w-2xl -mt-2 md:-mt-3">
+                      {solutionSub}
                     </p>
 
-                    {/* Bullets */}
                     <div ref={bulletsRef} className="flex flex-wrap items-center gap-x-8 gap-y-4 pt-2">
                       {bullets.map((point) => (
-                        <div
-                          key={point}
-                          className="flex items-center gap-2.5"
-                        >
+                        <div key={point} className="flex items-center gap-2.5">
                           <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#2BC8B7]/15 flex items-center justify-center">
                             <IconCheck className="text-[#2BC8B7]" />
                           </span>
-                          <span className="text-[14px] font-medium text-white/50 tracking-tight">
-                            {point}
-                          </span>
+                          <span className="text-[14px] font-medium text-white/50 tracking-tight">{point}</span>
                         </div>
                       ))}
                     </div>
 
-                    {/* CTA strip with Button-in-Button */}
                     <div
                       ref={ctaRef}
                       className="pt-8 flex items-center justify-between flex-wrap gap-4"
                       style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
                     >
-                      <p className="mono text-[11px] uppercase tracking-[0.18em] text-white/25">
-                        One connected machine. End-to-end.
-                      </p>
-
+                      <p className="mono text-[11px] uppercase tracking-[0.18em] text-white/25">{bottomNote}</p>
                       <a
-                        href="#cta"
+                        href={ctaHref}
                         className="group/btn inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full text-[13px] font-semibold transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98]"
                         style={{ background: "#2BC8B7", color: "#020204" }}
                       >
-                        <span>See How It Works</span>
-                        {/* Button-in-Button Trailing Icon */}
+                        <span>{ctaLabel}</span>
                         <span className="w-8 h-8 rounded-full bg-black/10 dark:bg-white/10 flex items-center justify-center transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/btn:translate-x-1 group-hover/btn:-translate-y-[1px] group-hover/btn:scale-105">
                           <IconArrowUpRight />
                         </span>
