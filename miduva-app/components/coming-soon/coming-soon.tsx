@@ -32,16 +32,6 @@ export function ComingSoon() {
             sizes="100vw"
           />
         )}
-        <div className={styles.heroWrap}>
-          <Image
-            src="/coming-soon/hero-infinity.png"
-            alt=""
-            fill
-            priority
-            className={styles.hero}
-            sizes="(max-width: 540px) 130vw, (max-width: 1024px) 82vw, 70vw"
-          />
-        </div>
       </div>
 
       <div className={styles.grain} aria-hidden="true" />
@@ -58,7 +48,7 @@ export function ComingSoon() {
         <header className={styles.head}>
           <div className={`${styles.label} ${styles.enter} ${styles.enter0}`}>
             <span className={styles.dot} aria-hidden="true" />
-            <span>Miduva / V0.NEXT — Calibrating</span>
+            <span>Miduva — Calibrating</span>
           </div>
           <div className={`${styles.headTrailing} ${styles.enter} ${styles.enter0}`}>
             Coming soon

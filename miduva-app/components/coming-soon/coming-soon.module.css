@@ -172,18 +172,20 @@
   mix-blend-mode: screen;
   filter: contrast(0.95) saturate(0.9) blur(2px);
   -webkit-mask-image: radial-gradient(
-    ellipse 70% 80% at 75% 30%,
+    ellipse 95% 110% at 75% 30%,
     #000 0%,
-    rgba(0, 0, 0, 0.8) 35%,
-    rgba(0, 0, 0, 0.4) 60%,
-    transparent 90%
+    rgba(0, 0, 0, 0.85) 30%,
+    rgba(0, 0, 0, 0.55) 55%,
+    rgba(0, 0, 0, 0.2) 80%,
+    transparent 100%
   );
   mask-image: radial-gradient(
-    ellipse 70% 80% at 75% 30%,
+    ellipse 95% 110% at 75% 30%,
     #000 0%,
-    rgba(0, 0, 0, 0.8) 35%,
-    rgba(0, 0, 0, 0.4) 60%,
-    transparent 90%
+    rgba(0, 0, 0, 0.85) 30%,
+    rgba(0, 0, 0, 0.55) 55%,
+    rgba(0, 0, 0, 0.2) 80%,
+    transparent 100%
   );
   animation: hazeDrift 32s ease-in-out infinite;
   will-change: opacity, transform;
@@ -204,22 +206,22 @@
   width: clamp(560px, 62vw, 1050px);
   aspect-ratio: 16 / 9;
   transform: translateY(-50%);
-  /* Aggressive left-edge mask so the ribbon's bright crossover never
-     crowds the headline. The headline ends ~38ch in; mask carries dark
-     across the leftmost ~55% of the hero element. */
+  /* The PNG carries its own alpha (luminance-cutout) so the rectangular
+     wrapper has nothing to hide. Keep only a light left-side mask so the
+     glow's bright crossover never crowds the headline on wide screens. */
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0%,
-    transparent 32%,
-    rgba(0, 0, 0, 0.6) 52%,
-    #000 72%
+    transparent 22%,
+    rgba(0, 0, 0, 0.5) 38%,
+    #000 58%
   );
   mask-image: linear-gradient(
     to right,
     transparent 0%,
-    transparent 32%,
-    rgba(0, 0, 0, 0.6) 52%,
-    #000 72%
+    transparent 22%,
+    rgba(0, 0, 0, 0.5) 38%,
+    #000 58%
   );
 }
 
@@ -317,9 +319,12 @@
 
 .main {
   align-self: center;
+  justify-self: center;
   max-width: 64rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: clamp(1.5rem, 3vw, 2.25rem);
 }
 
@@ -354,7 +359,8 @@
   display: flex;
   flex-direction: column;
   gap: clamp(0.875rem, 1.6vw, 1.125rem);
-  max-width: 30rem;
+  max-width: 26rem;
+  width: 100%;
 }
 
 .timing {
