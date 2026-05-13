@@ -223,7 +223,7 @@ function StepSlide({
               lineHeight: 1,
               letterSpacing: "-0.04em",
               color: "var(--teal-500)",
-              marginTop: isMobile ? 40 : "clamp(60px, 8vw, 120px)",
+              marginTop: isMobile ? 20 : "clamp(24px, 3vw, 48px)",
               marginBottom: isMobile ? 16 : "clamp(16px, 2vw, 32px)",
               textShadow: "0 0 60px rgba(43,200,183,0.25)",
             }}
