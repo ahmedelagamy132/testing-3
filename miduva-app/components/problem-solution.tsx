@@ -395,7 +395,7 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
           />
 
           {/* ── Bento Grid (Problems) ── */}
-          <div ref={bentoRef} className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-8">
+          <div ref={bentoRef} className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-8">
             <div className="mb-10 md:mb-12 text-center md:text-left">
               <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">
                 {problemEyebrow}
@@ -405,7 +405,7 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-5">
               <div ref={card1Ref} className="min-h-[300px] md:min-h-[380px] will-change-transform">
                 <ProblemCard problem={problems[0]} index={0} className="h-full" />
               </div>
