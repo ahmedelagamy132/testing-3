@@ -52,3 +52,4 @@ payload-types.ts
 # Tool-generated artifacts
 .impeccable/
 page.html
+tmp/
