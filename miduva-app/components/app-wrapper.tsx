@@ -39,13 +39,15 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
 
   return (
     <div className="relative min-h-screen overflow-x-clip">
-      <Nav ref={navRef} theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} data={data.nav} />
+      <Nav ref={navRef} theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} data={data.nav} branding={data.branding} />
       <main>
         <SvgMaskHero
           theme={theme}
           onRevealComplete={onRevealComplete}
           onRevealReverse={onRevealReverse}
           scanTarget={navRef}
+          illustrationDarkUrl={data.hero?.illustrationDarkUrl}
+          illustrationLightUrl={data.hero?.illustrationLightUrl}
         >
           <HeroContent theme={theme} data={data.hero} />
         </SvgMaskHero>

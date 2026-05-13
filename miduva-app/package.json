@@ -11,11 +11,13 @@
     "payload": "payload",
     "payload:generate": "payload generate:types",
     "payload:migrate": "payload migrate",
-    "payload:seed": "payload run payload/seed.ts"
+    "payload:seed": "payload run payload/seed.ts",
+    "payload:seed-images": "payload run payload/seed-images.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
     "@payloadcms/db-sqlite": "^3.84.1",
+    "@payloadcms/live-preview-react": "^3.84.1",
     "@payloadcms/next": "^3.84.1",
     "@payloadcms/richtext-lexical": "^3.84.1",
     "@splinetool/react-spline": "^4.1.0",

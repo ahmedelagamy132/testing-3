@@ -15,6 +15,8 @@ interface SvgMaskHeroProps {
   onRevealReverse?: () => void
   scanTarget?: React.RefObject<HTMLElement | null>
   theme?: "dark" | "light"
+  illustrationDarkUrl?: string
+  illustrationLightUrl?: string
 }
 
 type Phase = "intro" | "split" | "done"
@@ -29,7 +31,12 @@ export default function SvgMaskHero({
   onRevealComplete,
   children,
   theme = "dark",
+  illustrationDarkUrl,
+  illustrationLightUrl,
 }: SvgMaskHeroProps) {
+  const illustrationSrc = theme === "dark"
+    ? (illustrationDarkUrl || "/assets/system-dark.png")
+    : (illustrationLightUrl || "/assets/system-light.png")
   const [phase] = useState<Phase>("done")
   const hintRef = useRef<HTMLDivElement>(null)
 
@@ -76,7 +83,7 @@ export default function SvgMaskHero({
       {/* Background illustration */}
       <div className="hero-illustration" aria-hidden>
         <Image
-          src={theme === "dark" ? "/assets/system-dark.png" : "/assets/system-light.png"}
+          src={illustrationSrc}
           alt=""
           fill
           priority

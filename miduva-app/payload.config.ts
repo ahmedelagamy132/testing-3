@@ -8,6 +8,15 @@ import { subscribers } from './payload/collections/subscribers'
 export default buildConfig({
   admin: {
     user: 'users',
+    livePreview: {
+      url: '/preview',
+      breakpoints: [
+        { label: 'Mobile', name: 'mobile', width: 375, height: 667 },
+        { label: 'Tablet', name: 'tablet', width: 768, height: 1024 },
+        { label: 'Desktop', name: 'desktop', width: 1440, height: 900 },
+      ],
+      globals: ['landing-page'],
+    },
   },
 
   collections: [

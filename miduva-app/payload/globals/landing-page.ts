@@ -7,6 +7,30 @@ export const landingPage: GlobalConfig = {
     description: 'All content for the Miduva landing page.',
   },
   fields: [
+    // ── Branding ────────────────────────────────────────────────────────────
+    {
+      name: 'branding',
+      type: 'group',
+      label: 'Branding (logos)',
+      admin: {
+        description: 'Logos shown in the navigation bar. Use a transparent PNG. The "white" logo is used on dark sections, the regular logo on light sections.',
+      },
+      fields: [
+        {
+          name: 'logoDark',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Logo — dark version (used on light backgrounds)',
+        },
+        {
+          name: 'logoLight',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Logo — white/light version (used on dark backgrounds)',
+        },
+      ],
+    },
+
     // ── Navigation ──────────────────────────────────────────────────────────
     {
       name: 'nav',
@@ -54,6 +78,24 @@ export const landingPage: GlobalConfig = {
         { name: 'headline', type: 'text' },
         { name: 'tagline', type: 'text' },
         { name: 'body', type: 'textarea' },
+        {
+          name: 'illustrationDark',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Background illustration — dark mode',
+          admin: {
+            description: 'Large background visual behind the hero text when the site is in dark mode. Recommended: 2400×1600px, transparent or dark.',
+          },
+        },
+        {
+          name: 'illustrationLight',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Background illustration — light mode',
+          admin: {
+            description: 'Large background visual behind the hero text when the site is in light mode. Recommended: 2400×1600px.',
+          },
+        },
         {
           name: 'phrases',
           type: 'array',

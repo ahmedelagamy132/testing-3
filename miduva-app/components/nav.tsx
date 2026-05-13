@@ -1,7 +1,7 @@
 "use client"
 
 import { forwardRef, useState, useEffect } from "react"
-import type { NavData } from "@/lib/types"
+import type { BrandingData, NavData } from "@/lib/types"
 
 const DEFAULT_LEFT = [
   { n: "Services",     h: "#services"    },
@@ -19,10 +19,11 @@ interface NavProps {
   setTheme: (t: "dark" | "light") => void
   heroRevealed?: boolean
   data?: NavData
+  branding?: BrandingData
 }
 
 const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
-  { theme, setTheme, heroRevealed = true, data },
+  { theme, setTheme, heroRevealed = true, data, branding },
   ref,
 ) {
   const [scrolled, setScrolled] = useState(false)
@@ -65,7 +66,9 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
     ? "text-white/75 hover:text-white"
     : "text-[var(--muted)] hover:text-[var(--navy-900)]"
 
-  const logoSrc = useWhite ? "/assets/miduva-logo-white.png" : "/assets/miduva-logo.png"
+  const logoSrc = useWhite
+    ? (branding?.logoLightUrl || "/assets/miduva-logo-white.png")
+    : (branding?.logoDarkUrl || "/assets/miduva-logo.png")
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!href.startsWith("#")) return

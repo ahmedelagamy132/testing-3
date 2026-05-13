@@ -7,6 +7,12 @@ export interface HeroCta { label: string; href: string }
 export interface HeroData {
   headline?: string; tagline?: string; body?: string
   phrases?: string[]; primaryCta?: HeroCta; secondaryCta?: HeroCta
+  illustrationDarkUrl?: string; illustrationLightUrl?: string
+}
+
+export interface BrandingData {
+  logoDarkUrl?: string
+  logoLightUrl?: string
 }
 
 export interface SystemCard {
@@ -62,6 +68,7 @@ export interface FaqItem { id: string; num: string; question: string; answer: st
 export interface FaqData { items?: FaqItem[] }
 
 export interface LandingPageData {
+  branding?: BrandingData
   nav?: NavData; kpis?: KpiItem[]; hero?: HeroData; systems?: SystemsSectionData
   problemSolution?: ProblemSolutionData; results?: ResultsData; parallax?: ParallaxData
   whyMiduva?: WhyMiduvaData; howItWorks?: HowItWorksData; services?: ServicesData
