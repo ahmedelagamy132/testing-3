@@ -317,16 +317,17 @@ export default function FaqSection({ data }: { data?: FaqData }) {
         aria-hidden
         style={{
           position: "absolute",
-          left: "-28px",
+          left: "24px",
           top: "50%",
           transform: "translateY(-50%)",
-          fontSize: "clamp(200px, 24vw, 320px)",
+          fontSize: "clamp(320px, 72vh, 520px)",
           fontWeight: 900,
           lineHeight: 1,
           letterSpacing: "-0.06em",
-          color: isDark ? "rgba(43,200,183,0.046)" : "rgba(43,200,183,0.06)",
+          color: isDark ? "rgba(43,200,183,0.11)" : "rgba(43,200,183,0.09)",
           userSelect: "none",
           pointerEvents: "none",
+          zIndex: 0,
         }}
       >
         ?
