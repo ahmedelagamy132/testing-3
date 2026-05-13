@@ -208,28 +208,33 @@ function StepSlide({
       >
         {/* Giant number */}
         <motion.div
+          className="mono"
           style={{
-            scale: numScale,
+            marginTop: isMobile ? 20 : "clamp(24px, 3vw, 48px)",
+            marginBottom: isMobile ? 16 : "clamp(16px, 2vw, 32px)",
             opacity: numOpacity,
           }}
-          className="mono"
         >
-          <div
+          <motion.div
             style={{
-              fontSize: isMobile
-                ? "clamp(48px, 14vw, 80px)"
-                : "clamp(64px, 10vw, 160px)",
-              fontWeight: 800,
-              lineHeight: 1,
-              letterSpacing: "-0.04em",
-              color: "var(--teal-500)",
-              marginTop: isMobile ? 20 : "clamp(24px, 3vw, 48px)",
-              marginBottom: isMobile ? 16 : "clamp(16px, 2vw, 32px)",
-              textShadow: "0 0 60px rgba(43,200,183,0.25)",
+              scale: numScale,
             }}
           >
-            {step.num}
-          </div>
+            <div
+              style={{
+                fontSize: isMobile
+                  ? "clamp(48px, 14vw, 80px)"
+                  : "clamp(64px, 10vw, 160px)",
+                fontWeight: 800,
+                lineHeight: 1,
+                letterSpacing: "-0.04em",
+                color: "var(--teal-500)",
+                textShadow: "0 0 60px rgba(43,200,183,0.25)",
+              }}
+            >
+              {step.num}
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* Title */}
