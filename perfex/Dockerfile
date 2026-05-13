@@ -1,4 +1,4 @@
-FROM php:8.1-apache
+FROM php:8.1-apache-bookworm
 
 # Install all PHP extensions required by Perfex CRM
 RUN apt-get update && apt-get install -y \

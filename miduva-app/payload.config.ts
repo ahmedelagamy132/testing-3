@@ -2,7 +2,7 @@ import path from 'path'
 import { buildConfig } from 'payload'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { landingPage } from './payload/globals/landing-page.ts'
+import { landingPage } from './payload/globals/landing-page'
 
 export default buildConfig({
   admin: {
