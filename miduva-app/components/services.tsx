@@ -100,7 +100,10 @@ export default function Services({ data }: { data?: ServicesData }) {
   const ctaHref      = data?.ctaHref      ?? "#cta"
 
   const slides: Slide[] = data?.categories?.length
-    ? (data.categories as Slide[])
+    ? data.categories.map((s, i) => ({
+        ...(s as Slide),
+        imageUrl: (s as Slide).imageUrl || DEFAULT_SLIDES[i]?.imageUrl || DEFAULT_SLIDES[0].imageUrl,
+      }))
     : DEFAULT_SLIDES
 
   return (

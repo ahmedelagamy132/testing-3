@@ -93,10 +93,7 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
             {/* Layer 3 — title */}
             <div data-parallax-layer="3" className="parallax__layer">
               <div style={{ textAlign: "center" }}>
-                <div
-                  className="mono"
-                  style={{ fontSize: 13, letterSpacing: ".22em", textTransform: "uppercase", color: "var(--teal-500)", marginBottom: 18 }}
-                >
+                <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">
                   {eyebrow}
                 </div>
                 <h2 className="parallax__title">

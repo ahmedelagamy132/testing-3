@@ -3,6 +3,18 @@
 import { useState, useEffect } from "react"
 import { motion } from "motion/react"
 
+function useIsDark() {
+  const [isDark, setIsDark] = useState(true)
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
+    check()
+    const observer = new MutationObserver(check)
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
+    return () => observer.disconnect()
+  }, [])
+  return isDark
+}
+
 const MODULES = [
   {
     n: "Paid Ads",
@@ -380,26 +392,48 @@ function ModuleCard({
   span,
   visual,
   index,
-}: (typeof MODULES)[number] & { index: number }) {
+  isDark,
+}: (typeof MODULES)[number] & { index: number; isDark: boolean }) {
   const [hovered, setHovered] = useState(false)
   const isTeal = color === "teal"
-  const accent = isTeal ? "var(--teal-500)" : "var(--navy-700)"
+
+  const accent = isTeal
+    ? "var(--teal-500)"
+    : isDark ? "#ADBFE8" : "var(--navy-700)"
   const accentGlow = isTeal
     ? "rgba(43,200,183,0.18)"
-    : "rgba(74,123,196,0.18)"
+    : isDark ? "rgba(173,191,232,0.15)" : "rgba(74,123,196,0.18)"
   const accentBorder = isTeal
     ? "rgba(43,200,183,0.35)"
-    : "rgba(74,123,196,0.38)"
+    : isDark ? "rgba(173,191,232,0.28)" : "rgba(74,123,196,0.38)"
+
+  const baseBg = isDark
+    ? "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)"
+    : "var(--card)"
+  const baseBorder = isDark ? "rgba(255,255,255,0.07)" : "var(--line)"
+  const baseShadow = isDark
+    ? "0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05)"
+    : "0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.05)"
+  const hoverShadow = isDark
+    ? `0 20px 50px -15px ${accentGlow}, 0 4px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08)`
+    : `0 20px 50px -15px ${accentGlow}, inset 0 1px 0 rgba(255,255,255,0.06)`
+
+  const iconBg = isTeal
+    ? "var(--teal-50)"
+    : isDark ? "rgba(173,191,232,0.08)" : "rgba(74,123,196,0.10)"
+  const iconGlow = hovered
+    ? isTeal
+      ? "0 0 16px rgba(43,200,183,0.25)"
+      : isDark ? "0 0 16px rgba(173,191,232,0.20)" : "0 0 16px rgba(74,123,196,0.20)"
+    : "none"
 
   return (
     <div
       className="group relative rounded-2xl overflow-hidden transition-all duration-500 h-full"
       style={{
-        background: "var(--card)",
-        border: `1px solid ${hovered ? accentBorder : "var(--line)"}`,
-        boxShadow: hovered
-          ? `0 20px 50px -15px ${accentGlow}, inset 0 1px 0 rgba(255,255,255,0.06)`
-          : "0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.05)",
+        background: baseBg,
+        border: `1px solid ${hovered ? accentBorder : baseBorder}`,
+        boxShadow: hovered ? hoverShadow : baseShadow,
         transform: hovered ? "translateY(-4px) scale(1.01)" : "translateY(0) scale(1)",
       }}
       onMouseEnter={() => setHovered(true)}
@@ -432,12 +466,8 @@ function ModuleCard({
               style={{
                 width: 36,
                 height: 36,
-                background: isTeal ? "var(--teal-50)" : "rgba(74,123,196,0.10)",
-                boxShadow: hovered
-                  ? isTeal
-                    ? "0 0 16px rgba(43,200,183,0.25)"
-                    : "0 0 16px rgba(74,123,196,0.20)"
-                  : "none",
+                background: iconBg,
+                boxShadow: iconGlow,
               }}
             >
               <span
@@ -475,7 +505,11 @@ function ModuleCard({
           <span
             className="mono text-[10px] font-bold px-2 py-1 rounded-md transition-colors duration-300"
             style={{
-              background: hovered ? (isTeal ? "var(--teal-50)" : "rgba(74,123,196,0.12)") : "transparent",
+              background: hovered
+                ? isTeal
+                  ? "var(--teal-50)"
+                  : isDark ? "rgba(173,191,232,0.10)" : "rgba(74,123,196,0.12)"
+                : "transparent",
               color: accent,
             }}
           >
@@ -514,6 +548,8 @@ function ModuleCard({
 }
 
 export default function SystemRibbon() {
+  const isDark = useIsDark()
+
   return (
     <section id="systems" className="mt-16 md:mt-20">
       {/* Header */}
@@ -561,7 +597,7 @@ export default function SystemRibbon() {
               transition={{ duration: 0.5, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
               className={m.span === 2 ? "sm:col-span-2" : "col-span-1"}
             >
-              <ModuleCard {...m} index={i} />
+              <ModuleCard {...m} index={i} isDark={isDark} />
             </motion.div>
           ))}
         </div>

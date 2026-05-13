@@ -4,7 +4,7 @@ import { RootLayout } from '@payloadcms/next/layouts'
 import { handleServerFunctions } from '@payloadcms/next/layouts'
 import config from '@payload-config'
 import { importMap } from './importMap.js'
-import '@payloadcms/ui/scss/app.scss'
+import '@payloadcms/next/css'
 export { metadata } from '@payloadcms/next/layouts'
 
 const serverFn: ServerFunctionClient = async function (args) {

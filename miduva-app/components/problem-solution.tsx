@@ -396,26 +396,24 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
 
           {/* ── Bento Grid (Problems) ── */}
           <div ref={bentoRef} className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-8">
-            <div className="mb-5 md:mb-6 text-center md:text-left">
-              <div className="inline-flex mb-3">
-                <span className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--teal-500)] font-medium px-3 py-1 rounded-full bg-[var(--teal-500)]/[0.06] ring-1 ring-[var(--teal-500)]/15">
-                  {problemEyebrow}
-                </span>
+            <div className="mb-10 md:mb-12 text-center md:text-left">
+              <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">
+                {problemEyebrow}
               </div>
               <h2 className="text-[32px] md:text-[44px] lg:text-[56px] font-extrabold tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
                 {problemHeadline}
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 md:h-[420px] lg:h-[460px]">
-              <div ref={card1Ref} className="h-full md:row-span-2 will-change-transform">
-                <ProblemCard problem={problems[0]} index={0} />
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
+              <div ref={card1Ref} className="min-h-[300px] md:min-h-[380px] will-change-transform">
+                <ProblemCard problem={problems[0]} index={0} className="h-full" />
               </div>
-              <div ref={card2Ref} className="h-full will-change-transform">
-                <ProblemCard problem={problems[1]} index={1} />
+              <div ref={card2Ref} className="min-h-[300px] md:min-h-[380px] will-change-transform">
+                <ProblemCard problem={problems[1]} index={1} className="h-full" />
               </div>
-              <div ref={card3Ref} className="h-full will-change-transform">
-                <ProblemCard problem={problems[2]} index={2} />
+              <div ref={card3Ref} className="min-h-[300px] md:min-h-[380px] will-change-transform">
+                <ProblemCard problem={problems[2]} index={2} className="h-full" />
               </div>
             </div>
           </div>
@@ -435,10 +433,8 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
                   <div className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(43,200,183,0.13) 0%, transparent 65%)", filter: "blur(44px)" }} aria-hidden />
 
                   <div className="relative z-10 px-8 py-12 md:px-14 md:py-16 lg:px-20 lg:py-20 flex flex-col gap-7 md:gap-8">
-                    <div ref={eyebrowRef} className="inline-flex">
-                      <span className="mono text-[10px] uppercase tracking-[0.2em] text-[var(--teal-500)] font-medium px-3 py-1 rounded-full bg-[var(--teal-500)]/[0.08] ring-1 ring-[var(--teal-500)]/15">
-                        / the solution
-                      </span>
+                    <div ref={eyebrowRef} className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)]">
+                      / the solution
                     </div>
 
                     <p ref={headlineRef} className="text-[28px] md:text-[44px] lg:text-[56px] font-extrabold tracking-[-0.035em] leading-[1.08] text-white max-w-4xl">

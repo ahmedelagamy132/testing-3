@@ -169,7 +169,7 @@ function SystemGridCard({
 				<div ref={imgRef} className="md:[direction:ltr] order-1 will-change-transform">
 					<div className="overflow-hidden rounded-[28px] border border-[var(--line)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)]">
 						<img
-							src={system.imageUrl}
+							src={system.imageUrl || undefined}
 							alt={system.label}
 							className="w-full h-[44vh] md:h-[62vh] object-cover"
 							loading="lazy"
@@ -345,7 +345,7 @@ function SystemsSection({ systems }: { systems: System[] }) {
 						className="overflow-hidden h-[62vh] w-[40vw] border border-[var(--line)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)]"
 					>
 						<img
-							src={systems[0].imageUrl}
+							src={systems[0].imageUrl || undefined}
 							alt={systems[0].label}
 							className="h-full w-full object-cover"
 						/>
@@ -403,7 +403,7 @@ function MobileSystemsSection({ systems }: { systems: System[] }) {
 				<div key={system.id} className="mb-16 last:mb-0">
 					<div className="overflow-hidden rounded-[28px] border border-[var(--line)] mb-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)]">
 						<img
-							src={system.imageUrl}
+							src={system.imageUrl || undefined}
 							alt={system.label}
 							className="w-full h-[240px] sm:h-[300px] object-cover"
 							loading="lazy"
@@ -425,7 +425,10 @@ export default function SystemsZoomSection({ data }: { data?: SystemsSectionData
 	const headline      = data?.headline      ?? 'Three systems.'
 	const headlineAccent = data?.headlineAccent ?? 'One growth machine.'
 	const systems: System[] = data?.systems?.length
-		? (data.systems as System[])
+		? data.systems.map((s, i) => ({
+				...s,
+				imageUrl: s.imageUrl || DEFAULT_SYSTEMS[i]?.imageUrl || DEFAULT_SYSTEMS[0].imageUrl,
+		  }))
 		: DEFAULT_SYSTEMS
 
 	return (

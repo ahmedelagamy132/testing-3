@@ -1,0 +1,72 @@
+services:
+
+  # ── Reverse proxy ─────────────────────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - certbot_www:/var/www/certbot:ro
+      - certbot_conf:/etc/letsencrypt:ro
+    depends_on:
+      - nextjs
+      - perfex
+    networks:
+      - app
+    restart: unless-stopped
+
+  # ── Next.js + Payload CMS ─────────────────────────────────────────────────
+  nextjs:
+    build:
+      context: ./miduva-app
+    environment:
+      - NODE_ENV=production
+      - PAYLOAD_SECRET=${PAYLOAD_SECRET}
+      - DATABASE_URI=file:/data/payload.db
+    volumes:
+      - payload_db:/data               # persists payload.db across rebuilds
+      - payload_media:/app/public/media  # persists uploaded images
+    networks:
+      - app
+    restart: unless-stopped
+
+  # ── Perfex CRM (PHP 8.1 + Apache) ────────────────────────────────────────
+  perfex:
+    build:
+      context: ./perfex
+    volumes:
+      - ./perfex/html:/var/www/html    # bind mount — easy to update without rebuild
+    depends_on:
+      - mysql
+    networks:
+      - app
+    restart: unless-stopped
+
+  # ── MySQL (Perfex database only) ──────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=perfex
+      - MYSQL_USER=perfex
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app
+    restart: unless-stopped
+
+# ── Volumes ───────────────────────────────────────────────────────────────────
+volumes:
+  payload_db:      # SQLite database file
+  payload_media:   # Payload-uploaded images
+  mysql_data:      # Perfex MySQL data
+  certbot_www:     # Let's Encrypt ACME challenge webroot
+  certbot_conf:    # Let's Encrypt certificates
+
+# ── Network ───────────────────────────────────────────────────────────────────
+networks:
+  app:
+    driver: bridge

@@ -1,0 +1,11 @@
+# Secrets — never commit
+.env
+
+# Perfex CRM files (uploaded separately by admin)
+perfex/html/
+
+# Certificates (managed by Certbot on server)
+nginx/ssl/
+
+# Scratch / non-production sub-projects
+studio-hello-world/

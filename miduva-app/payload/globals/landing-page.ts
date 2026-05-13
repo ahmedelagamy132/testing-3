@@ -105,6 +105,9 @@ export const landingPage: GlobalConfig = {
               type: 'upload',
               relationTo: 'media',
               label: 'Card image',
+              admin: {
+                description: 'Recommended: 800×600px. This image appears inside the system card when the user zooms in.',
+              },
             },
           ],
         },
@@ -251,6 +254,9 @@ export const landingPage: GlobalConfig = {
               type: 'upload',
               relationTo: 'media',
               label: 'Step background image',
+              admin: {
+                description: 'Recommended: 800×600px. This image appears as the background for this step card.',
+              },
             },
           ],
         },
@@ -286,7 +292,30 @@ export const landingPage: GlobalConfig = {
               type: 'upload',
               relationTo: 'media',
               label: 'Category image',
+              admin: {
+                description: 'Recommended: 800×600px. This image is shown on the service category card.',
+              },
             },
+          ],
+        },
+      ],
+    },
+
+    // ── FAQ ─────────────────────────────────────────────────────────────────
+    {
+      name: 'faq',
+      type: 'group',
+      label: 'FAQ Section',
+      fields: [
+        {
+          name: 'items',
+          type: 'array',
+          label: 'FAQ items',
+          fields: [
+            { name: 'id', type: 'text', required: true },
+            { name: 'num', type: 'text', required: true },
+            { name: 'question', type: 'text', required: true },
+            { name: 'answer', type: 'textarea', required: true },
           ],
         },
       ],

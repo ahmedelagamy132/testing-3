@@ -313,7 +313,7 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
 
       {/* Giant watermark */}
       <motion.div aria-hidden className="absolute top-[10%] left-1/2 -translate-x-1/2 pointer-events-none select-none z-0" style={{ y: yWatermark }}>
-        <span className="block text-[clamp(180px,22vw,380px)] font-extrabold tracking-[-0.06em] leading-none mono" style={{ color: isDark ? "rgba(255,255,255,0.015)" : "rgba(15,35,73,0.04)" }}>
+        <span className="block text-[clamp(180px,22vw,380px)] font-extrabold tracking-[-0.06em] leading-none mono" style={{ color: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,35,73,0.10)" }}>
           WHY
         </span>
       </motion.div>
@@ -331,7 +331,7 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
 
         {/* Eyebrow tag */}
         <motion.div
-          className={`inline-flex items-center rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.2em] font-medium ring-1 text-teal-400 mb-8 mono ${isDark ? "bg-white/[0.04] ring-white/[0.1]" : "bg-[var(--chip)] ring-[var(--line)]"}`}
+          className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4"
           initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
           animate={isInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 20, filter: "blur(6px)" }}
           transition={{ duration: 0.7, ease: EASE_FLUID }}

@@ -187,6 +187,18 @@ export async function getLandingPageData(): Promise<LandingPageData> {
       }
     }
 
+    // ── faq ────────────────────────────────────────────────────────────────
+    if (doc.faq?.items?.length) {
+      data.faq = {
+        items: (doc.faq.items ?? []).map((item: AnyDoc) => ({
+          id: item.id,
+          num: item.num,
+          question: item.question,
+          answer: item.answer ?? '',
+        })),
+      }
+    }
+
     return data
   } catch (error) {
     console.error('[getLandingPageData] Failed to fetch from Payload:', error)

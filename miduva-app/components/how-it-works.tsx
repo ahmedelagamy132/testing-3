@@ -133,21 +133,24 @@ function StepSlide({
       >
         <motion.div
           style={{
+            position: "relative",
             width: "100%",
             height: "100%",
             scale: imageScale,
           }}
         >
-          <Image
-            src={step.imageUrl}
-            alt={step.title}
-            fill
-            unoptimized
-            style={{
-              objectFit: "cover",
-              objectPosition: isMobile ? "center top" : "center",
-            }}
-          />
+          {step.imageUrl && (
+            <Image
+              src={step.imageUrl}
+              alt={step.title}
+              fill
+              unoptimized
+              style={{
+                objectFit: "cover",
+                objectPosition: isMobile ? "center top" : "center",
+              }}
+            />
+          )}
 
           {!isMobile && (
             <>
@@ -342,7 +345,12 @@ function ProgressBar({ progress, isDark }: { progress: ReturnType<typeof useScro
 export default function HowItWorks({ data }: { data?: HowItWorksData }) {
   const eyebrow  = data?.eyebrow  ?? "/ how it works"
   const headline = data?.headline ?? "From audit to scale —"
-  const steps: Step[] = data?.steps?.length ? (data.steps as Step[]) : DEFAULT_STEPS
+  const steps: Step[] = data?.steps?.length
+    ? data.steps.map((s, i) => ({
+        ...(s as Step),
+        imageUrl: (s as Step).imageUrl || DEFAULT_STEPS[i]?.imageUrl || DEFAULT_STEPS[0].imageUrl,
+      }))
+    : DEFAULT_STEPS
 
   const sectionRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({

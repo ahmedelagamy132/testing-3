@@ -230,6 +230,67 @@ async function seed() {
         ],
       },
 
+      faq: {
+        items: [
+          {
+            id: 'different',
+            num: '01',
+            question: 'How is Miduva different from a traditional marketing agency?',
+            answer:
+              'Traditional agencies sell services: ad management, email sequences, content calendars. Miduva builds the infrastructure those services run on. We design a complete acquisition and conversion system, wire it together across your channels, and hand it to you fully owned. When the engagement ends, the system keeps running without us.',
+          },
+          {
+            id: 'specialize',
+            num: '02',
+            question: 'Do you work with any business, or do you specialize?',
+            answer:
+              'We work best with B2B SaaS companies and DTC brands generating between $1M and $30M in annual revenue. At that stage, there\'s enough volume to optimize against and enough complexity to warrant a system. Earlier-stage companies often need a different approach, and we\'ll say so upfront rather than take the engagement.',
+          },
+          {
+            id: 'first30',
+            num: '03',
+            question: 'What does the first 30 days actually look like?',
+            answer:
+              'We start with a full audit: current channels, funnel performance, conversion rates, and attribution. In week two, you receive a system blueprint, a prioritized roadmap, and the baseline KPIs we\'ll measure against. By day 30, the first components are live and generating real data. No 90-day ramp-up periods.',
+          },
+          {
+            id: 'timeline',
+            num: '04',
+            question: 'How quickly will I see results?',
+            answer:
+              'Most clients see measurable changes within 30 to 60 days. Meaningful ROI, the kind you\'d present in a board meeting, typically lands in the 60 to 90 day window as the system compounds. We put these expectations in writing before we start, not after a quarter passes.',
+          },
+          {
+            id: 'performance',
+            num: '05',
+            question: 'What if the system doesn\'t perform?',
+            answer:
+              'We build in checkpoints at 30, 60, and 90 days. If a component isn\'t hitting its benchmark, we diagnose and rebuild it, not add more budget to something broken. Every system ships with defined success criteria, and we hold ourselves to those, not to billable-hour targets.',
+          },
+          {
+            id: 'budget',
+            num: '06',
+            question: 'Do I need a large budget to get started?',
+            answer:
+              'We don\'t have a fixed minimum, but we do require an existing audience or traffic source to work with. Cold-start growth from zero is a different playbook. If you\'re already generating leads or revenue and want to systematize and scale, we\'re likely a strong fit.',
+          },
+          {
+            id: 'team',
+            num: '07',
+            question: 'Will I need to hire a team to manage what you build?',
+            answer:
+              'No. Operational independence is a design constraint on every system we build. It should run with minimal ongoing management from your side. We document everything, train your team on the parts that matter, and design for the scenario where we\'re no longer involved.',
+          },
+          {
+            id: 'ownership',
+            num: '08',
+            question: 'What does \'owned by you\' mean in practice?',
+            answer:
+              'Every tool, account, campaign, and automation lives in your accounts from day one. No proprietary platforms, no locked dashboards, no client portal we control. If you want to bring operations in-house or hand the system to another team, you can. We have no lock-in incentive.',
+          },
+        ],
+      },
+
       services: {
         eyebrow: '/ what we do',
         headline: 'Everything you need',
@@ -320,7 +381,7 @@ async function seed() {
   process.exit(0)
 }
 
-seed().catch((err) => {
+await seed().catch((err) => {
   console.error('❌ Seed failed:', err)
   process.exit(1)
 })

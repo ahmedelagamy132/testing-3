@@ -49,4 +49,6 @@ payload-types.ts
 # uploaded media (persisted as Docker volume in production)
 /public/media/
 
-.vercel
+# Tool-generated artifacts
+.impeccable/
+page.html
