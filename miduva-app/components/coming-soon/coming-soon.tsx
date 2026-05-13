@@ -32,14 +32,14 @@ export function ComingSoon() {
             sizes="100vw"
           />
         )}
-        <div className={styles.torusWrap}>
+        <div className={styles.heroWrap}>
           <Image
-            src="/coming-soon/hero-torus.png"
+            src="/coming-soon/hero-infinity.png"
             alt=""
             fill
             priority
-            className={styles.torus}
-            sizes="(max-width: 540px) 130vw, (max-width: 1024px) 78vw, 64vw"
+            className={styles.hero}
+            sizes="(max-width: 540px) 130vw, (max-width: 1024px) 82vw, 70vw"
           />
         </div>
       </div>
