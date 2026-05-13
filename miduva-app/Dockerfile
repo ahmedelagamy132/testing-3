@@ -44,6 +44,12 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder /app/.next      ./.next
 COPY --from=builder /app/public     ./public
 
+# Copy payload source + tsconfig so `npm run payload:seed` works at runtime
+# (tsconfig provides the @payload-config path alias that tsx needs)
+COPY --from=builder /app/payload        ./payload
+COPY --from=builder /app/payload.config.ts ./payload.config.ts
+COPY --from=builder /app/tsconfig.json  ./tsconfig.json
+
 # Copy node_modules with native bindings (better-sqlite3 .node files)
 COPY --from=deps /app/node_modules ./node_modules
 
