@@ -365,7 +365,7 @@
 
 .timing {
   font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--cs-ink-faded);
