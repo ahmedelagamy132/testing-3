@@ -47,7 +47,6 @@ export function ComingSoon() {
         {/* Head row: machine label + status */}
         <header className={styles.head}>
           <div className={`${styles.label} ${styles.enter} ${styles.enter0}`}>
-            <span className={styles.dot} aria-hidden="true" />
             <span>Miduva — Calibrating</span>
           </div>
           <div className={`${styles.headTrailing} ${styles.enter} ${styles.enter0}`}>
