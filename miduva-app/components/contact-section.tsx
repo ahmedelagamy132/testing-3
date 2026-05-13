@@ -12,11 +12,12 @@ import {
   CheckCircle2,
   Send,
 } from "lucide-react"
+import type { ContactData } from "@/lib/types"
 
 const EASE_FLUID  = [0.32, 0.72, 0, 1] as const
 const EASE_SMOOTH = [0.22, 1, 0.36, 1] as const
 
-const SERVICE_OPTIONS = [
+const DEFAULT_SERVICE_OPTIONS = [
   { value: "",                  label: "Select a service..." },
   { value: "growth-marketing",  label: "Growth & Marketing" },
   { value: "conversion-funnels",label: "Conversion & Funnels" },
@@ -27,16 +28,18 @@ const SERVICE_OPTIONS = [
   { value: "full-system",       label: "Full Growth System" },
 ]
 
-const TRUST_ITEMS = [
+const DEFAULT_TRUST_ITEMS = [
   { stat: "4.8×",    label: "Average ROAS" },
   { stat: "+312%",   label: "Lead Volume" },
   { stat: "14 days", label: "Time to Launch" },
   { stat: "94%",     label: "Client Retention" },
 ]
 
-const CONTACT_INFO = [
-  { icon: Mail,      label: "hello@miduva.com" },
-  { icon: Building2, label: "Available Worldwide · Remote-First" },
+const ICON_BY_NAME = { mail: Mail, building: Building2 } as const
+
+const DEFAULT_CONTACT_INFO: { icon: keyof typeof ICON_BY_NAME; label: string }[] = [
+  { icon: "mail",      label: "hello@miduva.com" },
+  { icon: "building",  label: "Available Worldwide · Remote-First" },
 ]
 
 function useIsDark() {
@@ -337,10 +340,24 @@ function SuccessState({ isDark, onReset }: { isDark: boolean; onReset: () => voi
   )
 }
 
-export default function ContactSection() {
+export default function ContactSection({ data }: { data?: ContactData } = {}) {
   const sectionRef = useRef<HTMLDivElement>(null)
   const isInView   = useInView(sectionRef, { once: true, margin: "-80px" })
   const isDark     = useIsDark()
+
+  const eyebrow         = data?.eyebrow         ?? "/ get in touch"
+  const headline        = data?.headline        ?? "Let's build something"
+  const headlineAccent  = data?.headlineAccent  ?? "that actually works."
+  const body            = data?.body            ?? "Tell us about your business. We'll review your situation and respond with a tailored plan — not a sales pitch."
+  const contactInfo     = data?.contactInfo?.length ? data.contactInfo : DEFAULT_CONTACT_INFO
+  const trustStats      = data?.trustStats?.length  ? data.trustStats  : DEFAULT_TRUST_ITEMS
+  const formHeadline    = data?.formHeadline    ?? "Start the conversation"
+  const formSubheadline = data?.formSubheadline ?? "We respond within 24 hours · No spam, ever"
+  const serviceOptions  = data?.serviceOptions?.length
+    ? [{ value: "", label: "Select a service..." }, ...data.serviceOptions]
+    : DEFAULT_SERVICE_OPTIONS
+  const submitLabel     = data?.submitLabel     ?? "Send Message"
+  const finePrint       = data?.finePrint       ?? "No commitment · No credit card · 100% Confidential"
 
   const [values,    setValues]    = useState<FormState>(INITIAL_STATE)
   const [errors,    setErrors]    = useState<FormErrors>({})
@@ -444,7 +461,7 @@ export default function ContactSection() {
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
               transition={{ duration: 0.5, ease: EASE_SMOOTH }}
             >
-              / get in touch
+              {eyebrow}
             </motion.div>
 
             {/* Headline */}
@@ -458,8 +475,8 @@ export default function ContactSection() {
               animate={isInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 40, filter: "blur(8px)" }}
               transition={{ duration: 0.7, delay: 0.1, ease: EASE_FLUID }}
             >
-              Let&apos;s build something<br />
-              <span className="shine">that actually works.</span>
+              {headline}<br />
+              <span className="shine">{headlineAccent}</span>
             </motion.h2>
 
             {/* Body */}
@@ -472,7 +489,7 @@ export default function ContactSection() {
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
               transition={{ duration: 0.55, delay: 0.22, ease: EASE_SMOOTH }}
             >
-              Tell us about your business. We&apos;ll review your situation and respond with a tailored plan — not a sales pitch.
+              {body}
             </motion.p>
 
             {/* Contact info */}
@@ -482,21 +499,24 @@ export default function ContactSection() {
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.5, delay: 0.32, ease: EASE_SMOOTH }}
             >
-              {CONTACT_INFO.map(({ icon: Icon, label }) => (
-                <div key={label} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{
-                    width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                    background: isDark ? "rgba(43,200,183,0.10)" : "rgba(43,200,183,0.07)",
-                    border: `1px solid rgba(43,200,183,${isDark ? "0.20" : "0.15"})`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <Icon style={{ width: 16, height: 16, color: "var(--teal-500)" }} strokeWidth={1.5} />
+              {contactInfo.map(({ icon, label }) => {
+                const Icon = ICON_BY_NAME[icon] ?? Mail
+                return (
+                  <div key={label} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                      background: isDark ? "rgba(43,200,183,0.10)" : "rgba(43,200,183,0.07)",
+                      border: `1px solid rgba(43,200,183,${isDark ? "0.20" : "0.15"})`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <Icon style={{ width: 16, height: 16, color: "var(--teal-500)" }} strokeWidth={1.5} />
+                    </div>
+                    <span style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.60)" : "var(--muted)" }}>
+                      {label}
+                    </span>
                   </div>
-                  <span style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.60)" : "var(--muted)" }}>
-                    {label}
-                  </span>
-                </div>
-              ))}
+                )
+              })}
             </motion.div>
 
             {/* KPI mini-grid */}
@@ -507,7 +527,7 @@ export default function ContactSection() {
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
               transition={{ duration: 0.55, delay: 0.44, ease: EASE_SMOOTH }}
             >
-              {TRUST_ITEMS.map(({ stat, label }) => (
+              {trustStats.map(({ stat, label }) => (
                 <div
                   key={label}
                   style={{
@@ -585,10 +605,10 @@ export default function ContactSection() {
                           fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em",
                           color: isDark ? "white" : "var(--ink)", margin: "0 0 6px",
                         }}>
-                          Start the conversation
+                          {formHeadline}
                         </h3>
                         <p style={{ fontSize: 13, color: "var(--muted)", margin: 0 }}>
-                          We respond within 24 hours · No spam, ever
+                          {formSubheadline}
                         </p>
                       </motion.div>
 
@@ -623,7 +643,7 @@ export default function ContactSection() {
                       <div style={{ marginBottom: 14 }}>
                         <ContactSelect
                           label="Service Interest" value={values.service}
-                          options={SERVICE_OPTIONS} index={3}
+                          options={serviceOptions} index={3}
                           isDark={isDark} isInView={isInView}
                           onChange={v => {
                             setValues(p => ({ ...p, service: v }))
@@ -692,7 +712,7 @@ export default function ContactSection() {
                         ) : (
                           <>
                             <Send style={{ width: 16, height: 16 }} strokeWidth={2} />
-                            Send Message
+                            {submitLabel}
                             <ArrowRight style={{ width: 15, height: 15 }} strokeWidth={2.5} />
                           </>
                         )}
@@ -710,7 +730,7 @@ export default function ContactSection() {
                         animate={isInView ? { opacity: 1 } : { opacity: 0 }}
                         transition={{ duration: 0.5, delay: 0.7 }}
                       >
-                        No commitment · No credit card · 100% Confidential
+                        {finePrint}
                       </motion.p>
                     </motion.form>
                   )}

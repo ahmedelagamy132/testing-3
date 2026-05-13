@@ -41,35 +41,61 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
     <div className="relative min-h-screen overflow-x-clip">
       <Nav ref={navRef} theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} data={data.nav} branding={data.branding} />
       <main>
-        <SvgMaskHero
-          theme={theme}
-          onRevealComplete={onRevealComplete}
-          onRevealReverse={onRevealReverse}
-          scanTarget={navRef}
-          illustrationDarkUrl={data.hero?.illustrationDarkUrl}
-          illustrationLightUrl={data.hero?.illustrationLightUrl}
-        >
-          <HeroContent theme={theme} data={data.hero} />
-        </SvgMaskHero>
-        <SystemsZoomSection data={data.systems} />
-        <ProblemSolution data={data.problemSolution} />
-        <HowItWorks data={data.howItWorks} />
-        <ResultsStats data={data.results} />
-        <WhyMiduva data={data.whyMiduva} />
-        <ParallaxSection data={data.parallax} />
-        <div className="px-6 py-10 md:py-14">
+        <div id="anchor-hero" className="preview-anchor">
+          <SvgMaskHero
+            theme={theme}
+            onRevealComplete={onRevealComplete}
+            onRevealReverse={onRevealReverse}
+            scanTarget={navRef}
+            illustrationDarkUrl={data.hero?.illustrationDarkUrl}
+            illustrationLightUrl={data.hero?.illustrationLightUrl}
+          >
+            <HeroContent theme={theme} data={data.hero} />
+          </SvgMaskHero>
+        </div>
+        <div id="anchor-systems" className="preview-anchor">
+          <SystemsZoomSection data={data.systems} />
+        </div>
+        <div id="anchor-problem-solution" className="preview-anchor">
+          <ProblemSolution data={data.problemSolution} />
+        </div>
+        <div id="anchor-how-it-works" className="preview-anchor">
+          <HowItWorks data={data.howItWorks} />
+        </div>
+        <div id="anchor-results" className="preview-anchor">
+          <ResultsStats data={data.results} />
+        </div>
+        <div id="anchor-why-miduva" className="preview-anchor">
+          <WhyMiduva data={data.whyMiduva} />
+        </div>
+        <div id="anchor-parallax" className="preview-anchor">
+          <ParallaxSection data={data.parallax} />
+        </div>
+        <div id="anchor-dashboard" className="preview-anchor px-6 py-10 md:py-14">
           <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
-            <Dashboard />
+            <Dashboard data={data.dashboard} />
           </div>
         </div>
-        <Services data={data.services} />
-        <SystemRibbon />
-        <FaqSection data={data.faq} />
+        <div id="anchor-services" className="preview-anchor">
+          <Services data={data.services} />
+        </div>
+        <div id="anchor-growth-os" className="preview-anchor">
+          <SystemRibbon data={data.growthOs} />
+        </div>
+        <div id="anchor-faq" className="preview-anchor">
+          <FaqSection data={data.faq} />
+        </div>
         <div className="h-12 md:h-20" />
-        <FreeOffer theme={theme} />
-        <ContactSection />
+        <div id="anchor-free-offer" className="preview-anchor">
+          <FreeOffer theme={theme} data={data.freeOffer} />
+        </div>
+        <div id="anchor-contact" className="preview-anchor">
+          <ContactSection data={data.contact} />
+        </div>
       </main>
-      <CinematicFooter />
+      <div id="anchor-footer" className="preview-anchor">
+        <CinematicFooter data={data.footer} />
+      </div>
     </div>
   )
 }

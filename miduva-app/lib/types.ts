@@ -1,8 +1,6 @@
 export interface NavLink { label: string; href: string }
 export interface NavData { leftLinks?: NavLink[]; rightLinks?: NavLink[] }
 
-export interface KpiItem { key: string; value: string }
-
 export interface HeroCta { label: string; href: string }
 export interface HeroData {
   headline?: string; tagline?: string; body?: string
@@ -19,8 +17,11 @@ export interface SystemCard {
   id: string; num: string; label: string
   title: string; description: string; imageUrl: string
 }
+export interface SystemBackgroundImage { url: string; alt: string }
 export interface SystemsSectionData {
-  eyebrow?: string; headline?: string; headlineAccent?: string; systems?: SystemCard[]
+  eyebrow?: string; headline?: string; headlineAccent?: string
+  systems?: SystemCard[]
+  backgroundImages?: SystemBackgroundImage[]
 }
 
 export interface ProblemCard {
@@ -67,10 +68,68 @@ export interface ServicesData {
 export interface FaqItem { id: string; num: string; question: string; answer: string }
 export interface FaqData { items?: FaqItem[] }
 
+export interface DashboardKpi { label: string; value: string; delta: string; color: 'teal' | 'navy' }
+export interface DashboardFunnelStage { name: string; value: string }
+export interface DashboardClient { initials: string; name: string }
+export interface DashboardData {
+  urlLabel?: string; statusLabel?: string
+  navItems?: string[]
+  clients?: DashboardClient[]
+  eyebrow?: string; title?: string
+  kpis?: DashboardKpi[]
+  chartTitle?: string; chartSubtitle?: string
+  funnelTitle?: string; funnelStages?: DashboardFunnelStage[]
+}
+
+export type GrowthOsVisual = 'bars' | 'funnel' | 'nodes' | 'grid' | 'rings' | 'spark'
+export interface GrowthOsModule {
+  name: string; tag: string; description: string
+  color: 'teal' | 'navy'; span: 1 | 2; visual: GrowthOsVisual
+}
+export interface GrowthOsData {
+  eyebrow?: string; headline?: string; headlineAccent?: string
+  description?: string; ctaLabel?: string; ctaHref?: string
+  modules?: GrowthOsModule[]
+}
+
+export interface FreeOfferData {
+  eyebrow?: string
+  headlineLine1?: string; headlineAccent?: string; headlineLine3?: string
+  includes?: string[]
+  ctaLabel?: string; ctaHref?: string
+  trustNote?: string
+}
+
+export interface ContactInfoRow { icon: 'mail' | 'building'; label: string }
+export interface ContactTrustStat { stat: string; label: string }
+export interface ContactServiceOption { value: string; label: string }
+export interface ContactData {
+  eyebrow?: string; headline?: string; headlineAccent?: string; body?: string
+  contactInfo?: ContactInfoRow[]
+  trustStats?: ContactTrustStat[]
+  formHeadline?: string; formSubheadline?: string
+  serviceOptions?: ContactServiceOption[]
+  submitLabel?: string; finePrint?: string
+}
+
+export interface FooterLink { label: string; href: string }
+export interface FooterData {
+  giantBgText?: string; heading?: string
+  marqueeItems?: string[]
+  primaryCtas?: FooterLink[]
+  secondaryLinks?: FooterLink[]
+  copyright?: string; createdByLabel?: string
+}
+
 export interface LandingPageData {
   branding?: BrandingData
-  nav?: NavData; kpis?: KpiItem[]; hero?: HeroData; systems?: SystemsSectionData
+  nav?: NavData; hero?: HeroData; systems?: SystemsSectionData
   problemSolution?: ProblemSolutionData; results?: ResultsData; parallax?: ParallaxData
   whyMiduva?: WhyMiduvaData; howItWorks?: HowItWorksData; services?: ServicesData
   faq?: FaqData
+  dashboard?: DashboardData
+  growthOs?: GrowthOsData
+  freeOffer?: FreeOfferData
+  contact?: ContactData
+  footer?: FooterData
 }

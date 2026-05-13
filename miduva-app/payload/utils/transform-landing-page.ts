@@ -43,10 +43,6 @@ export function transformLandingPage(doc: AnyDoc | null | undefined): LandingPag
     }
   }
 
-  if (doc.kpis?.length) {
-    data.kpis = doc.kpis.map((k: AnyDoc) => ({ key: k.key, value: k.value }))
-  }
-
   if (doc.hero) {
     data.hero = {
       headline: doc.hero.headline ?? undefined,
@@ -73,6 +69,15 @@ export function transformLandingPage(doc: AnyDoc | null | undefined): LandingPag
         description: s.description ?? '',
         imageUrl: mediaUrl(s.image),
       })),
+      backgroundImages: (doc.systems.backgroundImages ?? [])
+        .map((b: AnyDoc) => ({
+          url: mediaUrl(b.image),
+          alt:
+            (b.image && typeof b.image === 'object' && 'alt' in b.image
+              ? ((b.image as AnyDoc).alt as string | undefined)
+              : undefined) ?? '',
+        }))
+        .filter((b: { url: string }) => Boolean(b.url)),
     }
   }
 
@@ -186,6 +191,95 @@ export function transformLandingPage(doc: AnyDoc | null | undefined): LandingPag
         question: item.question,
         answer: item.answer ?? '',
       })),
+    }
+  }
+
+  if (doc.dashboard) {
+    const d = doc.dashboard
+    data.dashboard = {
+      urlLabel: d.urlLabel ?? undefined,
+      statusLabel: d.statusLabel ?? undefined,
+      navItems: (d.navItems ?? []).map((n: AnyDoc) => n.label).filter(Boolean),
+      clients: (d.clients ?? []).map((c: AnyDoc) => ({ initials: c.initials, name: c.name })),
+      eyebrow: d.eyebrow ?? undefined,
+      title: d.title ?? undefined,
+      kpis: (d.kpis ?? []).map((k: AnyDoc) => ({
+        label: k.label,
+        value: k.value,
+        delta: k.delta,
+        color: (k.color as 'teal' | 'navy') ?? 'teal',
+      })),
+      chartTitle: d.chartTitle ?? undefined,
+      chartSubtitle: d.chartSubtitle ?? undefined,
+      funnelTitle: d.funnelTitle ?? undefined,
+      funnelStages: (d.funnelStages ?? []).map((s: AnyDoc) => ({ name: s.name, value: s.value })),
+    }
+  }
+
+  if (doc.growthOs) {
+    const g = doc.growthOs
+    data.growthOs = {
+      eyebrow: g.eyebrow ?? undefined,
+      headline: g.headline ?? undefined,
+      headlineAccent: g.headlineAccent ?? undefined,
+      description: g.description ?? undefined,
+      ctaLabel: g.ctaLabel ?? undefined,
+      ctaHref: g.ctaHref ?? undefined,
+      modules: (g.modules ?? []).map((m: AnyDoc) => ({
+        name: m.name,
+        tag: m.tag,
+        description: m.description,
+        color: (m.color as 'teal' | 'navy') ?? 'teal',
+        span: (Number(m.span) === 2 ? 2 : 1) as 1 | 2,
+        visual: m.visual,
+      })),
+    }
+  }
+
+  if (doc.freeOffer) {
+    const f = doc.freeOffer
+    data.freeOffer = {
+      eyebrow: f.eyebrow ?? undefined,
+      headlineLine1: f.headlineLine1 ?? undefined,
+      headlineAccent: f.headlineAccent ?? undefined,
+      headlineLine3: f.headlineLine3 ?? undefined,
+      includes: (f.includes ?? []).map((i: AnyDoc) => i.label).filter(Boolean),
+      ctaLabel: f.ctaLabel ?? undefined,
+      ctaHref: f.ctaHref ?? undefined,
+      trustNote: f.trustNote ?? undefined,
+    }
+  }
+
+  if (doc.contact) {
+    const c = doc.contact
+    data.contact = {
+      eyebrow: c.eyebrow ?? undefined,
+      headline: c.headline ?? undefined,
+      headlineAccent: c.headlineAccent ?? undefined,
+      body: c.body ?? undefined,
+      contactInfo: (c.contactInfo ?? []).map((row: AnyDoc) => ({
+        icon: (row.icon as 'mail' | 'building') ?? 'mail',
+        label: row.label,
+      })),
+      trustStats: (c.trustStats ?? []).map((s: AnyDoc) => ({ stat: s.stat, label: s.label })),
+      formHeadline: c.formHeadline ?? undefined,
+      formSubheadline: c.formSubheadline ?? undefined,
+      serviceOptions: (c.serviceOptions ?? []).map((o: AnyDoc) => ({ value: o.value, label: o.label })),
+      submitLabel: c.submitLabel ?? undefined,
+      finePrint: c.finePrint ?? undefined,
+    }
+  }
+
+  if (doc.footer) {
+    const f = doc.footer
+    data.footer = {
+      giantBgText: f.giantBgText ?? undefined,
+      heading: f.heading ?? undefined,
+      marqueeItems: (f.marqueeItems ?? []).map((m: AnyDoc) => m.phrase).filter(Boolean),
+      primaryCtas: (f.primaryCtas ?? []).map((l: AnyDoc) => ({ label: l.label, href: l.href })),
+      secondaryLinks: (f.secondaryLinks ?? []).map((l: AnyDoc) => ({ label: l.label, href: l.href })),
+      copyright: f.copyright ?? undefined,
+      createdByLabel: f.createdByLabel ?? undefined,
     }
   }
 

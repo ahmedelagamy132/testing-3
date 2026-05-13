@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "motion/react"
+import type { GrowthOsData, GrowthOsModule } from "@/lib/types"
 
 function useIsDark() {
   const [isDark, setIsDark] = useState(true)
@@ -15,55 +16,13 @@ function useIsDark() {
   return isDark
 }
 
-const MODULES = [
-  {
-    n: "Paid Ads",
-    tag: "Meta · Google · TikTok",
-    desc: "Multi-channel acquisition tuned for CAC efficiency.",
-    color: "teal",
-    span: 2,
-    visual: "bars",
-  },
-  {
-    n: "Funnel Design",
-    tag: "High-converting flows",
-    desc: "Landing pages & flows that turn clicks into SQLs.",
-    color: "navy",
-    span: 1,
-    visual: "funnel",
-  },
-  {
-    n: "Automation",
-    tag: "Sequences & triggers",
-    desc: "Smart nurture that responds to behaviour in real time.",
-    color: "teal",
-    span: 1,
-    visual: "nodes",
-  },
-  {
-    n: "CRM & Data",
-    tag: "Pipeline · attribution",
-    desc: "Clean data architecture with full-funnel visibility.",
-    color: "navy",
-    span: 2,
-    visual: "grid",
-  },
-  {
-    n: "Lead Scoring",
-    tag: "Qualify & prioritise",
-    desc: "AI-ranked leads so sales always knows who to call.",
-    color: "teal",
-    span: 2,
-    visual: "rings",
-  },
-  {
-    n: "Analytics",
-    tag: "Live · actionable",
-    desc: "No vanity metrics. Just decisions that move revenue.",
-    color: "navy",
-    span: 1,
-    visual: "spark",
-  },
+const DEFAULT_MODULES: GrowthOsModule[] = [
+  { name: "Paid Ads",      tag: "Meta · Google · TikTok",   description: "Multi-channel acquisition tuned for CAC efficiency.",       color: "teal", span: 2, visual: "bars"   },
+  { name: "Funnel Design", tag: "High-converting flows",    description: "Landing pages & flows that turn clicks into SQLs.",          color: "navy", span: 1, visual: "funnel" },
+  { name: "Automation",    tag: "Sequences & triggers",     description: "Smart nurture that responds to behaviour in real time.",     color: "teal", span: 1, visual: "nodes"  },
+  { name: "CRM & Data",    tag: "Pipeline · attribution",   description: "Clean data architecture with full-funnel visibility.",       color: "navy", span: 2, visual: "grid"   },
+  { name: "Lead Scoring",  tag: "Qualify & prioritise",     description: "AI-ranked leads so sales always knows who to call.",         color: "teal", span: 2, visual: "rings"  },
+  { name: "Analytics",     tag: "Live · actionable",        description: "No vanity metrics. Just decisions that move revenue.",       color: "navy", span: 1, visual: "spark"  },
 ]
 
 function ModuleVisual({ type, color }: { type: string; color: string }) {
@@ -385,15 +344,14 @@ function ModuleVisual({ type, color }: { type: string; color: string }) {
 }
 
 function ModuleCard({
-  n,
+  name: n,
   tag,
-  desc,
+  description: desc,
   color,
-  span,
   visual,
   index,
   isDark,
-}: (typeof MODULES)[number] & { index: number; isDark: boolean }) {
+}: GrowthOsModule & { index: number; isDark: boolean }) {
   const [hovered, setHovered] = useState(false)
   const isTeal = color === "teal"
 
@@ -547,11 +505,19 @@ function ModuleCard({
   )
 }
 
-export default function SystemRibbon() {
+export default function SystemRibbon({ data }: { data?: GrowthOsData } = {}) {
   const isDark = useIsDark()
 
+  const eyebrow        = data?.eyebrow        ?? "/ growth os"
+  const headline       = data?.headline       ?? "Six modules."
+  const headlineAccent = data?.headlineAccent ?? "One connected system."
+  const description    = data?.description    ?? "Every lever connected, every number visible, every dollar accounted for."
+  const ctaLabel       = data?.ctaLabel       ?? "See how we build it"
+  const ctaHref        = data?.ctaHref        ?? "#"
+  const modules        = data?.modules?.length ? data.modules : DEFAULT_MODULES
+
   return (
-    <section id="systems" className="mt-16 md:mt-20">
+    <section id="growth-os" className="mt-16 md:mt-20">
       {/* Header */}
       <div className="max-w-6xl mx-auto px-6">
         <motion.div
@@ -563,21 +529,21 @@ export default function SystemRibbon() {
         >
           <div>
             <div className="mono text-[11px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-2">
-              / growth os
+              {eyebrow}
             </div>
             <h2 className="text-[22px] md:text-[28px] font-extrabold text-[var(--navy-900)] tracking-[-0.03em] leading-tight">
-              Six modules.{" "}
-              <span style={{ color: "var(--teal-500)" }}>One connected system.</span>
+              {headline}{" "}
+              <span style={{ color: "var(--teal-500)" }}>{headlineAccent}</span>
             </h2>
             <p className="mt-1.5 text-[13px] text-[var(--muted)] max-w-md leading-relaxed">
-              Every lever connected, every number visible, every dollar accounted for.
+              {description}
             </p>
           </div>
           <a
-            href="#"
+            href={ctaHref}
             className="inline-flex items-center gap-2 text-[12px] font-semibold text-[var(--navy-900)] border border-[var(--line)] px-4 py-2 rounded-full hover:border-[var(--teal-500)] hover:text-[var(--teal-500)] transition-colors duration-200"
           >
-            See how we build it
+            {ctaLabel}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M5 12h14M13 5l7 7-7 7" />
             </svg>
@@ -588,7 +554,7 @@ export default function SystemRibbon() {
       {/* Bento grid */}
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {MODULES.map((m, i) => (
+          {modules.map((m, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 40 }}

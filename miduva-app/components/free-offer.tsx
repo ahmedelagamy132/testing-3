@@ -3,17 +3,27 @@
 import { useRef } from "react"
 import { motion, useInView } from "motion/react"
 import { CalendarCheck, ArrowRight } from "lucide-react"
+import type { FreeOfferData } from "@/lib/types"
 
-const INCLUDES = [
+const DEFAULT_INCLUDES = [
   "Full Business Audit",
   "Custom Growth Plan",
   "Expert Recommendations",
 ]
 
-export default function FreeOffer({ theme = "light" }: { theme?: "dark" | "light" }) {
+export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | "light"; data?: FreeOfferData }) {
   const sectionRef = useRef<HTMLDivElement>(null)
   const isInView = useInView(sectionRef, { once: true, margin: "-80px" })
   const isDark = theme === "dark"
+
+  const eyebrow        = data?.eyebrow        ?? "/ free offer"
+  const headlineLine1  = data?.headlineLine1  ?? "Get a Free"
+  const headlineAccent = data?.headlineAccent ?? "Growth Strategy"
+  const headlineLine3  = data?.headlineLine3  ?? "for Your Business."
+  const includes       = data?.includes?.length ? data.includes : DEFAULT_INCLUDES
+  const ctaLabel       = data?.ctaLabel       ?? "Book Your Free Call"
+  const ctaHref        = data?.ctaHref        ?? "#"
+  const trustNote      = data?.trustNote      ?? "No commitment · No credit card · Just real strategy"
 
   return (
     <section
@@ -99,7 +109,7 @@ export default function FreeOffer({ theme = "light" }: { theme?: "dark" | "light
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
-          / free offer
+          {eyebrow}
         </motion.div>
 
         {/* Headline */}
@@ -116,9 +126,9 @@ export default function FreeOffer({ theme = "light" }: { theme?: "dark" | "light
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
           transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
-          Get a Free<br />
-          <span className="shine">Growth Strategy</span><br />
-          for Your Business.
+          {headlineLine1}<br />
+          <span className="shine">{headlineAccent}</span><br />
+          {headlineLine3}
         </motion.h2>
 
         {/* Include chips */}
@@ -134,7 +144,7 @@ export default function FreeOffer({ theme = "light" }: { theme?: "dark" | "light
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.55, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
         >
-          {INCLUDES.map((label) => (
+          {includes.map((label) => (
             <div
               key={label}
               style={{
@@ -194,7 +204,7 @@ export default function FreeOffer({ theme = "light" }: { theme?: "dark" | "light
             />
 
             <motion.a
-              href="#"
+              href={ctaHref}
               style={{
                 position: "relative",
                 display: "inline-flex",
@@ -215,7 +225,7 @@ export default function FreeOffer({ theme = "light" }: { theme?: "dark" | "light
               transition={{ type: "spring", stiffness: 280, damping: 20 }}
             >
               <CalendarCheck style={{ width: 18, height: 18 }} strokeWidth={2} />
-              Book Your Free Call
+              {ctaLabel}
               <ArrowRight style={{ width: 16, height: 16 }} strokeWidth={2.5} />
             </motion.a>
           </div>
@@ -231,7 +241,7 @@ export default function FreeOffer({ theme = "light" }: { theme?: "dark" | "light
               margin: 0,
             }}
           >
-            No commitment · No credit card · Just real strategy
+            {trustNote}
           </p>
         </motion.div>
       </div>

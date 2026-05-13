@@ -6,6 +6,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
 import { Phone, ArrowRight } from "lucide-react";
+import type { FooterData } from "@/lib/types";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -184,17 +185,37 @@ const MagneticButton = React.forwardRef<HTMLElement, MagneticButtonProps>(
 );
 MagneticButton.displayName = "MagneticButton";
 
-const MarqueeItem = () => (
+const DEFAULT_MARQUEE = [
+  "More Leads, Less Effort",
+  "4.8× ROAS Guaranteed",
+  "Launch in 14 Days",
+  "94% Client Retention",
+  "Done-For-You Systems",
+];
+
+const DEFAULT_PRIMARY_CTAS = [
+  { label: "Book a Free Call", href: "#" },
+  { label: "Get Started", href: "#" },
+];
+
+const DEFAULT_SECONDARY_LINKS = [
+  { label: "Privacy Policy", href: "#" },
+  { label: "Terms of Service", href: "#" },
+  { label: "Support", href: "#" },
+];
+
+const MarqueeItem = ({ items }: { items: string[] }) => (
   <div className="flex items-center space-x-12 px-6">
-    <span>More Leads, Less Effort</span> <span className="text-primary/60">✦</span>
-    <span>4.8× ROAS Guaranteed</span>    <span className="text-secondary/60">✦</span>
-    <span>Launch in 14 Days</span>        <span className="text-primary/60">✦</span>
-    <span>94% Client Retention</span>    <span className="text-secondary/60">✦</span>
-    <span>Done-For-You Systems</span>    <span className="text-primary/60">✦</span>
+    {items.map((label, i) => (
+      <React.Fragment key={`${label}-${i}`}>
+        <span>{label}</span>
+        <span className={i % 2 === 0 ? "text-primary/60" : "text-secondary/60"}>✦</span>
+      </React.Fragment>
+    ))}
   </div>
 );
 
-export function CinematicFooter() {
+export function CinematicFooter({ data }: { data?: FooterData } = {}) {
   const wrapperRef  = useRef<HTMLDivElement>(null);
   const giantTextRef = useRef<HTMLDivElement>(null);
   const headingRef  = useRef<HTMLHeadingElement>(null);
@@ -245,6 +266,14 @@ export function CinematicFooter() {
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
+  const giantBgText     = data?.giantBgText     ?? "MIDUVA";
+  const heading         = data?.heading         ?? "Ready to grow?";
+  const marqueeItems    = data?.marqueeItems?.length    ? data.marqueeItems    : DEFAULT_MARQUEE;
+  const primaryCtas     = data?.primaryCtas?.length     ? data.primaryCtas     : DEFAULT_PRIMARY_CTAS;
+  const secondaryLinks  = data?.secondaryLinks?.length  ? data.secondaryLinks  : DEFAULT_SECONDARY_LINKS;
+  const copyright       = data?.copyright       ?? "© 2026 Miduva. All rights reserved.";
+  const createdByLabel  = data?.createdByLabel  ?? "Created by";
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
@@ -265,14 +294,14 @@ export function CinematicFooter() {
             ref={giantTextRef}
             className="footer-giant-bg-text absolute -bottom-[5vh] left-1/2 -translate-x-1/2 whitespace-nowrap z-0 pointer-events-none select-none"
           >
-            MIDUVA
+            {giantBgText}
           </div>
 
           {/* Marquee */}
           <div className="absolute top-12 left-0 w-full overflow-hidden border-y border-border/50 bg-background/60 backdrop-blur-md py-4 z-10 -rotate-2 scale-110 shadow-2xl">
             <div className="flex w-max animate-footer-scroll-marquee text-xs md:text-sm font-bold tracking-[0.3em] text-muted-foreground uppercase">
-              <MarqueeItem />
-              <MarqueeItem />
+              <MarqueeItem items={marqueeItems} />
+              <MarqueeItem items={marqueeItems} />
             </div>
           </div>
 
@@ -282,42 +311,42 @@ export function CinematicFooter() {
               ref={headingRef}
               className="text-5xl md:text-8xl font-black footer-text-glow tracking-tighter mb-12 text-center"
             >
-              Ready to grow?
+              {heading}
             </h2>
 
             <div ref={linksRef} className="flex flex-col items-center gap-6 w-full">
               {/* Primary CTAs */}
               <div className="flex flex-wrap justify-center gap-4 w-full">
-                <MagneticButton
-                  as="a"
-                  href="#"
-                  className="footer-glass-pill px-10 py-5 rounded-full text-foreground font-bold text-sm md:text-base flex items-center gap-3 group"
-                >
-                  <Phone className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                  Book a Free Call
-                </MagneticButton>
-
-                <MagneticButton
-                  as="a"
-                  href="#"
-                  className="footer-glass-pill px-10 py-5 rounded-full text-foreground font-bold text-sm md:text-base flex items-center gap-3 group"
-                >
-                  Get Started
-                  <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
-                </MagneticButton>
+                {primaryCtas.map((cta, i) => (
+                  <MagneticButton
+                    key={`${cta.label}-${i}`}
+                    as="a"
+                    href={cta.href}
+                    className="footer-glass-pill px-10 py-5 rounded-full text-foreground font-bold text-sm md:text-base flex items-center gap-3 group"
+                  >
+                    {i === 0 ? (
+                      <Phone className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    ) : null}
+                    {cta.label}
+                    {i !== 0 ? (
+                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                    ) : null}
+                  </MagneticButton>
+                ))}
               </div>
 
               {/* Secondary links */}
               <div className="flex flex-wrap justify-center gap-3 md:gap-6 w-full mt-2">
-                <MagneticButton as="a" href="#" className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground">
-                  Privacy Policy
-                </MagneticButton>
-                <MagneticButton as="a" href="#" className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground">
-                  Terms of Service
-                </MagneticButton>
-                <MagneticButton as="a" href="#" className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground">
-                  Support
-                </MagneticButton>
+                {secondaryLinks.map((link, i) => (
+                  <MagneticButton
+                    key={`${link.label}-${i}`}
+                    as="a"
+                    href={link.href}
+                    className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground"
+                  >
+                    {link.label}
+                  </MagneticButton>
+                ))}
               </div>
             </div>
           </div>
@@ -325,11 +354,11 @@ export function CinematicFooter() {
           {/* Bottom bar */}
           <div className="relative z-20 w-full pb-8 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-muted-foreground text-[10px] md:text-xs font-semibold tracking-widest uppercase order-2 md:order-1">
-              © 2026 Miduva. All rights reserved.
+              {copyright}
             </div>
 
             <div className="footer-glass-pill px-6 py-3 rounded-full flex items-center gap-2 order-1 md:order-2 cursor-default border-border/50">
-              <span className="text-muted-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest">Created by</span>
+              <span className="text-muted-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest">{createdByLabel}</span>
               <span className="text-foreground font-black text-xs md:text-sm tracking-normal ml-1">Miduva</span>
             </div>
 

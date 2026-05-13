@@ -1,4 +1,5 @@
 import path from 'path'
+import sharp from 'sharp'
 import { buildConfig } from 'payload'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -8,6 +9,12 @@ import { subscribers } from './payload/collections/subscribers'
 export default buildConfig({
   admin: {
     user: 'users',
+    meta: {
+      titleSuffix: ' — Miduva CMS',
+    },
+    components: {
+      providers: ['@/payload/components/tab-watcher-provider#TabWatcherProvider'],
+    },
     livePreview: {
       url: '/preview',
       breakpoints: [
@@ -22,8 +29,14 @@ export default buildConfig({
   collections: [
     {
       slug: 'users',
+      labels: {
+        singular: 'Admin user',
+        plural: 'Admin users',
+      },
       auth: true,
       admin: {
+        group: 'System',
+        description: 'People who can sign in to this CMS.',
         useAsTitle: 'email',
       },
       fields: [],
@@ -34,6 +47,9 @@ export default buildConfig({
         singular: 'Image',
         plural: 'Media Library',
       },
+      access: {
+        read: () => true,
+      },
       admin: {
         group: 'Media',
         description: 'Upload and manage all images used across the site. Give each image a clear title so you can find it easily.',
@@ -41,21 +57,22 @@ export default buildConfig({
       },
       upload: {
         staticDir: path.resolve(process.cwd(), 'public/media'),
+        displayPreview: true,
         imageSizes: [
           {
             name: 'thumbnail',
-            width: 400,
-            height: 300,
+            width: 480,
+            height: 360,
             position: 'centre',
           },
           {
             name: 'card',
-            width: 800,
-            height: 600,
+            width: 1024,
+            height: 768,
             position: 'centre',
           },
         ],
-        adminThumbnail: 'thumbnail',
+        adminThumbnail: 'card',
         mimeTypes: ['image/*'],
       },
       fields: [
@@ -91,6 +108,8 @@ export default buildConfig({
   }),
 
   editor: lexicalEditor({}),
+
+  sharp,
 
   typescript: {
     outputFile: path.resolve(process.cwd(), 'payload-types.ts'),

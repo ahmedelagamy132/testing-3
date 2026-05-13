@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import type { SystemsSectionData } from '@/lib/types';
+import type { SystemBackgroundImage, SystemsSectionData } from '@/lib/types';
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  DATA                                                                        */
@@ -17,48 +17,6 @@ type System = {
 	description: string;
 	imageUrl: string;
 };
-
-const DEFAULT_SYSTEMS: System[] = [
-	{
-		id: 'lead-gen',
-		num: '01',
-		label: 'Lead Generation System',
-		title: 'Consistent leads.\nOn autopilot.',
-		description:
-			'Generate predictable lead flow using ads, funnels & precision conversion systems built for your market.',
-		imageUrl:
-			'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1600&auto=format&fit=crop',
-	},
-	{
-		id: 'website-conversion',
-		num: '02',
-		label: 'Website & Conversion System',
-		title: 'Your website,\nactually converting.',
-		description:
-			"Turn traffic into revenue with a high-performance site engineered around your buyer's journey.",
-		imageUrl:
-			'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?q=80&w=1600&auto=format&fit=crop',
-	},
-	{
-		id: 'automation',
-		num: '03',
-		label: 'Smart Automation System',
-		title: 'Sales & follow-ups\nrunning 24/7.',
-		description:
-			'CRM workflows, AI agents, and email sequences that close deals while you sleep, no extra hires.',
-		imageUrl:
-			'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1600&auto=format&fit=crop',
-	},
-];
-
-const BG_IMAGES = [
-	{ src: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80', alt: 'Marketing charts' },
-	{ src: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80', alt: 'Data visualization' },
-	{ src: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&h=800&fit=crop&crop=entropy&auto=format&q=80', alt: 'Digital marketing' },
-	{ src: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80', alt: 'Growth metrics' },
-	{ src: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&h=800&fit=crop&crop=entropy&auto=format&q=80', alt: 'Web design' },
-	{ src: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1280&h=720&fit=crop&crop=entropy&auto=format&q=80', alt: 'Automation' },
-];
 
 const BG_POSITION_CLASSES = [
 	'[&>div]:!-top-[30vh] [&>div]:!left-[5vw] [&>div]:!h-[30vh] [&>div]:!w-[35vw]',
@@ -190,7 +148,13 @@ function SystemGridCard({
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  MAIN SECTION                                                                */
 /* ─────────────────────────────────────────────────────────────────────────── */
-function SystemsSection({ systems }: { systems: System[] }) {
+function SystemsSection({
+	systems,
+	backgroundImages,
+}: {
+	systems: System[];
+	backgroundImages: SystemBackgroundImage[];
+}) {
 	const outerRef = useRef<HTMLDivElement>(null);
 
 	const bgWrapperRef = useRef<HTMLDivElement>(null);
@@ -322,14 +286,14 @@ function SystemsSection({ systems }: { systems: System[] }) {
 
 				{/* ── Decorative background zoom images ── */}
 				<div ref={bgWrapperRef} className="absolute inset-0">
-					{BG_IMAGES.map((img, i) => (
+					{backgroundImages.map((img, i) => (
 						<div
 							key={i}
 							ref={(el) => { bgRefs.current[i] = el; }}
-							className={`absolute inset-0 flex h-full w-full items-center justify-center ${BG_POSITION_CLASSES[i]}`}
+							className={`absolute inset-0 flex h-full w-full items-center justify-center ${BG_POSITION_CLASSES[i] ?? ''}`}
 						>
 							<div className="relative h-[25vh] w-[25vw]">
-								<img src={img.src} alt={img.alt} className="h-full w-full object-cover" />
+								<img src={img.url} alt={img.alt} className="h-full w-full object-cover" />
 							</div>
 						</div>
 					))}
@@ -397,6 +361,7 @@ function SystemsSection({ systems }: { systems: System[] }) {
 /*  MOBILE FALLBACK                                                             */
 /* ─────────────────────────────────────────────────────────────────────────── */
 function MobileSystemsSection({ systems }: { systems: System[] }) {
+	if (systems.length === 0) return null;
 	return (
 		<div className="md:hidden bg-white dark:bg-[#020204] py-12 px-6">
 			{systems.map((system) => (
@@ -421,15 +386,16 @@ function MobileSystemsSection({ systems }: { systems: System[] }) {
 /*  EXPORT                                                                      */
 /* ─────────────────────────────────────────────────────────────────────────── */
 export default function SystemsZoomSection({ data }: { data?: SystemsSectionData }) {
-	const eyebrow       = data?.eyebrow       ?? '/ our systems'
-	const headline      = data?.headline      ?? 'Three systems.'
-	const headlineAccent = data?.headlineAccent ?? 'One growth machine.'
-	const systems: System[] = data?.systems?.length
-		? data.systems.map((s, i) => ({
-				...s,
-				imageUrl: s.imageUrl || DEFAULT_SYSTEMS[i]?.imageUrl || DEFAULT_SYSTEMS[0].imageUrl,
-		  }))
-		: DEFAULT_SYSTEMS
+	const eyebrow        = data?.eyebrow        ?? ''
+	const headline       = data?.headline       ?? ''
+	const headlineAccent = data?.headlineAccent ?? ''
+	const systems: System[] = (data?.systems ?? []).filter((s): s is System => Boolean(s.imageUrl))
+	const backgroundImages: SystemBackgroundImage[] = data?.backgroundImages ?? []
+
+	if (systems.length < 3 || backgroundImages.length < 6) {
+		// Section can't animate without the full set wired in the CMS.
+		return null;
+	}
 
 	return (
 		<section id="systems">
@@ -447,7 +413,7 @@ export default function SystemsZoomSection({ data }: { data?: SystemsSectionData
 
 			{/* Desktop: animated zoom scroll */}
 			<div className="hidden md:block">
-				<SystemsSection systems={systems} />
+				<SystemsSection systems={systems} backgroundImages={backgroundImages} />
 			</div>
 
 			{/* Mobile: simple stacked cards */}
