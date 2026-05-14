@@ -53,8 +53,28 @@ export function LivePreviewWrapper({ initialDoc, serverURL }: Props) {
     }
 
     window.addEventListener("message", handler)
+
+    // Tell the parent admin window we're ready to receive focus messages.
+    // The tab-watcher will reply with the current selected tab's anchor, fixing the
+    // race where the parent fires "focus-section" before this listener is mounted.
+    const announce = () => {
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage({ type: "miduva:preview-ready" }, "*")
+        }
+      } catch {
+        /* cross-origin, give up — the parent's poll/load fallbacks will catch us */
+      }
+    }
+    announce()
+    // Re-announce a couple of times in case the parent's listener hasn't mounted yet.
+    const t1 = window.setTimeout(announce, 250)
+    const t2 = window.setTimeout(announce, 1000)
+
     return () => {
       window.removeEventListener("message", handler)
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
       if (typeof document !== "undefined") delete document.body.dataset.focusSection
     }
   }, [applyFocus])
