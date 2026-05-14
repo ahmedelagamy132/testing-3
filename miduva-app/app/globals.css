@@ -309,6 +309,11 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
 
 /* When a tab is selected in the admin, render only that section. */
 body[data-focus-section] .preview-anchor { display: none !important; }
+
+/* In focus mode the page is only one section tall, which trips Nav's
+   "hide near the cinematic footer" logic. Force it to stay visible so editors
+   on the Branding & Nav tab can actually see what they're editing. */
+body[data-focus-section] header.fixed.top-0 { transform: none !important; }
 body[data-focus-section="hero"] #anchor-hero,
 body[data-focus-section="systems"] #anchor-systems,
 body[data-focus-section="problem-solution"] #anchor-problem-solution,
