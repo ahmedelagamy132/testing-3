@@ -121,6 +121,14 @@ export interface FooterData {
   copyright?: string; createdByLabel?: string
 }
 
+export type SectionId =
+  | 'hero' | 'systems' | 'problem-solution' | 'how-it-works' | 'results'
+  | 'why-miduva' | 'parallax' | 'dashboard' | 'services' | 'growth-os'
+  | 'faq' | 'free-offer' | 'contact' | 'footer'
+
+export interface LayoutSectionEntry { id: SectionId; visible: boolean }
+export interface LayoutData { sections?: LayoutSectionEntry[] }
+
 export interface LandingPageData {
   branding?: BrandingData
   nav?: NavData; hero?: HeroData; systems?: SystemsSectionData
@@ -132,4 +140,5 @@ export interface LandingPageData {
   freeOffer?: FreeOfferData
   contact?: ContactData
   footer?: FooterData
+  layout?: LayoutData
 }

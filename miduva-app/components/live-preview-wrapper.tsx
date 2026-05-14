@@ -47,8 +47,12 @@ export function LivePreviewWrapper({ initialDoc, serverURL }: Props) {
     const handler = (event: MessageEvent) => {
       const payload = event.data
       if (!payload || payload.type !== "miduva:focus-section") return
-      const anchor = payload.anchor as string | undefined
-      if (!anchor) return
+      const anchor = payload.anchor as string | null | undefined
+      // null/empty anchor means "exit focus mode and show the whole page".
+      if (anchor === null || anchor === undefined || anchor === "") {
+        applyFocus(null)
+        return
+      }
       applyFocus(anchor)
     }
 

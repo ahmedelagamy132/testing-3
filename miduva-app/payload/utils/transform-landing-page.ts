@@ -283,5 +283,16 @@ export function transformLandingPage(doc: AnyDoc | null | undefined): LandingPag
     }
   }
 
+  if (doc.layout?.sections && Array.isArray(doc.layout.sections)) {
+    data.layout = {
+      sections: doc.layout.sections
+        .filter((row: AnyDoc) => row && typeof row.id === 'string')
+        .map((row: AnyDoc) => ({
+          id: row.id,
+          visible: row.visible !== false,
+        })),
+    }
+  }
+
   return data
 }

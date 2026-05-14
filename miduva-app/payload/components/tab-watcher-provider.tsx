@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 
 // Tab labels (defined in payload/globals/landing-page.ts) → anchor IDs in the live preview.
 const TAB_TO_ANCHOR: Record<string, string> = {
+  Layout: '__exit__',
   'Branding & Nav': 'nav',
   Hero: 'hero',
   Systems: 'systems',
@@ -38,10 +39,17 @@ export const TabWatcherProvider = ({ children }: { children: React.ReactNode }) 
       pendingAnchor = anchor
       const iframes = findPreviewIframes()
       if (iframes.length === 0) return false
+      // The sentinel '__exit__' is mapped from tabs that should show the whole
+      // page (e.g. Layout). Translate it to a null anchor so the wrapper exits
+      // focus mode rather than trying to scroll to a non-existent section.
+      const payload =
+        anchor === '__exit__'
+          ? { type: 'miduva:focus-section', anchor: null }
+          : { type: 'miduva:focus-section', anchor }
       let delivered = false
       for (const f of iframes) {
         if (!f.contentWindow) continue
-        f.contentWindow.postMessage({ type: 'miduva:focus-section', anchor }, '*')
+        f.contentWindow.postMessage(payload, '*')
         delivered = true
       }
       return delivered

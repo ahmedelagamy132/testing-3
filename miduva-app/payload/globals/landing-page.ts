@@ -26,6 +26,89 @@ export const landingPage: GlobalConfig = {
     {
       type: 'tabs',
       tabs: [
+        // ── Page Layout ──────────────────────────────────────────────────────
+        {
+          label: 'Layout',
+          description:
+            'Pick which sections appear on the public landing page and in what order. Drag rows to reorder. Untick to hide a section. Branding & Nav is always at the top.',
+          fields: [
+            {
+              name: 'layout',
+              type: 'group',
+              label: 'Page sections',
+              fields: [
+                {
+                  name: 'sections',
+                  type: 'array',
+                  label: 'Sections (top → bottom)',
+                  minRows: 1,
+                  admin: {
+                    initCollapsed: false,
+                    className: 'compact-array',
+                    description: 'Drag the handle on the left to reorder. Each row is one section on the public page.',
+                    components: {
+                      RowLabel: '@/payload/components/section-row-label#SectionRowLabel',
+                    },
+                  },
+                  defaultValue: [
+                    { id: 'hero', visible: true },
+                    { id: 'systems', visible: true },
+                    { id: 'problem-solution', visible: true },
+                    { id: 'how-it-works', visible: true },
+                    { id: 'results', visible: true },
+                    { id: 'why-miduva', visible: true },
+                    { id: 'parallax', visible: true },
+                    { id: 'dashboard', visible: true },
+                    { id: 'services', visible: true },
+                    { id: 'growth-os', visible: true },
+                    { id: 'faq', visible: true },
+                    { id: 'free-offer', visible: true },
+                    { id: 'contact', visible: true },
+                    { id: 'footer', visible: true },
+                  ],
+                  fields: [
+                    {
+                      type: 'row',
+                      fields: [
+                        {
+                          name: 'id',
+                          type: 'select',
+                          required: true,
+                          label: 'Section',
+                          admin: { width: '70%' },
+                          options: [
+                            { label: 'Hero', value: 'hero' },
+                            { label: 'Systems', value: 'systems' },
+                            { label: 'Problem & Solution', value: 'problem-solution' },
+                            { label: 'How It Works', value: 'how-it-works' },
+                            { label: 'Results', value: 'results' },
+                            { label: 'Why Miduva', value: 'why-miduva' },
+                            { label: 'The Difference (Parallax)', value: 'parallax' },
+                            { label: 'Dashboard', value: 'dashboard' },
+                            { label: 'Services', value: 'services' },
+                            { label: 'Growth OS', value: 'growth-os' },
+                            { label: 'FAQ', value: 'faq' },
+                            { label: 'Free Offer', value: 'free-offer' },
+                            { label: 'Contact', value: 'contact' },
+                            { label: 'Footer', value: 'footer' },
+                          ],
+                        },
+                        {
+                          name: 'visible',
+                          type: 'checkbox',
+                          label: 'Show on site',
+                          defaultValue: true,
+                          admin: { width: '30%' },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+
         // ── Branding & Navigation ────────────────────────────────────────────
         {
           label: 'Branding & Nav',
