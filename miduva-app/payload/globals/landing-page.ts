@@ -79,7 +79,8 @@ export const landingPage: GlobalConfig = {
                       label: 'Left links',
                       admin: {
                         width: '50%',
-                        initCollapsed: true,
+                        initCollapsed: false,
+                        className: 'compact-array',
                         components: { RowLabel: rowLabel },
                       },
                       fields: [
@@ -98,7 +99,8 @@ export const landingPage: GlobalConfig = {
                       label: 'Right links',
                       admin: {
                         width: '50%',
-                        initCollapsed: true,
+                        initCollapsed: false,
+                        className: 'compact-array',
                         components: { RowLabel: rowLabel },
                       },
                       fields: [
@@ -137,7 +139,8 @@ export const landingPage: GlobalConfig = {
                   label: 'Rotating phrases',
                   admin: {
                     description: 'Words that cycle through inside the headline. Order matters.',
-                    initCollapsed: true,
+                    initCollapsed: false,
+                    className: 'compact-array compact-array--no-labels',
                     components: { RowLabel: rowLabel },
                   },
                   fields: [{ name: 'phrase', type: 'text', required: true }],
@@ -362,7 +365,8 @@ export const landingPage: GlobalConfig = {
                       type: 'array',
                       label: 'Bullet points',
                       admin: {
-                        initCollapsed: true,
+                        initCollapsed: false,
+                        className: 'compact-array compact-array--no-labels',
                         components: { RowLabel: rowLabel },
                       },
                       fields: [{ name: 'text', type: 'text', required: true }],

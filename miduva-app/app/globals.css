@@ -314,6 +314,45 @@ body[data-focus-section] .preview-anchor { display: none !important; }
    "hide near the cinematic footer" logic. Force it to stay visible so editors
    on the Branding & Nav tab can actually see what they're editing. */
 body[data-focus-section] header.fixed.top-0 { transform: none !important; }
+
+/* ─── Compact array rows for single/short-field arrays ──────────────────────
+   Applied via admin.className: 'compact-array' on the parent array field.
+   Strips the heavy collapsible card chrome (chevron, duplicate row label,
+   thick padding) so each row renders as a slim input. Drag handle and the
+   row actions menu (duplicate / remove) are kept. */
+.array-field.compact-array .array-field__draggable-rows > * { margin-bottom: 6px; }
+.array-field.compact-array .array-field__row {
+  background: transparent !important;
+  border: 1px solid var(--theme-elevation-150, #e2e8f0) !important;
+  border-radius: 6px !important;
+  padding: 0 !important;
+}
+.array-field.compact-array .collapsible__toggle-wrap {
+  min-height: 0 !important;
+  padding: 4px 6px !important;
+  background: transparent !important;
+  border-bottom: 0 !important;
+}
+/* Hide the open/closed chevron — rows are always expanded. */
+.array-field.compact-array .collapsible__toggle--collapsed,
+.array-field.compact-array .collapsible__toggle--open,
+.array-field.compact-array .collapsible__indicator {
+  display: none !important;
+}
+/* Hide the redundant row label — the field input IS the label for compact rows. */
+.array-field.compact-array .collapsible__header-wrap { display: none !important; }
+/* Disable the click-to-collapse on the header so users can't accidentally hide
+   the field they just opened. */
+.array-field.compact-array .collapsible__toggle-wrap { cursor: default !important; }
+.array-field.compact-array .collapsible__content {
+  padding: 4px 10px 10px !important;
+  display: block !important;
+}
+.array-field.compact-array .array-field__fields { margin: 0 !important; }
+/* The field input itself fills the row — drop its label for one-field arrays
+   that opt into .compact-array--no-labels. */
+.array-field.compact-array--no-labels .field-label { display: none !important; }
+.array-field.compact-array--no-labels .collapsible__content { padding-top: 8px !important; }
 body[data-focus-section="hero"] #anchor-hero,
 body[data-focus-section="systems"] #anchor-systems,
 body[data-focus-section="problem-solution"] #anchor-problem-solution,
