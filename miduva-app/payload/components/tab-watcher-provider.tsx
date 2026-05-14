@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 // Tab labels (defined in payload/globals/landing-page.ts) → anchor IDs in the live preview.
 const TAB_TO_ANCHOR: Record<string, string> = {
-  'Branding & Nav': 'hero',
+  'Branding & Nav': 'nav',
   Hero: 'hero',
   Systems: 'systems',
   'Problem & Solution': 'problem-solution',

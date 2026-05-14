@@ -39,7 +39,13 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
 
   return (
     <div className="relative min-h-screen overflow-x-clip">
-      <Nav ref={navRef} theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} data={data.nav} branding={data.branding} />
+      {/* Nav is position:fixed and lives outside the section flow, so we wrap it
+          in an anchor PLUS a small backdrop block. The backdrop only paints when
+          this anchor is the focused one (CMS preview), giving the floating nav
+          something to sit against instead of an empty viewport. */}
+      <div id="anchor-nav" className="preview-anchor preview-nav-backdrop">
+        <Nav ref={navRef} theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} data={data.nav} branding={data.branding} />
+      </div>
       <main>
         <div id="anchor-hero" className="preview-anchor">
           <SvgMaskHero

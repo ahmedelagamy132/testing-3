@@ -315,6 +315,18 @@ body[data-focus-section] .preview-anchor { display: none !important; }
    on the Branding & Nav tab can actually see what they're editing. */
 body[data-focus-section] header.fixed.top-0 { transform: none !important; }
 
+/* Nav-only focus: paint a tall dark backdrop behind the floating nav so the
+   editor has visual context instead of staring at a blank viewport. The
+   backdrop is normally collapsed to 0 height — only activates when this
+   anchor is the focused section in the CMS preview. */
+.preview-nav-backdrop { min-height: 0; }
+body[data-focus-section="nav"] .preview-nav-backdrop {
+  min-height: 50vh;
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(43, 200, 183, 0.10), transparent 70%),
+    linear-gradient(180deg, #0b1417 0%, #0f1a1f 100%);
+}
+
 /* ─── Compact array rows for single/short-field arrays ──────────────────────
    Applied via admin.className: 'compact-array' on the parent array field.
    Strips the heavy collapsible card chrome (chevron, duplicate row label,
@@ -353,6 +365,7 @@ body[data-focus-section] header.fixed.top-0 { transform: none !important; }
    that opt into .compact-array--no-labels. */
 .array-field.compact-array--no-labels .field-label { display: none !important; }
 .array-field.compact-array--no-labels .collapsible__content { padding-top: 8px !important; }
+body[data-focus-section="nav"] #anchor-nav,
 body[data-focus-section="hero"] #anchor-hero,
 body[data-focus-section="systems"] #anchor-systems,
 body[data-focus-section="problem-solution"] #anchor-problem-solution,
