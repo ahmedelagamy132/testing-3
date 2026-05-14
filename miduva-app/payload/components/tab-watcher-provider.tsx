@@ -48,9 +48,19 @@ export const TabWatcherProvider = ({ children }: { children: React.ReactNode }) 
     }
 
     const checkActiveTab = () => {
-      const activeTab = document.querySelector('[role="tab"][aria-selected="true"]')
+      // Payload renders tabs as <button class="tabs-field__tab-button"> with an
+      // "--active" modifier — there is no role="tab" or aria-selected.
+      const activeTab =
+        document.querySelector('.tabs-field__tab-button--active') ??
+        // Fallback selectors in case Payload renames classes in a minor release.
+        document.querySelector('button.tabs-field__tab-button[aria-selected="true"]') ??
+        document.querySelector('[role="tab"][aria-selected="true"]')
       if (!activeTab) return
-      const label = activeTab.textContent?.trim()
+      // The button may contain extra elements (error pill etc.) — read only the
+      // tab's own label text, ignoring nested numeric/icon children.
+      const label = (activeTab.childNodes[0]?.textContent ?? activeTab.textContent ?? '')
+        .replace(/\s+/g, ' ')
+        .trim()
       if (!label) return
       const anchor = TAB_TO_ANCHOR[label]
       if (anchor) broadcast(anchor)
@@ -59,11 +69,12 @@ export const TabWatcherProvider = ({ children }: { children: React.ReactNode }) 
     // Initial attempt — may quietly fail if the live-preview iframe isn't mounted yet.
     checkActiveTab()
 
-    // Re-evaluate whenever a tab's aria-selected flips.
+    // Payload toggles a CSS class on the active tab button, so watch for class
+    // mutations (and childList for when tabs first mount).
     const observer = new MutationObserver(() => checkActiveTab())
     observer.observe(document.body, {
       attributes: true,
-      attributeFilter: ['aria-selected'],
+      attributeFilter: ['class', 'aria-selected'],
       subtree: true,
       childList: true,
     })
