@@ -1,7 +1,19 @@
-import type { ArrayField, GlobalConfig } from 'payload'
+import type { ArrayField, GlobalConfig, UploadField } from 'payload'
 
 const rowLabel: NonNullable<NonNullable<ArrayField['admin']>['components']>['RowLabel'] =
   '@/payload/components/array-row-label#ArrayRowLabel'
+
+const largeImageField: NonNullable<NonNullable<UploadField['admin']>['components']>['Field'] =
+  '@/payload/components/large-image-field#LargeImageField'
+
+// Helper that injects our custom Field renderer into any upload field's admin block.
+// Cast to `any` because Payload's UploadField['admin'] is a discriminated union over
+// `relationTo` / `hasMany` and the spread widens to a shape the union can't narrow cleanly.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const largeImageAdmin = (extra: Record<string, any> = {}): any => ({
+  ...extra,
+  components: { ...(extra.components ?? {}), Field: largeImageField },
+})
 
 export const landingPage: GlobalConfig = {
   slug: 'landing-page',
@@ -36,14 +48,14 @@ export const landingPage: GlobalConfig = {
                       type: 'upload',
                       relationTo: 'media',
                       label: 'Dark logo (for light backgrounds)',
-                      admin: { width: '50%' },
+                      admin: largeImageAdmin({ width: '50%' }),
                     },
                     {
                       name: 'logoLight',
                       type: 'upload',
                       relationTo: 'media',
                       label: 'Light logo (for dark backgrounds)',
-                      admin: { width: '50%' },
+                      admin: largeImageAdmin({ width: '50%' }),
                     },
                   ],
                 },
@@ -178,20 +190,20 @@ export const landingPage: GlobalConfig = {
                           type: 'upload',
                           relationTo: 'media',
                           label: 'Dark-mode background',
-                          admin: {
+                          admin: largeImageAdmin({
                             width: '50%',
                             description: 'Shown behind hero text in dark mode. ~2400×1600px.',
-                          },
+                          }),
                         },
                         {
                           name: 'illustrationLight',
                           type: 'upload',
                           relationTo: 'media',
                           label: 'Light-mode background',
-                          admin: {
+                          admin: largeImageAdmin({
                             width: '50%',
                             description: 'Shown behind hero text in light mode. ~2400×1600px.',
-                          },
+                          }),
                         },
                       ],
                     },
@@ -245,7 +257,7 @@ export const landingPage: GlobalConfig = {
                       type: 'upload',
                       relationTo: 'media',
                       label: 'Card image',
-                      admin: { description: 'Recommended 800×600px. Shows when the card is expanded.' },
+                      admin: largeImageAdmin({ description: 'Recommended 800×600px. Shows when the card is expanded.' }),
                     },
                   ],
                 },
@@ -268,6 +280,7 @@ export const landingPage: GlobalConfig = {
                       relationTo: 'media',
                       required: true,
                       label: 'Image',
+                      admin: largeImageAdmin(),
                     },
                   ],
                 },
@@ -546,7 +559,7 @@ export const landingPage: GlobalConfig = {
                       type: 'upload',
                       relationTo: 'media',
                       label: 'Step background image',
-                      admin: { description: 'Recommended 800×600px.' },
+                      admin: largeImageAdmin({ description: 'Recommended 800×600px.' }),
                     },
                   ],
                 },
@@ -601,7 +614,7 @@ export const landingPage: GlobalConfig = {
                       type: 'upload',
                       relationTo: 'media',
                       label: 'Category image',
-                      admin: { description: 'Recommended 800×600px.' },
+                      admin: largeImageAdmin({ description: 'Recommended 800×600px.' }),
                     },
                     {
                       name: 'items',
