@@ -1,7 +1,6 @@
 import { existsSync } from "node:fs"
 import path from "node:path"
 import Image from "next/image"
-import { SubscribeForm } from "./subscribe-form"
 import styles from "./coming-soon.module.css"
 
 const HAZE_REL = "/coming-soon/atmos-haze.png"
@@ -44,16 +43,6 @@ export function ComingSoon() {
       </div>
 
       <div className={styles.shell}>
-        {/* Head row: machine label + status */}
-        <header className={styles.head}>
-          <div className={`${styles.label} ${styles.enter} ${styles.enter0}`}>
-            <span>Miduva — Calibrating</span>
-          </div>
-          <div className={`${styles.headTrailing} ${styles.enter} ${styles.enter0}`}>
-            Coming soon
-          </div>
-        </header>
-
         {/* Main composition */}
         <section className={styles.main} aria-labelledby="cs-heading">
           <div className={`${styles.wordmarkWrap} ${styles.enter} ${styles.enter1}`}>
@@ -66,6 +55,9 @@ export function ComingSoon() {
               className={styles.wordmark}
               sizes="(max-width: 540px) 70vw, (max-width: 1024px) 50vw, 520px"
             />
+            <p className={`${styles.slogan} ${styles.enter} ${styles.enter1}`}>
+              Delivering Revenue
+            </p>
           </div>
 
           <h1
@@ -76,19 +68,13 @@ export function ComingSoon() {
             <span className={styles.headlineAccent}>Almost</span> ready.
           </h1>
 
-          <div className={styles.formRow}>
-            <p className={`${styles.timing} ${styles.enter} ${styles.enter3}`}>
-              Launching May 2026
-            </p>
-            <SubscribeForm />
-          </div>
+          <p className={`${styles.timing} ${styles.enter} ${styles.enter3}`}>
+            Launching May 2026
+          </p>
         </section>
 
-        {/* Foot row: contact */}
+        {/* Foot row: centered contact */}
         <footer className={styles.foot}>
-          <div className={`${styles.footLeft} ${styles.enter} ${styles.enter5}`}>
-            // Built with care
-          </div>
           <a
             href="mailto:business@miduva.com"
             className={`${styles.footLink} ${styles.enter} ${styles.enter5}`}
