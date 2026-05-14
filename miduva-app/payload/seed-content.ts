@@ -5,6 +5,8 @@ import config from '@payload-config'
 const ROOT = process.cwd()
 const ASSETS = path.join(ROOT, 'public', 'assets')
 const SYSTEMS_ASSETS = path.join(ASSETS, 'systems')
+const HIW_ASSETS = path.join(ASSETS, 'how-it-works')
+const SERVICES_ASSETS = path.join(ASSETS, 'services')
 const PUBLIC = path.join(ROOT, 'public')
 
 interface ImageEntry {
@@ -45,6 +47,18 @@ const IMAGES: ImageEntry[] = [
   { title: 'Systems bg — growth', alt: 'Growth metrics', filePath: path.join(SYSTEMS_ASSETS, 'bg-growth.jpg') },
   { title: 'Systems bg — web', alt: 'Web design', filePath: path.join(SYSTEMS_ASSETS, 'bg-web.jpg') },
   { title: 'Systems bg — automation', alt: 'Automation', filePath: path.join(SYSTEMS_ASSETS, 'bg-automation.jpg') },
+  // How It Works steps — one purpose-built image per step
+  { title: 'How It Works — Analyze',  alt: 'Analyze your business',  filePath: path.join(HIW_ASSETS, 'analyze.jpg')  },
+  { title: 'How It Works — Strategy', alt: 'Build a custom strategy', filePath: path.join(HIW_ASSETS, 'strategy.jpg') },
+  { title: 'How It Works — Launch',   alt: 'Launch & optimize',      filePath: path.join(HIW_ASSETS, 'launch.jpg')   },
+  { title: 'How It Works — Scale',    alt: 'Scale your results',     filePath: path.join(HIW_ASSETS, 'scale.jpg')    },
+  // Services / What We Do — one image per service category
+  { title: 'Service — Growth & Marketing',      alt: 'Growth and marketing',     filePath: path.join(SERVICES_ASSETS, 'growth-marketing.jpg')    },
+  { title: 'Service — Conversion & Funnels',    alt: 'Conversion and funnels',   filePath: path.join(SERVICES_ASSETS, 'conversion-funnels.jpg')  },
+  { title: 'Service — Websites & Development',  alt: 'Websites and development', filePath: path.join(SERVICES_ASSETS, 'websites-dev.jpg')        },
+  { title: 'Service — E-Commerce',              alt: 'E-commerce',               filePath: path.join(SERVICES_ASSETS, 'ecommerce.jpg')           },
+  { title: 'Service — AI & Automation',         alt: 'AI and automation',        filePath: path.join(SERVICES_ASSETS, 'ai-automation.jpg')       },
+  { title: 'Service — Data & Analytics',        alt: 'Data and analytics',       filePath: path.join(SERVICES_ASSETS, 'data-analytics.jpg')      },
 ]
 
 type Payload = Awaited<ReturnType<typeof getPayload>>
@@ -254,38 +268,60 @@ async function run() {
     patch.systems = systemsPatch
   }
 
-  // ── How It Works steps (4)
+  // ── How It Works steps — match each step by `id` to its purpose-built asset
   const howItWorks = (current.howItWorks ?? {}) as AnyRecord
   const stepsArr = (howItWorks.steps as AnyRecord[] | undefined) ?? []
   if (stepsArr.length > 0) {
-    const pool = [
-      mediaId('Hero — background'),
-      mediaId('Background plate'),
-      mediaId('Foreground plate'),
-      mediaId('Hero — image'),
+    const stepImageById: Record<string, number | string | null> = {
+      analyze:  mediaId('How It Works — Analyze'),
+      strategy: mediaId('How It Works — Strategy'),
+      launch:   mediaId('How It Works — Launch'),
+      scale:    mediaId('How It Works — Scale'),
+    }
+    const fallbackPool = [
+      mediaId('How It Works — Analyze'),
+      mediaId('How It Works — Strategy'),
+      mediaId('How It Works — Launch'),
+      mediaId('How It Works — Scale'),
     ].filter(Boolean) as (number | string)[]
-    const next = assignByOrder(stepsArr, 'image', pool)
-    if (JSON.stringify(next) !== JSON.stringify(stepsArr)) {
-      patch.howItWorks = { ...howItWorks, steps: next }
-      console.log('  + wired step images')
+    const nextSteps = stepsArr.map((step, idx) => {
+      const matched = stepImageById[(step.id as string) ?? ''] ?? fallbackPool[idx % fallbackPool.length] ?? null
+      if (!matched) return step
+      return { ...step, image: matched }
+    })
+    if (JSON.stringify(nextSteps) !== JSON.stringify(stepsArr)) {
+      patch.howItWorks = { ...howItWorks, steps: nextSteps }
+      console.log('  + wired How It Works step images')
     }
   }
 
-  // ── Services categories (6)
+  // ── Services categories — match each category by `id` to its purpose-built asset
   const services = (current.services ?? {}) as AnyRecord
   const categoriesArr = (services.categories as AnyRecord[] | undefined) ?? []
   if (categoriesArr.length > 0) {
-    const pool = [
-      mediaId('Main brand background'),
-      mediaId('Hero — image (alt 1)'),
-      mediaId('Hero — image (light)'),
-      mediaId('Hero — image (variant p)'),
-      mediaId('Hero — image (variant 7)'),
-      mediaId('AI generated visual'),
+    const serviceImageById: Record<string, number | string | null> = {
+      'growth-marketing':   mediaId('Service — Growth & Marketing'),
+      'conversion-funnels': mediaId('Service — Conversion & Funnels'),
+      'websites-dev':       mediaId('Service — Websites & Development'),
+      ecommerce:            mediaId('Service — E-Commerce'),
+      'ai-automation':      mediaId('Service — AI & Automation'),
+      'data-analytics':     mediaId('Service — Data & Analytics'),
+    }
+    const fallbackPool = [
+      mediaId('Service — Growth & Marketing'),
+      mediaId('Service — Conversion & Funnels'),
+      mediaId('Service — Websites & Development'),
+      mediaId('Service — E-Commerce'),
+      mediaId('Service — AI & Automation'),
+      mediaId('Service — Data & Analytics'),
     ].filter(Boolean) as (number | string)[]
-    const next = assignByOrder(categoriesArr, 'image', pool)
-    if (JSON.stringify(next) !== JSON.stringify(categoriesArr)) {
-      patch.services = { ...services, categories: next }
+    const nextCategories = categoriesArr.map((cat, idx) => {
+      const matched = serviceImageById[(cat.id as string) ?? ''] ?? fallbackPool[idx % fallbackPool.length] ?? null
+      if (!matched) return cat
+      return { ...cat, image: matched }
+    })
+    if (JSON.stringify(nextCategories) !== JSON.stringify(categoriesArr)) {
+      patch.services = { ...services, categories: nextCategories }
       console.log('  + wired service category images')
     }
   }
