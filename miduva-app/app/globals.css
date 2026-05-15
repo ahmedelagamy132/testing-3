@@ -310,6 +310,17 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
 /* When a tab is selected in the admin, render only that section. */
 body[data-focus-section] .preview-anchor { display: none !important; }
 
+/* ── Collapse sticky-scroll tall containers in focused preview mode ──────────
+   Sections like "How It Works" and "Systems" use 400-700vh for their scroll
+   animations. In focused tab preview this creates a huge empty dead zone.
+   Collapse them to 100vh so the editor sees the section without wasted space. */
+body[data-focus-section="how-it-works"] #how-it-works {
+  height: 100vh !important;
+}
+body[data-focus-section="systems"] #systems-scroll {
+  height: 100vh !important;
+}
+
 /* In focus mode the page is only one section tall, which trips Nav's
    "hide near the cinematic footer" logic. Force it to stay visible so editors
    on the Branding & Nav tab can actually see what they're editing. */

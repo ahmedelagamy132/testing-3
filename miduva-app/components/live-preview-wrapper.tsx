@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useLivePreview } from "@payloadcms/live-preview-react"
 import { AppWrapper } from "@/components/app-wrapper"
 import { transformLandingPage } from "@/payload/utils/transform-landing-page"
@@ -11,6 +11,82 @@ type RawDoc = Record<string, any>
 interface Props {
   initialDoc: RawDoc | null
   serverURL: string
+}
+
+// The public site is designed for a desktop viewport. Two cases:
+//   • viewport < 1440: render the site inside a fixed 1440px box and scale
+//     the box down so the desktop layout stays intact (the site root uses
+//     `overflow-x-clip`, so without this the right edge of every section is
+//     silently cut off).
+//   • viewport ≥ 1440: don't constrain. Let the site render at the popup's
+//     natural width — its own `max-w-*` containers center the content.
+//     If we instead pinned the inner to 1440, everything past 1440 would
+//     be visible empty space on the right.
+const DESIGN_WIDTH = 1440
+
+function PreviewScaler({ children }: { children: React.ReactNode }) {
+  const outerRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+  const [needsScaling, setNeedsScaling] = useState(false)
+  const [scaledHeight, setScaledHeight] = useState<number | undefined>(undefined)
+
+  useEffect(() => {
+    const outer = outerRef.current
+    const inner = innerRef.current
+    if (!outer || !inner) return
+
+    const recompute = () => {
+      const available = outer.clientWidth
+      if (available >= DESIGN_WIDTH) {
+        setNeedsScaling(false)
+        setScale(1)
+        setScaledHeight(undefined)
+        return
+      }
+      const next = available / DESIGN_WIDTH
+      setNeedsScaling(true)
+      setScale(next)
+      setScaledHeight(inner.scrollHeight * next)
+    }
+
+    recompute()
+
+    const ro = new ResizeObserver(recompute)
+    ro.observe(outer)
+    ro.observe(inner)
+    window.addEventListener("resize", recompute)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener("resize", recompute)
+    }
+  }, [])
+
+  return (
+    <div
+      ref={outerRef}
+      style={{
+        width: "100%",
+        overflow: needsScaling ? "hidden" : "visible",
+        height: needsScaling ? scaledHeight : undefined,
+      }}
+    >
+      <div
+        ref={innerRef}
+        style={
+          needsScaling
+            ? {
+                width: DESIGN_WIDTH,
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+              }
+            : { width: "100%" }
+        }
+      >
+        {children}
+      </div>
+    </div>
+  )
 }
 
 export function LivePreviewWrapper({ initialDoc, serverURL }: Props) {
@@ -85,7 +161,9 @@ export function LivePreviewWrapper({ initialDoc, serverURL }: Props) {
 
   return (
     <>
-      <AppWrapper data={transformLandingPage(data)} />
+      <PreviewScaler>
+        <AppWrapper data={transformLandingPage(data)} />
+      </PreviewScaler>
       {focused && (
         <button
           type="button"

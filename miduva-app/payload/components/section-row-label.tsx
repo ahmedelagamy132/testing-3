@@ -19,11 +19,11 @@ const SECTION_LABEL: Record<string, string> = {
   footer: 'Footer',
 }
 
-type RowData = { id?: string; visible?: boolean }
+type RowData = { sectionId?: string; visible?: boolean }
 
 export const SectionRowLabel = () => {
   const { data, rowNumber } = useRowLabel<RowData>()
-  const id = data?.id ?? ''
+  const id = data?.sectionId ?? ''
   const label = SECTION_LABEL[id] ?? id ?? `Section ${String(rowNumber ?? 1).padStart(2, '0')}`
   const hidden = data?.visible === false
   return (

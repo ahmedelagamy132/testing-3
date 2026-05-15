@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef, type ReactNode } from "react"
+import Image from "next/image"
 import type { LandingPageData, SectionId } from "@/lib/types"
 import Nav from "./nav"
 import SvgMaskHero from "./svg-mask-hero"
@@ -48,16 +49,39 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
   // structural wrappers (Nav at top, footer outside main).
   const sectionRenderers: Record<SectionId, () => ReactNode> = {
     hero: () => (
-      <SvgMaskHero
-        theme={theme}
-        onRevealComplete={onRevealComplete}
-        onRevealReverse={onRevealReverse}
-        scanTarget={navRef}
-        illustrationDarkUrl={data.hero?.illustrationDarkUrl}
-        illustrationLightUrl={data.hero?.illustrationLightUrl}
-      >
-        <HeroContent theme={theme} data={data.hero} />
-      </SvgMaskHero>
+      <div className="relative">
+        {/* Mobile-only atmospheric haze — scoped to the hero so it scrolls away
+            with the section instead of covering the whole page. */}
+        <div
+          className="md:hidden absolute inset-0 pointer-events-none overflow-hidden"
+          style={{ zIndex: 10 }}
+          aria-hidden="true"
+        >
+          <Image
+            src="/coming-soon/atmos-haze.png"
+            alt=""
+            fill
+            sizes="100vw"
+            style={{
+              objectFit: "cover",
+              objectPosition: "65% 35%",
+              opacity: 0.42,
+              mixBlendMode: "screen",
+              filter: "contrast(0.95) saturate(0.9) blur(2px)",
+            }}
+          />
+        </div>
+        <SvgMaskHero
+          theme={theme}
+          onRevealComplete={onRevealComplete}
+          onRevealReverse={onRevealReverse}
+          scanTarget={navRef}
+          illustrationDarkUrl={data.hero?.illustrationDarkUrl}
+          illustrationLightUrl={data.hero?.illustrationLightUrl}
+        >
+          <HeroContent theme={theme} data={data.hero} />
+        </SvgMaskHero>
+      </div>
     ),
     systems: () => <SystemsZoomSection data={data.systems} />,
     "problem-solution": () => <ProblemSolution data={data.problemSolution} />,

@@ -21,6 +21,16 @@ export const landingPage: GlobalConfig = {
   admin: {
     description:
       'Every section of the public landing page. Use the tabs below — they follow the order sections appear on the page, top to bottom.',
+    components: {
+      elements: {
+        // Renders a button in the document header that pops the live preview
+        // out into its own window. The in-pane preview is hidden via CSS in
+        // app/(payload)/admin/layout.tsx so the editor takes the full width.
+        beforeDocumentControls: [
+          '@/payload/components/open-preview-button#OpenPreviewButton',
+        ],
+      },
+    },
   },
   fields: [
     {
@@ -50,28 +60,33 @@ export const landingPage: GlobalConfig = {
                       RowLabel: '@/payload/components/section-row-label#SectionRowLabel',
                     },
                   },
+                  // Field is named `sectionId` (not `id`) to avoid colliding with
+                  // Payload's auto-generated row primary key. When the user-defined
+                  // field is named `id` AND `type: 'select'`, the sqlite adapter
+                  // mistakenly types the column as INTEGER PK, which then rejects
+                  // string values like 'hero'.
                   defaultValue: [
-                    { id: 'hero', visible: true },
-                    { id: 'systems', visible: true },
-                    { id: 'problem-solution', visible: true },
-                    { id: 'how-it-works', visible: true },
-                    { id: 'results', visible: true },
-                    { id: 'why-miduva', visible: true },
-                    { id: 'parallax', visible: true },
-                    { id: 'dashboard', visible: true },
-                    { id: 'services', visible: true },
-                    { id: 'growth-os', visible: true },
-                    { id: 'faq', visible: true },
-                    { id: 'free-offer', visible: true },
-                    { id: 'contact', visible: true },
-                    { id: 'footer', visible: true },
+                    { sectionId: 'hero', visible: true },
+                    { sectionId: 'systems', visible: true },
+                    { sectionId: 'problem-solution', visible: true },
+                    { sectionId: 'how-it-works', visible: true },
+                    { sectionId: 'results', visible: true },
+                    { sectionId: 'why-miduva', visible: true },
+                    { sectionId: 'parallax', visible: true },
+                    { sectionId: 'dashboard', visible: true },
+                    { sectionId: 'services', visible: true },
+                    { sectionId: 'growth-os', visible: true },
+                    { sectionId: 'faq', visible: true },
+                    { sectionId: 'free-offer', visible: true },
+                    { sectionId: 'contact', visible: true },
+                    { sectionId: 'footer', visible: true },
                   ],
                   fields: [
                     {
                       type: 'row',
                       fields: [
                         {
-                          name: 'id',
+                          name: 'sectionId',
                           type: 'select',
                           required: true,
                           label: 'Section',

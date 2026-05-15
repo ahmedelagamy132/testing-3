@@ -267,7 +267,10 @@
   min-height: 100svh;
   min-height: 100dvh;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  /* `.main` (the headline lockup) takes the 1fr row and centers itself
+     vertically with `align-self: center`. `.foot` pins to the bottom in the
+     auto row. There is no rendered header right now, so no third row. */
+  grid-template-rows: 1fr auto;
   padding-inline: clamp(1.5rem, 4vw, 4rem);
   padding-block: clamp(1.5rem, 4vw, 2.75rem);
   gap: clamp(1.25rem, 3vw, 2rem);

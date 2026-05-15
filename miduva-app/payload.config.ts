@@ -14,12 +14,19 @@ export default buildConfig({
     },
     components: {
       providers: ['@/payload/components/tab-watcher-provider#TabWatcherProvider'],
+      graphics: {
+        Logo: '@/payload/components/admin-logo#AdminLogo',
+        Icon: '@/payload/components/admin-logo#AdminIcon',
+      },
+      views: {
+        dashboard: {
+          Component: '@/payload/components/admin-dashboard#AdminDashboard',
+        },
+      },
     },
     livePreview: {
       url: '/preview',
       breakpoints: [
-        { label: 'Mobile', name: 'mobile', width: 375, height: 667 },
-        { label: 'Tablet', name: 'tablet', width: 768, height: 1024 },
         { label: 'Desktop', name: 'desktop', width: 1440, height: 900 },
       ],
       globals: ['landing-page'],

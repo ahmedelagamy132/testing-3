@@ -286,9 +286,9 @@ export function transformLandingPage(doc: AnyDoc | null | undefined): LandingPag
   if (doc.layout?.sections && Array.isArray(doc.layout.sections)) {
     data.layout = {
       sections: doc.layout.sections
-        .filter((row: AnyDoc) => row && typeof row.id === 'string')
+        .filter((row: AnyDoc) => row && typeof row.sectionId === 'string')
         .map((row: AnyDoc) => ({
-          id: row.id,
+          id: row.sectionId,
           visible: row.visible !== false,
         })),
     }

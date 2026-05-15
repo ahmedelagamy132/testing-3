@@ -1,0 +1,14 @@
+.admin-logo {
+  display: block;
+  height: 38px;
+  width: auto;
+
+  &--white { display: block; }
+  &--dark  { display: none; }
+}
+
+// Payload sets data-theme="light" on <html> in light mode
+html[data-theme='light'] {
+  .admin-logo--white { display: none; }
+  .admin-logo--dark  { display: block; }
+}
