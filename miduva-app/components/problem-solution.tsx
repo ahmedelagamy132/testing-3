@@ -28,6 +28,19 @@ function useIsDark() {
   return isDark
 }
 
+/* ─── Mobile breakpoint hook (matches Tailwind `md`) ─── */
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    const apply = () => setIsMobile(mq.matches)
+    apply()
+    mq.addEventListener("change", apply)
+    return () => mq.removeEventListener("change", apply)
+  }, [])
+  return isMobile
+}
+
 /* ─── Default Data ─── */
 const DEFAULT_PROBLEMS: ProblemCardData[] = [
   {
@@ -337,7 +350,10 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
   const bulletsRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
 
+  const isMobile = useIsMobile()
+
   useLayoutEffect(() => {
+    if (isMobile) return
     const ctx = gsap.context(() => {
       const solutionEls = [
         eyebrowRef.current,
@@ -377,95 +393,95 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
     }, outerRef)
 
     return () => ctx.revert()
-  }, [])
+  }, [isMobile])
 
   return (
     <section id="problem-solution" className="relative">
       <div
         ref={outerRef}
-        className="relative h-[300vh] md:h-[350vh] w-full bg-[#F8F9FB] dark:bg-[#020204]"
+        className="relative h-auto md:h-[300vh] lg:h-[350vh] w-full bg-[#F8F9FB] dark:bg-[#020204]"
       >
         <NoiseOverlay />
 
-        <div className="sticky top-0 h-screen w-full overflow-hidden flex items-start lg:items-center justify-center pt-20 md:pt-24 lg:pt-0">
+        <div className="relative md:sticky md:top-0 h-auto md:h-screen w-full overflow-visible md:overflow-hidden flex flex-col md:flex-row items-stretch md:items-start lg:items-center justify-start md:justify-center gap-12 md:gap-0 pt-14 pb-16 md:py-0 md:pt-24 lg:pt-0">
           <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] pointer-events-none"
+            className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[60vh] pointer-events-none"
             style={{ background: "radial-gradient(ellipse, rgba(43,200,183,0.06) 0%, transparent 70%)", filter: "blur(60px)" }}
             aria-hidden
           />
 
           {/* ── Bento Grid (Problems) ── */}
-          <div ref={bentoRef} className="relative z-10 w-full max-w-7xl mx-auto px-6 md:px-8">
-            <div className="mb-10 md:mb-12 text-center md:text-left">
-              <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">
+          <div ref={bentoRef} className="relative z-10 w-full max-w-7xl mx-auto px-5 md:px-8">
+            <div className="mb-8 md:mb-12 text-left md:text-left">
+              <div className="mono text-[11px] md:text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-3 md:mb-4">
                 {problemEyebrow}
               </div>
-              <h2 className="text-[32px] md:text-[44px] lg:text-[56px] font-extrabold tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
+              <h2 className="text-[28px] md:text-[44px] lg:text-[56px] font-extrabold tracking-[-0.035em] md:tracking-[-0.04em] text-[var(--ink)] leading-[1.05]">
                 {problemHeadline}
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-5">
-              <div ref={card1Ref} className="min-h-[300px] md:min-h-[380px] will-change-transform">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+              <div ref={card1Ref} className="md:min-h-[380px] md:will-change-transform">
                 <ProblemCard problem={problems[0]} index={0} className="h-full" />
               </div>
-              <div ref={card2Ref} className="min-h-[300px] md:min-h-[380px] will-change-transform">
+              <div ref={card2Ref} className="md:min-h-[380px] md:will-change-transform">
                 <ProblemCard problem={problems[1]} index={1} className="h-full" />
               </div>
-              <div ref={card3Ref} className="min-h-[300px] md:min-h-[380px] will-change-transform">
+              <div ref={card3Ref} className="md:min-h-[380px] md:will-change-transform">
                 <ProblemCard problem={problems[2]} index={2} className="h-full" />
               </div>
             </div>
           </div>
 
-          {/* ── Solution Overlay ── */}
+          {/* ── Solution (overlay on desktop, inline below on mobile) ── */}
           <div
             ref={solutionRef}
-            className="absolute inset-0 z-20 flex items-center justify-center p-6 md:p-12 lg:p-20 will-change-transform"
+            className="relative md:absolute md:inset-0 z-20 block md:flex md:items-center md:justify-center w-full px-5 md:p-12 lg:p-20 md:will-change-transform"
           >
             <div className="w-full max-w-5xl mx-auto">
-              <div className="p-[6px] rounded-[2rem] bg-[#0F2349]/[0.08] dark:bg-white/[0.03] ring-1 ring-[#0F2349]/10 dark:ring-white/[0.08]">
+              <div className="p-[5px] md:p-[6px] rounded-[1.5rem] md:rounded-[2rem] bg-[#0F2349]/[0.08] dark:bg-white/[0.03] ring-1 ring-[#0F2349]/10 dark:ring-white/[0.08]">
                 <div
                   ref={solutionInnerRef}
-                  className="relative overflow-hidden rounded-[calc(2rem-6px)] bg-[#0F2349] dark:bg-[#020204]"
+                  className="relative overflow-hidden rounded-[calc(1.5rem-5px)] md:rounded-[calc(2rem-6px)] bg-[#0F2349] dark:bg-[#020204]"
                 >
                   <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(43,200,183,0.18) 0%, transparent 65%)", filter: "blur(52px)" }} aria-hidden />
                   <div className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(43,200,183,0.13) 0%, transparent 65%)", filter: "blur(44px)" }} aria-hidden />
 
-                  <div className="relative z-10 px-8 py-12 md:px-14 md:py-16 lg:px-20 lg:py-20 flex flex-col gap-7 md:gap-8">
-                    <div ref={eyebrowRef} className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)]">
+                  <div className="relative z-10 px-6 py-9 md:px-14 md:py-16 lg:px-20 lg:py-20 flex flex-col gap-5 md:gap-8">
+                    <div ref={eyebrowRef} className="mono text-[11px] md:text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)]">
                       / the solution
                     </div>
 
-                    <p ref={headlineRef} className="text-[28px] md:text-[44px] lg:text-[56px] font-extrabold tracking-[-0.035em] leading-[1.08] text-white max-w-4xl">
+                    <p ref={headlineRef} className="text-[26px] md:text-[44px] lg:text-[56px] font-extrabold tracking-[-0.03em] md:tracking-[-0.035em] leading-[1.08] text-white max-w-4xl">
                       {solutionHeadline}{" "}
                       <span className="shine">{solutionAccent}</span>
                     </p>
 
-                    <p ref={subheadRef} className="text-[15px] md:text-[16px] leading-[1.6] text-white/40 max-w-2xl -mt-2 md:-mt-3">
+                    <p ref={subheadRef} className="text-[14px] md:text-[16px] leading-[1.55] md:leading-[1.6] text-white/45 max-w-2xl md:-mt-3">
                       {solutionSub}
                     </p>
 
-                    <div ref={bulletsRef} className="flex flex-wrap items-center gap-x-8 gap-y-4 pt-2">
+                    <div ref={bulletsRef} className="flex flex-col md:flex-row md:flex-wrap items-stretch md:items-center gap-3 md:gap-x-8 md:gap-y-4 md:pt-2">
                       {bullets.map((point) => (
-                        <div key={point} className="flex items-center gap-2.5">
-                          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#2BC8B7]/15 flex items-center justify-center">
+                        <div key={point} className="flex items-start md:items-center gap-2.5">
+                          <span className="mt-[2px] md:mt-0 flex-shrink-0 w-5 h-5 rounded-full bg-[#2BC8B7]/15 flex items-center justify-center">
                             <IconCheck className="text-[#2BC8B7]" />
                           </span>
-                          <span className="text-[14px] font-medium text-white/50 tracking-tight">{point}</span>
+                          <span className="text-[14px] font-medium text-white/55 tracking-tight leading-[1.4]">{point}</span>
                         </div>
                       ))}
                     </div>
 
                     <div
                       ref={ctaRef}
-                      className="pt-8 flex items-center justify-between flex-wrap gap-4"
+                      className="pt-6 md:pt-8 flex flex-col md:flex-row items-stretch md:items-center md:justify-between gap-4 md:flex-wrap"
                       style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
                     >
-                      <p className="mono text-[11px] uppercase tracking-[0.18em] text-white/25">{bottomNote}</p>
+                      <p className="mono text-[10px] md:text-[11px] uppercase tracking-[0.18em] text-white/25 order-2 md:order-1">{bottomNote}</p>
                       <a
                         href={ctaHref}
-                        className="group/btn inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full text-[13px] font-semibold transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98]"
+                        className="group/btn inline-flex items-center justify-between md:justify-start gap-3 pl-5 md:pl-6 pr-2 py-2 rounded-full text-[13px] font-semibold transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98] order-1 md:order-2 w-full md:w-auto"
                         style={{ background: "#2BC8B7", color: "#020204" }}
                       >
                         <span>{ctaLabel}</span>
