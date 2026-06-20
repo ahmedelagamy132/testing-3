@@ -315,14 +315,15 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
             </h2>
 
             <div ref={linksRef} className="flex flex-col items-center gap-6 w-full">
-              {/* Primary CTAs */}
-              <div className="flex flex-wrap justify-center gap-4 w-full">
+              {/* Primary CTAs — full-width stacked on mobile (even, intentional),
+                  inline row on larger screens. */}
+              <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-3 sm:gap-4 w-full max-w-sm sm:max-w-none mx-auto">
                 {primaryCtas.map((cta, i) => (
                   <MagneticButton
                     key={`${cta.label}-${i}`}
                     as="a"
                     href={cta.href}
-                    className="footer-glass-pill px-10 py-5 rounded-full text-foreground font-bold text-sm md:text-base flex items-center gap-3 group"
+                    className="footer-glass-pill w-full sm:w-auto justify-center px-8 sm:px-10 py-4 sm:py-5 rounded-full text-foreground font-bold text-sm md:text-base flex items-center gap-3 group"
                   >
                     {i === 0 ? (
                       <Phone className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
