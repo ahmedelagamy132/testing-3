@@ -433,7 +433,7 @@ export default function SystemsZoomSection({ data }: { data?: SystemsSectionData
 
 	return (
 		<section id="systems">
-			<div className="relative flex h-[50vh] items-center justify-center overflow-hidden bg-white dark:bg-[#020204]">
+			<div className="relative flex min-h-[230px] items-center justify-center overflow-hidden bg-white py-12 dark:bg-[#020204] md:h-[50vh] md:min-h-0 md:py-0">
 				<div className="text-center px-6">
 					<div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">
 						{eyebrow}
