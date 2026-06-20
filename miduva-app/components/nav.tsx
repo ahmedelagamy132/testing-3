@@ -90,10 +90,10 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
       }`}
     >
       <nav
-        className={`mx-auto mt-3 overflow-hidden transition-all duration-500 ${
+        className={`mx-auto mt-3 overflow-hidden rounded-[24px] transition-[background-color,border-color,box-shadow,backdrop-filter,max-width] duration-300 lg:duration-500 ${
           compactSurface
-            ? "max-w-5xl rounded-[24px] border border-[var(--line)] bg-[var(--card)]/95 shadow-[0_18px_60px_-26px_rgba(15,35,73,.55)] backdrop-blur-xl dark:bg-[#050b17]/95 dark:shadow-[0_18px_60px_-26px_rgba(0,0,0,.9)]"
-            : "max-w-6xl rounded-full border border-transparent bg-transparent shadow-none backdrop-blur-none"
+            ? "max-w-5xl border border-[var(--line)] bg-[var(--card)]/95 shadow-[0_18px_60px_-26px_rgba(15,35,73,.55)] backdrop-blur-xl dark:bg-[#050b17]/95 dark:shadow-[0_18px_60px_-26px_rgba(0,0,0,.9)]"
+            : "max-w-5xl border border-transparent bg-transparent shadow-none backdrop-blur-none lg:max-w-6xl lg:rounded-full"
         }`}
       >
         <div className="hidden lg:grid grid-cols-[1fr_auto_1fr] items-center px-8 py-3 gap-8">

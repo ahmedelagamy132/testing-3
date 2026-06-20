@@ -19,12 +19,20 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
       const scrollable = (header as HTMLElement).offsetHeight - window.innerHeight
       if (scrollable <= 0) return
       const p = Math.min(1, Math.max(0, -rect.top / scrollable))
-      const config = [
-        { sel: '[data-parallax-layer="1"]', y: -90 },
-        { sel: '[data-parallax-layer="2"]', y: -55 },
-        { sel: '[data-parallax-layer="3"]', y: -22 },
-        { sel: '[data-parallax-layer="4"]', y: -6  },
-      ]
+      const isMobile = window.matchMedia("(max-width: 700px)").matches
+      const config = isMobile
+        ? [
+            { sel: '[data-parallax-layer="1"]', y: -8 },
+            { sel: '[data-parallax-layer="2"]', y: 0 },
+            { sel: '[data-parallax-layer="3"]', y: 0 },
+            { sel: '[data-parallax-layer="4"]', y: 0 },
+          ]
+        : [
+            { sel: '[data-parallax-layer="1"]', y: -90 },
+            { sel: '[data-parallax-layer="2"]', y: -55 },
+            { sel: '[data-parallax-layer="3"]', y: -22 },
+            { sel: '[data-parallax-layer="4"]', y: -6  },
+          ]
       config.forEach((c) => {
         const n = layers.querySelector(c.sel) as HTMLElement | null
         if (n) n.style.transform = `translateY(${p * c.y}%)`
@@ -75,15 +83,13 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
 
             {/* Layer 2 — bar graph silhouette */}
             <div data-parallax-layer="2" className="parallax__layer">
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 14, width: "88%", maxWidth: 1100, height: "62%", opacity: 0.18 }}>
+              <div className="parallax__bar-silhouette">
                 {[38, 54, 46, 62, 70, 66, 78, 86, 80, 92, 102, 118, 112, 128].map((h, i) => (
                   <div
                     key={i}
+                    className="parallax__bar"
                     style={{
-                      flex: 1,
                       height: `${h * 0.7}%`,
-                      background: "linear-gradient(180deg,var(--navy-700),var(--navy-900))",
-                      borderRadius: "14px 14px 2px 2px",
                     }}
                   />
                 ))}
@@ -100,7 +106,7 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
                   {headline}<br />
                   <em>system.</em>
                 </h2>
-                <div style={{ marginTop: 22, maxWidth: 620, marginInline: "auto", color: "var(--muted)", fontSize: 18, lineHeight: 1.55 }}>
+                <div className="parallax__description">
                   {description}
                 </div>
               </div>
@@ -109,17 +115,11 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
             {/* Layer 4 — pipeline card, anchored bottom-right */}
             <div data-parallax-layer="4" className="parallax__layer">
               <div
+                className="parallax__pipeline-card"
                 style={{
-                  position: "absolute",
-                  bottom: 52,
-                  right: 52,
                   background: "var(--card)",
                   border: "1px solid var(--line)",
-                  borderRadius: 20,
-                  padding: "18px 20px",
-                  width: 300,
                   boxShadow: "0 32px 64px -24px rgba(15,35,73,.4), 0 0 0 1px rgba(255,255,255,0.04)",
-                  transform: "rotate(1.5deg)",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
@@ -143,11 +143,11 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
                   <span style={{ color: "var(--muted)", fontWeight: 400 }}>vs last Q</span>
                 </div>
                 <div style={{ height: 1, background: "var(--line)", margin: "12px 0" }} />
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 52 }}>
+                <div className="parallax__pipeline-bars">
                   {bars.map((h, i) => (
                     <div
                       key={i}
-                      style={{ flex: 1, height: `${h * 0.85}%`, background: "var(--teal-500)", borderRadius: 2, opacity: 0.7 + i * 0.025 }}
+                      style={{ height: `${h * 0.85}%`, opacity: 0.7 + i * 0.025 }}
                     />
                   ))}
                 </div>
