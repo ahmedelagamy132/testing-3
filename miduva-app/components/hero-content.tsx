@@ -18,10 +18,19 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
   const primaryLabel  = data?.primaryCta?.label  ?? "Get Started"
   const primaryHref   = data?.primaryCta?.href   ?? "#get-started"
   const secondaryLabel = data?.secondaryCta?.label ?? "See Our Work"
-  const secondaryHref  = data?.secondaryCta?.href  ?? "#case-studies"
+  const secondaryHref  = data?.secondaryCta?.href  ?? "#our-work"
 
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
+
+  // Legibility safety net over the busy hero artwork, layered on top of the
+  // backdrop scrim. Soft and theme-aware so it reads as depth, not a hard halo.
+  const headingShadow = theme === "dark"
+    ? "0 1px 24px rgba(2,4,12,0.55), 0 1px 2px rgba(2,4,12,0.45)"
+    : "0 1px 18px rgba(255,255,255,0.7)"
+  const textShadow = theme === "dark"
+    ? "0 1px 12px rgba(2,4,12,0.7), 0 1px 2px rgba(2,4,12,0.5)"
+    : "0 1px 8px rgba(255,255,255,0.85)"
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -59,6 +68,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
             letterSpacing: "-0.03em",
             margin: 0,
             color: theme === "dark" ? "#fff" : "var(--navy-900)",
+            textShadow: headingShadow,
           }}
         >
           {headline}
@@ -73,7 +83,8 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
             lineHeight: 1.2,
             letterSpacing: "-0.01em",
             marginTop: 12,
-            color: theme === "dark" ? "rgba(255,255,255,0.55)" : "var(--muted)",
+            color: theme === "dark" ? "rgba(255,255,255,0.7)" : "var(--muted)",
+            textShadow,
           }}
         >
           Engineered to{" "}
@@ -101,7 +112,8 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
             letterSpacing: "0.2em",
             lineHeight: 1.7,
             textTransform: "uppercase",
-            color: theme === "dark" ? "rgba(255,255,255,0.45)" : "var(--muted)",
+            color: theme === "dark" ? "rgba(255,255,255,0.6)" : "var(--muted)",
+            textShadow,
             margin: "16px 0 0",
           }}
         >
@@ -112,7 +124,8 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
           style={{
             fontSize: "clamp(12px, 0.9vw, 14px)",
             lineHeight: 1.75,
-            color: theme === "dark" ? "rgba(255,255,255,0.6)" : "var(--muted)",
+            color: theme === "dark" ? "rgba(255,255,255,0.78)" : "var(--muted)",
+            textShadow,
             margin: "10px 0 0",
           }}
         >

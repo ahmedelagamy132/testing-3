@@ -8,6 +8,7 @@ const SECTION_LABEL: Record<string, string> = {
   'problem-solution': 'Problem & Solution',
   'how-it-works': 'How It Works',
   results: 'Results',
+  'our-work': 'Our Work',
   'why-miduva': 'Why Miduva',
   parallax: 'The Difference (Parallax)',
   dashboard: 'Dashboard',

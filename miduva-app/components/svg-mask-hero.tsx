@@ -110,16 +110,29 @@ export default function SvgMaskHero({
         />
       </div>
 
-      {/* Scrim — keeps the headline + CTAs legible over the busy artwork on
-          mobile. Theme-aware: darkens at the edges on dark, lightens on light. */}
+      {/* Legibility scrim — keeps the headline, tagline and CTAs readable over
+          the busy artwork. Desktop weights the gradient to the left (text is
+          left-aligned), leaving the illustration on the right untouched; mobile
+          weights it to the top text band, then opens up over the lower artwork.
+          Theme-aware: darkens on dark, lightens on light. */}
+      <div
+        className="hero-desktop-scrim"
+        aria-hidden
+        style={{
+          background:
+            theme === "dark"
+              ? "linear-gradient(90deg, rgba(5,8,26,0.88) 0%, rgba(5,8,26,0.62) 26%, rgba(5,8,26,0.22) 48%, rgba(5,8,26,0) 68%)"
+              : "linear-gradient(90deg, rgba(244,246,251,0.92) 0%, rgba(244,246,251,0.66) 26%, rgba(244,246,251,0.26) 48%, rgba(244,246,251,0) 68%)",
+        }}
+      />
       <div
         className="hero-mobile-scrim"
         aria-hidden
         style={{
           background:
             theme === "dark"
-              ? "linear-gradient(180deg, rgba(5,8,26,0.72) 0%, rgba(5,8,26,0.28) 32%, rgba(5,8,26,0.34) 64%, rgba(5,8,26,0.86) 100%)"
-              : "linear-gradient(180deg, rgba(244,246,251,0.80) 0%, rgba(244,246,251,0.30) 34%, rgba(244,246,251,0.40) 66%, rgba(244,246,251,0.90) 100%)",
+              ? "linear-gradient(180deg, rgba(5,8,26,0.90) 0%, rgba(5,8,26,0.74) 30%, rgba(5,8,26,0.56) 52%, rgba(5,8,26,0.30) 72%, rgba(5,8,26,0.86) 100%)"
+              : "linear-gradient(180deg, rgba(244,246,251,0.92) 0%, rgba(244,246,251,0.76) 30%, rgba(244,246,251,0.58) 52%, rgba(244,246,251,0.32) 72%, rgba(244,246,251,0.90) 100%)",
         }}
       />
 
@@ -327,6 +340,13 @@ export default function SvgMaskHero({
           pointer-events: none;
           display: none;
         }
+        .hero-desktop-scrim {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          display: block;
+        }
         .hero-mobile-scrim {
           position: absolute;
           inset: 0;
@@ -516,6 +536,7 @@ export default function SvgMaskHero({
           /* Swap the landscape desktop art for the portrait mobile art. */
           .hero-illustration { display: none; }
           .hero-illustration-mobile { display: block; }
+          .hero-desktop-scrim { display: none; }
           .hero-mobile-scrim { display: block; }
         }
 

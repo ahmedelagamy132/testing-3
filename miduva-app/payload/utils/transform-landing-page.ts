@@ -1,4 +1,4 @@
-import type { LandingPageData } from '@/lib/types'
+import type { LandingPageData, SectionId } from '@/lib/types'
 
 type MediaDoc = { url?: string | null }
 
@@ -23,6 +23,25 @@ function extractStrings(
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyDoc = Record<string, any>
+type LayoutSection = { id: SectionId; visible: boolean }
+
+const DEFAULT_SECTION_IDS: SectionId[] = [
+  'hero',
+  'systems',
+  'problem-solution',
+  'how-it-works',
+  'results',
+  'our-work',
+  'why-miduva',
+  'parallax',
+  'dashboard',
+  'services',
+  'growth-os',
+  'faq',
+  'free-offer',
+  'contact',
+  'footer',
+]
 
 export function transformLandingPage(doc: AnyDoc | null | undefined): LandingPageData {
   if (!doc) return {}
@@ -284,13 +303,26 @@ export function transformLandingPage(doc: AnyDoc | null | undefined): LandingPag
   }
 
   if (doc.layout?.sections && Array.isArray(doc.layout.sections)) {
+    const sections: LayoutSection[] = doc.layout.sections
+      .filter((row: AnyDoc) => row && typeof row.sectionId === 'string')
+      .map((row: AnyDoc) => ({
+        id: row.sectionId as SectionId,
+        visible: row.visible !== false,
+      }))
+    const seen = new Set(sections.map((row) => row.id))
+
+    if (!seen.has('our-work')) {
+      const resultsIndex = sections.findIndex((row) => row.id === 'results')
+      const insertAt = resultsIndex >= 0 ? resultsIndex + 1 : sections.length
+      sections.splice(insertAt, 0, { id: 'our-work', visible: true })
+      seen.add('our-work')
+    }
+
     data.layout = {
-      sections: doc.layout.sections
-        .filter((row: AnyDoc) => row && typeof row.sectionId === 'string')
-        .map((row: AnyDoc) => ({
-          id: row.sectionId,
-          visible: row.visible !== false,
-        })),
+      sections: [
+        ...sections,
+        ...DEFAULT_SECTION_IDS.filter((id) => !seen.has(id)).map((id) => ({ id, visible: true })),
+      ],
     }
   }
 

@@ -14,6 +14,7 @@ import ProblemSolution from "./problem-solution"
 import HowItWorks from "./how-it-works"
 import ResultsStats from "./results-stats"
 import WhyMiduva from "./why-miduva"
+import OurWork from "./our-work"
 import FaqSection from "./faq-section"
 import FreeOffer from "./free-offer"
 import ContactSection from "./contact-section"
@@ -25,7 +26,7 @@ interface AppWrapperProps {
 
 const DEFAULT_ORDER: SectionId[] = [
   "hero", "systems", "problem-solution", "how-it-works", "results",
-  "why-miduva", "parallax", "dashboard", "services", "growth-os",
+  "our-work", "why-miduva", "parallax", "dashboard", "services", "growth-os",
   "faq", "free-offer", "contact", "footer",
 ]
 
@@ -65,6 +66,7 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
     "problem-solution": () => <ProblemSolution data={data.problemSolution} />,
     "how-it-works": () => <HowItWorks data={data.howItWorks} />,
     results: () => <ResultsStats data={data.results} />,
+    "our-work": () => <OurWork />,
     "why-miduva": () => <WhyMiduva data={data.whyMiduva} />,
     parallax: () => <ParallaxSection data={data.parallax} />,
     dashboard: () => (

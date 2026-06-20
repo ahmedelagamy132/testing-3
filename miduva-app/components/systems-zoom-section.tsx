@@ -18,6 +18,42 @@ type System = {
 	imageUrl: string;
 };
 
+const DEFAULT_SYSTEMS: System[] = [
+	{
+		id: 'lead-gen',
+		num: '01',
+		label: 'Lead Generation System',
+		title: 'Consistent leads.\nOn autopilot.',
+		description: 'Generate predictable lead flow using ads, funnels & precision conversion systems built for your market.',
+		imageUrl: '/assets/systems/lead-gen.jpg',
+	},
+	{
+		id: 'website-conversion',
+		num: '02',
+		label: 'Website & Conversion System',
+		title: 'Your website,\nactually converting.',
+		description: "Turn traffic into revenue with a high-performance site engineered around your buyer's journey.",
+		imageUrl: '/assets/systems/website-conversion.jpg',
+	},
+	{
+		id: 'automation',
+		num: '03',
+		label: 'Smart Automation System',
+		title: 'Sales & follow-ups\nrunning 24/7.',
+		description: 'CRM workflows, AI agents, and email sequences that close deals while you sleep, no extra hires.',
+		imageUrl: '/assets/systems/automation.jpg',
+	},
+];
+
+const DEFAULT_BACKGROUND_IMAGES: SystemBackgroundImage[] = [
+	{ url: '/assets/systems/bg-growth.jpg', alt: 'Growth dashboard visualization' },
+	{ url: '/assets/systems/bg-web.jpg', alt: 'Website conversion interface' },
+	{ url: '/assets/systems/bg-data.jpg', alt: 'Data analytics workspace' },
+	{ url: '/assets/systems/bg-automation.jpg', alt: 'Automation workflow interface' },
+	{ url: '/assets/systems/bg-digital.jpg', alt: 'Digital campaign interface' },
+	{ url: '/assets/systems/bg-charts.jpg', alt: 'Performance chart visualization' },
+];
+
 const BG_POSITION_CLASSES = [
 	'[&>div]:!-top-[30vh] [&>div]:!left-[5vw] [&>div]:!h-[30vh] [&>div]:!w-[35vw]',
 	'[&>div]:!-top-[10vh] [&>div]:!-left-[25vw] [&>div]:!h-[45vh] [&>div]:!w-[20vw]',
@@ -386,16 +422,14 @@ function MobileSystemsSection({ systems }: { systems: System[] }) {
 /*  EXPORT                                                                      */
 /* ─────────────────────────────────────────────────────────────────────────── */
 export default function SystemsZoomSection({ data }: { data?: SystemsSectionData }) {
-	const eyebrow        = data?.eyebrow        ?? ''
-	const headline       = data?.headline       ?? ''
-	const headlineAccent = data?.headlineAccent ?? ''
-	const systems: System[] = (data?.systems ?? []).filter((s): s is System => Boolean(s.imageUrl))
-	const backgroundImages: SystemBackgroundImage[] = data?.backgroundImages ?? []
-
-	if (systems.length < 3 || backgroundImages.length < 6) {
-		// Section can't animate without the full set wired in the CMS.
-		return null;
-	}
+	const eyebrow        = data?.eyebrow        ?? '/ our systems'
+	const headline       = data?.headline       ?? 'Three systems.'
+	const headlineAccent = data?.headlineAccent ?? 'One growth machine.'
+	const cmsSystems = (data?.systems ?? []).filter((s): s is System => Boolean(s.imageUrl))
+	const systems: System[] = cmsSystems.length >= 3 ? cmsSystems : DEFAULT_SYSTEMS
+	const cmsBackgroundImages = data?.backgroundImages ?? []
+	const backgroundImages: SystemBackgroundImage[] =
+		cmsBackgroundImages.length >= 6 ? cmsBackgroundImages : DEFAULT_BACKGROUND_IMAGES
 
 	return (
 		<section id="systems">

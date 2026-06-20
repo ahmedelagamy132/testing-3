@@ -123,7 +123,7 @@ export interface FooterData {
 
 export type SectionId =
   | 'hero' | 'systems' | 'problem-solution' | 'how-it-works' | 'results'
-  | 'why-miduva' | 'parallax' | 'dashboard' | 'services' | 'growth-os'
+  | 'our-work' | 'why-miduva' | 'parallax' | 'dashboard' | 'services' | 'growth-os'
   | 'faq' | 'free-offer' | 'contact' | 'footer'
 
 export interface LayoutSectionEntry { id: SectionId; visible: boolean }

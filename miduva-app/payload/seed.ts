@@ -16,8 +16,8 @@ async function seed() {
           { label: 'How it Works', href: '#how-it-works' },
         ],
         rightLinks: [
-          { label: 'Case Studies', href: '#case-studies' },
-          { label: 'About', href: '#about' },
+          { label: 'Our Work', href: '#our-work' },
+          { label: 'About', href: '#why-miduva' },
           { label: 'Get Started', href: '#cta' },
         ],
       },
@@ -32,7 +32,7 @@ async function seed() {
           { phrase: 'scale your business.' },
         ],
         primaryCta: { label: 'Get Started', href: '#get-started' },
-        secondaryCta: { label: 'See Our Work', href: '#case-studies' },
+        secondaryCta: { label: 'See Our Work', href: '#our-work' },
       },
 
       systems: {

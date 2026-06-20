@@ -9,7 +9,7 @@ const DEFAULT_LEFT = [
   { n: "How it Works", h: "#how-it-works"},
 ]
 const DEFAULT_RIGHT = [
-  { n: "Case Studies", h: "#results"     },
+  { n: "Our Work",     h: "#our-work"    },
   { n: "About",        h: "#why-miduva"  },
   { n: "Get Started",  h: "#cta"         },
 ]

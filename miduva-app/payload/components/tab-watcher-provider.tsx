@@ -10,6 +10,7 @@ const TAB_TO_ANCHOR: Record<string, string> = {
   Systems: 'systems',
   'Problem & Solution': 'problem-solution',
   Results: 'results',
+  'Our Work': 'our-work',
   'The Difference': 'parallax',
   'How It Works': 'how-it-works',
   Services: 'services',

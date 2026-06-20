@@ -200,7 +200,7 @@ function DifferentiatorCard({
         <div className={`relative h-full overflow-hidden rounded-[calc(2rem-5px)] transition-shadow duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDark ? "bg-[#08080c] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_0_40px_rgba(43,200,183,0.06)]" : "bg-[var(--card)] shadow-[inset_0_1px_1px_rgba(15,35,73,0.06)] group-hover:shadow-[inset_0_1px_1px_rgba(15,35,73,0.1),0_0_40px_rgba(43,200,183,0.06)]"}`}>
           <div aria-hidden className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(43,200,183,0.10) 0%, transparent 70%)", filter: "blur(40px)" }} />
 
-          <div className={`relative z-10 h-full flex flex-col ${isWide ? "md:flex-row md:items-center md:justify-between gap-6 md:gap-10" : ""} p-6 md:p-8`}>
+          <div className={`relative z-10 h-full flex flex-col ${isWide ? "md:flex-row md:items-center md:justify-between md:gap-10" : ""} p-6 md:p-8`}>
             <div className="flex flex-col flex-1">
               <div className="flex items-center gap-3 mb-5">
                 <div className={`w-10 h-10 rounded-xl ring-1 flex items-center justify-center flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-teal-500/30 group-hover:bg-teal-500/10 ${isDark ? "bg-white/[0.04] ring-white/[0.1]" : "bg-[var(--chip)] ring-[var(--line)]"}`}>
@@ -235,14 +235,17 @@ function DifferentiatorCard({
               </div>
             </div>
 
-            {/* Wide card right side */}
+            {/* Wide card stat — a full-width band on mobile (bars stretch, the
+                figure pairs with its label on one baseline), an inline cluster
+                on desktop. The bar chart stays visible on mobile instead of
+                leaving the figure stranded. */}
             {isWide && (
-              <div className="flex items-center gap-4 md:gap-6 flex-shrink-0">
-                <div className="hidden md:flex items-end gap-[6px] h-14">
+              <div className={`flex flex-col gap-4 md:flex-row md:items-center md:gap-6 md:flex-shrink-0 w-full md:w-auto mt-6 md:mt-0 pt-6 md:pt-0 border-t md:border-t-0 ${isDark ? "border-white/[0.08]" : "border-[var(--line)]"}`}>
+                <div className="flex items-end gap-[5px] md:gap-[6px] h-12 md:h-14 flex-1 md:flex-none">
                   {[32, 48, 40, 64, 72, 56, 80, 88, 76, 92, 84, 96].map((h, i) => (
                     <motion.div
                       key={i}
-                      className="w-[6px] rounded-full bg-teal-500/20"
+                      className="flex-1 md:flex-none md:w-[6px] rounded-full bg-teal-500/25 md:bg-teal-500/20"
                       style={{ height: `${h}%` }}
                       initial={{ scaleY: 0 }}
                       animate={isInView ? { scaleY: 1 } : { scaleY: 0 }}
@@ -250,11 +253,11 @@ function DifferentiatorCard({
                     />
                   ))}
                 </div>
-                <div className="text-right">
-                  <div className={`text-[28px] md:text-[36px] font-extrabold tracking-[-0.04em] leading-none ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
+                <div className="flex items-baseline justify-between gap-3 md:block md:text-right">
+                  <div className={`text-[32px] md:text-[36px] font-extrabold tracking-[-0.04em] leading-none ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
                     4.8×
                   </div>
-                  <div className={`text-[10px] uppercase tracking-[0.18em] mono mt-1 ${isDark ? "text-white/25" : "text-[var(--muted)]"}`}>
+                  <div className={`text-[10px] uppercase tracking-[0.18em] mono md:mt-1 ${isDark ? "text-white/25" : "text-[var(--muted)]"}`}>
                     Avg. ROAS
                   </div>
                 </div>
@@ -265,7 +268,7 @@ function DifferentiatorCard({
           {/* Giant ambient number */}
           <div
             aria-hidden
-            className={`absolute bottom-[-16px] right-2 text-[clamp(80px,10vw,140px)] font-extrabold leading-none tracking-[-0.06em] pointer-events-none select-none mono transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-[-4px] ${isDark ? "text-white/[0.04] group-hover:text-white/[0.06]" : "text-[var(--ink)]/[0.04] group-hover:text-[var(--ink)]/[0.06]"}`}
+            className={`absolute bottom-[-12px] right-2 md:bottom-[-16px] text-[clamp(60px,10vw,140px)] font-extrabold leading-none tracking-[-0.06em] pointer-events-none select-none mono transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-[-4px] ${isDark ? "text-white/[0.04] group-hover:text-white/[0.06]" : "text-[var(--ink)]/[0.04] group-hover:text-[var(--ink)]/[0.06]"}`}
           >
             {diff.num}
           </div>
@@ -313,7 +316,7 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
 
       {/* Giant watermark */}
       <motion.div aria-hidden className="absolute top-[10%] left-1/2 -translate-x-1/2 pointer-events-none select-none z-0" style={{ y: yWatermark }}>
-        <span className="block text-[clamp(180px,22vw,380px)] font-extrabold tracking-[-0.06em] leading-none mono" style={{ color: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,35,73,0.10)" }}>
+        <span className="block text-[clamp(96px,22vw,380px)] font-extrabold tracking-[-0.06em] leading-none mono" style={{ color: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,35,73,0.10)" }}>
           WHY
         </span>
       </motion.div>
@@ -327,7 +330,7 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
       <div aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px pointer-events-none z-10" style={{ background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.25), transparent)" }} />
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-24 md:py-40">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-40">
 
         {/* Eyebrow tag */}
         <motion.div
@@ -340,7 +343,7 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
         </motion.div>
 
         {/* Headline — cinematic word reveal */}
-        <motion.div className="mb-20 md:mb-28" style={{ y: yHeadline }}>
+        <motion.div className="mb-14 md:mb-28" style={{ y: yHeadline }}>
           <h2 className={`text-[clamp(32px,5vw,56px)] font-extrabold tracking-[-0.04em] leading-[1.1] ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
             {PHRASES.map((phrase, i) => (
               <span key={i} className="inline-block overflow-hidden mr-[0.28em] align-bottom relative">
