@@ -292,7 +292,7 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
           {/* Giant background text */}
           <div
             ref={giantTextRef}
-            className="footer-giant-bg-text hidden md:block absolute -bottom-[5vh] left-1/2 -translate-x-1/2 whitespace-nowrap z-0 pointer-events-none select-none"
+            className="footer-giant-bg-text absolute bottom-16 md:bottom-auto md:-bottom-[5vh] left-1/2 -translate-x-1/2 whitespace-nowrap z-0 pointer-events-none select-none"
           >
             {giantBgText}
           </div>
