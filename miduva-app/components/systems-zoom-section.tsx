@@ -399,9 +399,9 @@ function SystemsSection({
 function MobileSystemsSection({ systems }: { systems: System[] }) {
 	if (systems.length === 0) return null;
 	return (
-		<div className="md:hidden bg-white dark:bg-[#020204] py-12 px-6">
+		<div className="md:hidden bg-white dark:bg-[#020204] py-10 px-6">
 			{systems.map((system) => (
-				<div key={system.id} className="mb-16 last:mb-0">
+				<div key={system.id} className="mb-10 last:mb-0">
 					<div className="overflow-hidden rounded-[28px] border border-[var(--line)] mb-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)]">
 						<img
 							src={system.imageUrl || undefined}

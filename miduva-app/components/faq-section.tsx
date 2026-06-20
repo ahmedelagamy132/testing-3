@@ -314,11 +314,11 @@ export default function FaqSection({ data }: { data?: FaqData }) {
 
       <div
         ref={sectionRef}
-        className="relative z-10 max-w-4xl mx-auto px-6 py-20 md:py-28"
+        className="relative z-10 max-w-4xl mx-auto px-6 py-14 md:py-28"
       >
         {/* Header */}
         <motion.div
-          className="mb-12 md:mb-14"
+          className="mb-8 md:mb-14"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.55, ease: EASE_FLUID }}

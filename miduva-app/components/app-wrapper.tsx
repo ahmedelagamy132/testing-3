@@ -130,7 +130,7 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
           if (id === "free-offer" && mainIds[idx - 1] === "faq") {
             return (
               <div key={`spacer-${idx}`}>
-                <div className="h-12 md:h-20" />
+                <div className="h-4 md:h-20" />
                 {node}
               </div>
             )

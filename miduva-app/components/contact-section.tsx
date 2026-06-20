@@ -445,7 +445,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
         style={{
           position: "relative", zIndex: 10,
           maxWidth: 1200, margin: "0 auto",
-          padding: "clamp(80px, 10vw, 140px) clamp(24px, 5vw, 48px)",
+          padding: "clamp(56px, 10vw, 140px) clamp(24px, 5vw, 48px)",
         }}
       >
         <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: "clamp(40px, 6vw, 96px)", alignItems: "center" }}>

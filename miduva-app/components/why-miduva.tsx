@@ -330,7 +330,7 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
       <div aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px pointer-events-none z-10" style={{ background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.25), transparent)" }} />
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-20 md:py-40">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 md:py-40">
 
         {/* Eyebrow tag */}
         <motion.div
@@ -343,7 +343,7 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
         </motion.div>
 
         {/* Headline — cinematic word reveal */}
-        <motion.div className="mb-14 md:mb-28" style={{ y: yHeadline }}>
+        <motion.div className="mb-10 md:mb-28" style={{ y: yHeadline }}>
           <h2 className={`text-[clamp(32px,5vw,56px)] font-extrabold tracking-[-0.04em] leading-[1.1] ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
             {PHRASES.map((phrase, i) => (
               <span key={i} className="inline-block overflow-hidden mr-[0.28em] align-bottom relative">

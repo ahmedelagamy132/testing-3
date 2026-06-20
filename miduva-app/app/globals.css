@@ -440,6 +440,10 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
   padding: 96px 0 104px;
 }
 
+.free-offer-section {
+  min-height: 100vh;
+}
+
 .our-work-section::before {
   content: "";
   position: absolute;
@@ -635,7 +639,11 @@ html.dark .our-work-tile:hover .our-work-logo {
 
 @media (max-width: 900px) {
   .our-work-section {
-    padding: 76px 0 86px;
+    padding: 58px 0 62px;
+  }
+
+  .free-offer-section {
+    min-height: auto;
   }
 
   .our-work-copy {

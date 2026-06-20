@@ -32,11 +32,10 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
         background: isDark ? "#020204" : "#0F2349",
         position: "relative",
         overflow: "hidden",
-        minHeight: "100vh",
         display: "flex",
         alignItems: "center",
       }}
-      className="grain"
+      className="grain free-offer-section"
     >
       {/* Central mega elliptical glow */}
       <div
