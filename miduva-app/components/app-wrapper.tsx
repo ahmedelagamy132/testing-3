@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef, type ReactNode } from "react"
-import Image from "next/image"
 import type { LandingPageData, SectionId } from "@/lib/types"
 import Nav from "./nav"
 import SvgMaskHero from "./svg-mask-hero"
@@ -50,27 +49,6 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
   const sectionRenderers: Record<SectionId, () => ReactNode> = {
     hero: () => (
       <div className="relative">
-        {/* Mobile-only atmospheric haze — scoped to the hero so it scrolls away
-            with the section instead of covering the whole page. */}
-        <div
-          className="md:hidden absolute inset-0 pointer-events-none overflow-hidden"
-          style={{ zIndex: 10 }}
-          aria-hidden="true"
-        >
-          <Image
-            src="/coming-soon/atmos-haze.png"
-            alt=""
-            fill
-            sizes="100vw"
-            style={{
-              objectFit: "cover",
-              objectPosition: "65% 35%",
-              opacity: 0.42,
-              mixBlendMode: "screen",
-              filter: "contrast(0.95) saturate(0.9) blur(2px)",
-            }}
-          />
-        </div>
         <SvgMaskHero
           theme={theme}
           onRevealComplete={onRevealComplete}
@@ -90,7 +68,7 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
     "why-miduva": () => <WhyMiduva data={data.whyMiduva} />,
     parallax: () => <ParallaxSection data={data.parallax} />,
     dashboard: () => (
-      <div className="px-6 py-10 md:py-14">
+      <div className="hidden px-6 py-10 md:block md:py-14">
         <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
           <Dashboard data={data.dashboard} />
         </div>

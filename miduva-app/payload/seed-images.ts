@@ -66,7 +66,7 @@ async function run() {
   const current = (await payload.findGlobal({
     slug: 'landing-page',
     depth: 0,
-  })) as Record<string, unknown>
+  })) as unknown as Record<string, unknown>
 
   const branding = (current.branding ?? {}) as Record<string, unknown>
   const hero = (current.hero ?? {}) as Record<string, unknown>

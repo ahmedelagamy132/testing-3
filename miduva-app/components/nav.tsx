@@ -57,6 +57,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
   const hiddenForFooter = isHidden
   // Hide the nav during the intro animation; slide in once reveal completes
   const hiddenForIntro = !heroRevealed
+  const compactSurface = scrolled || open
 
   const useWhite = theme === "dark"
 
@@ -84,15 +85,15 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
   return (
     <header
       ref={ref}
-      className={`fixed top-0 inset-x-0 z-40 px-3 transition-transform duration-500 will-change-transform ${
+      className={`fixed top-0 inset-x-0 z-50 px-3 transition-transform duration-500 will-change-transform ${
         hiddenForFooter || hiddenForIntro ? "-translate-y-[150%]" : "translate-y-0"
       }`}
     >
       <nav
-        className={`mx-auto mt-3 rounded-full transition-all duration-500 ${
-          scrolled
-            ? "max-w-5xl border bg-[var(--card)]/75 backdrop-blur-xl border-[var(--line)] shadow-[0_10px_40px_-20px_rgba(15,35,73,.25)] dark:shadow-[0_10px_40px_-20px_rgba(0,0,0,.6)]"
-            : "max-w-6xl border border-transparent bg-transparent shadow-none backdrop-blur-none"
+        className={`mx-auto mt-3 overflow-hidden transition-all duration-500 ${
+          compactSurface
+            ? "max-w-5xl rounded-[24px] border border-[var(--line)] bg-[var(--card)]/95 shadow-[0_18px_60px_-26px_rgba(15,35,73,.55)] backdrop-blur-xl dark:bg-[#050b17]/95 dark:shadow-[0_18px_60px_-26px_rgba(0,0,0,.9)]"
+            : "max-w-6xl rounded-full border border-transparent bg-transparent shadow-none backdrop-blur-none"
         }`}
       >
         <div className="hidden lg:grid grid-cols-[1fr_auto_1fr] items-center px-8 py-3 gap-8">
@@ -174,19 +175,35 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
                   ? "border-white/20 text-white/80"
                   : "border-[var(--line)] text-[var(--navy-900)]"
               }`}
-              aria-label="menu"
+              aria-label={open ? "Close menu" : "Open menu"}
+              aria-expanded={open}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M4 7h16M4 12h16M4 17h16"/>
-              </svg>
+              {open ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 6l12 12M18 6 6 18"/>
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 7h16M4 12h16M4 17h16"/>
+                </svg>
+              )}
             </button>
           </div>
         </div>
 
         {open && (
-          <div className="lg:hidden px-5 pb-5 border-t border-[var(--line)] pt-3 space-y-3">
+          <div className="lg:hidden border-t border-[var(--line)] px-5 pb-5 pt-2">
             {[...leftItems, ...rightItems].map((i) => (
-              <a key={i.n} href={i.h} onClick={(e) => handleNavClick(e, i.h)} className="block text-[var(--muted)] text-sm">
+              <a
+                key={i.n}
+                href={i.h}
+                onClick={(e) => handleNavClick(e, i.h)}
+                className={`block rounded-lg px-2 py-3 text-sm font-medium transition ${
+                  useWhite
+                    ? "text-white/75 hover:bg-white/[0.06] hover:text-white"
+                    : "text-[var(--muted)] hover:bg-[var(--chip)] hover:text-[var(--navy-900)]"
+                }`}
+              >
                 {i.n}
               </a>
             ))}

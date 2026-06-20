@@ -37,6 +37,12 @@ export default function SvgMaskHero({
   const illustrationSrc = theme === "dark"
     ? (illustrationDarkUrl || "/assets/system-dark.png")
     : (illustrationLightUrl || "/assets/system-light.png")
+  // Dedicated portrait artwork for small screens — the landscape desktop
+  // illustration crops badly in a phone viewport, so we swap in a framing
+  // composed for vertical space.
+  const mobileIllustrationSrc = theme === "dark"
+    ? "/assets/system-dark-mobile.png"
+    : "/assets/system-light-mobile.png"
   const [phase] = useState<Phase>("done")
   const hintRef = useRef<HTMLDivElement>(null)
 
@@ -80,17 +86,42 @@ export default function SvgMaskHero({
         <div className="hb-grid" />
       </div>
 
-      {/* Background illustration */}
+      {/* Background illustration — desktop (landscape) */}
       <div className="hero-illustration" aria-hidden>
         <Image
           src={illustrationSrc}
           alt=""
           fill
           priority
-          unoptimized
+          sizes="100vw"
           style={{ objectFit: "cover", objectPosition: "center" }}
         />
       </div>
+
+      {/* Background illustration — mobile (portrait) */}
+      <div className="hero-illustration-mobile" aria-hidden>
+        <Image
+          src={mobileIllustrationSrc}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectFit: "cover", objectPosition: "center 38%" }}
+        />
+      </div>
+
+      {/* Scrim — keeps the headline + CTAs legible over the busy artwork on
+          mobile. Theme-aware: darkens at the edges on dark, lightens on light. */}
+      <div
+        className="hero-mobile-scrim"
+        aria-hidden
+        style={{
+          background:
+            theme === "dark"
+              ? "linear-gradient(180deg, rgba(5,8,26,0.72) 0%, rgba(5,8,26,0.28) 32%, rgba(5,8,26,0.34) 64%, rgba(5,8,26,0.86) 100%)"
+              : "linear-gradient(180deg, rgba(244,246,251,0.80) 0%, rgba(244,246,251,0.30) 34%, rgba(244,246,251,0.40) 66%, rgba(244,246,251,0.90) 100%)",
+        }}
+      />
 
       {/* Vignette for text legibility */}
       {/* <div className="hb-vignette" aria-hidden /> */}
@@ -288,6 +319,22 @@ export default function SvgMaskHero({
           animation: hb-float 9s ease-in-out infinite alternate;
         }
 
+        /* Portrait illustration + its scrim — desktop hides both. */
+        .hero-illustration-mobile {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+          display: none;
+        }
+        .hero-mobile-scrim {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          pointer-events: none;
+          display: none;
+        }
+
         /* Hero content fades in as the split begins */
         .hero-content-wrap {
           position: absolute;
@@ -466,11 +513,10 @@ export default function SvgMaskHero({
         }
 
         @media (max-width: 768px) {
-          /* Swap: hide illustration, show animated orb backdrop instead */
+          /* Swap the landscape desktop art for the portrait mobile art. */
           .hero-illustration { display: none; }
-          .hb-base  { display: block; }
-          .hb-orb   { display: block; }
-          .hb-grid  { display: block; }
+          .hero-illustration-mobile { display: block; }
+          .hero-mobile-scrim { display: block; }
         }
 
         @media (prefers-reduced-motion: reduce) {

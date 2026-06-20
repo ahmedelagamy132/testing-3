@@ -538,7 +538,7 @@
 
 .footLink {
   font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 15px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--cs-ink-soft);
@@ -631,7 +631,7 @@
 
 @media (max-width: 540px) {
   .footLink {
-    font-size: 10px;
+    font-size: 13px;
     letter-spacing: 0.2em;
   }
   /* On phones, the hero is pinned above the wordmark, clipped to the upper
