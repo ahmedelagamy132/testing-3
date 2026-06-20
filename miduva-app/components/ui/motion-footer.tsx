@@ -292,7 +292,7 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
           {/* Giant background text */}
           <div
             ref={giantTextRef}
-            className="footer-giant-bg-text absolute -bottom-[5vh] left-1/2 -translate-x-1/2 whitespace-nowrap z-0 pointer-events-none select-none"
+            className="footer-giant-bg-text hidden md:block absolute -bottom-[5vh] left-1/2 -translate-x-1/2 whitespace-nowrap z-0 pointer-events-none select-none"
           >
             {giantBgText}
           </div>
@@ -306,10 +306,10 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
           </div>
 
           {/* Main center content */}
-          <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 mt-20 w-full max-w-5xl mx-auto">
+          <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pt-24 pb-4 md:pt-0 md:pb-0 md:mt-20 w-full max-w-5xl mx-auto">
             <h2
               ref={headingRef}
-              className="text-5xl md:text-8xl font-black footer-text-glow tracking-tighter mb-12 text-center"
+              className="text-5xl md:text-8xl font-black footer-text-glow tracking-tighter mb-8 md:mb-12 text-center"
             >
               {heading}
             </h2>
@@ -351,26 +351,30 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
             </div>
           </div>
 
-          {/* Bottom bar */}
-          <div className="relative z-20 w-full pb-8 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-muted-foreground text-[10px] md:text-xs font-semibold tracking-widest uppercase order-2 md:order-1">
+          {/* Bottom bar — desktop spreads three items across; mobile collapses to
+              two tidy rows: the wordmark + scroll-to-top together, copyright below.
+              md:contents flattens the mobile group back into the row on desktop. */}
+          <div className="relative z-20 w-full pb-8 px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+            <div className="text-muted-foreground text-[10px] md:text-xs font-semibold tracking-widest uppercase order-3 md:order-1 text-center md:text-left">
               {copyright}
             </div>
 
-            <div className="footer-glass-pill px-6 py-3 rounded-full flex items-center gap-2 order-1 md:order-2 cursor-default border-border/50">
-              <span className="text-muted-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest">{createdByLabel}</span>
-              <span className="text-foreground font-black text-xs md:text-sm tracking-normal ml-1">Miduva</span>
-            </div>
+            <div className="flex items-center gap-3 order-1 md:contents">
+              <div className="footer-glass-pill px-6 py-3 rounded-full flex items-center gap-2 md:order-2 cursor-default border-border/50">
+                <span className="text-muted-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest">{createdByLabel}</span>
+                <span className="text-foreground font-black text-xs md:text-sm tracking-normal ml-1">Miduva</span>
+              </div>
 
-            <MagneticButton
-              as="button"
-              onClick={scrollToTop}
-              className="w-12 h-12 rounded-full footer-glass-pill flex items-center justify-center text-muted-foreground hover:text-foreground group order-3"
-            >
-              <svg className="w-5 h-5 transform group-hover:-translate-y-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-            </MagneticButton>
+              <MagneticButton
+                as="button"
+                onClick={scrollToTop}
+                className="w-12 h-12 rounded-full footer-glass-pill flex items-center justify-center text-muted-foreground hover:text-foreground group md:order-3 shrink-0"
+              >
+                <svg className="w-5 h-5 transform group-hover:-translate-y-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                </svg>
+              </MagneticButton>
+            </div>
           </div>
         </footer>
       </div>

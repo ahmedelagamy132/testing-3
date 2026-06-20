@@ -59,6 +59,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
     >
       <div className="hero-content-wrapper" style={{ maxWidth: "clamp(280px, 42vw, 620px)" }}>
         <h1
+          className="hero-headline"
           style={{
             fontFamily:
               "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
@@ -75,6 +76,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
         </h1>
 
         <p
+          className="hero-subline"
           style={{
             fontFamily:
               "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
@@ -97,6 +99,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
         </p>
 
           <div
+            className="hero-divider"
             style={{
               marginTop: "clamp(20px, 3.5vh, 40px)",
               height: 1,
@@ -105,6 +108,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
           />
 
         <p
+          className="hero-tagline"
           style={{
             fontFamily:
               "var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
@@ -121,6 +125,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
         </p>
 
         <p
+          className="hero-body"
           style={{
             fontSize: "clamp(12px, 0.9vw, 14px)",
             lineHeight: 1.75,
@@ -214,20 +219,51 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
         @media (max-width: 768px) {
           .hero-section {
             align-items: center !important;
+            padding: clamp(96px, 13vh, 118px) 18px 28px !important;
           }
           .hero-content-wrapper {
             text-align: center !important;
-            max-width: calc(100vw - 48px) !important;
+            max-width: min(100vw - 30px, 430px) !important;
+          }
+          .hero-headline {
+            font-size: clamp(40px, 9.2vw, 46px) !important;
+            line-height: 1 !important;
+            letter-spacing: -0.04em !important;
+          }
+          .hero-subline {
+            font-size: clamp(18px, 4.2vw, 20px) !important;
+            line-height: 1.16 !important;
+            margin-top: 12px !important;
+          }
+          .hero-divider {
+            margin-top: 20px !important;
+          }
+          .hero-tagline {
+            font-size: 10px !important;
+            line-height: 1.55 !important;
+            letter-spacing: 0.22em !important;
+            margin-top: 14px !important;
+          }
+          .hero-body {
+            font-size: 13px !important;
+            line-height: 1.62 !important;
+            margin-top: 12px !important;
           }
           .hero-cta-group {
             justify-content: center !important;
             flex-wrap: nowrap !important;
             gap: 8px !important;
+            width: min(100%, 390px) !important;
+            margin: 22px auto 0 !important;
           }
           .hero-btn-primary,
           .hero-btn-secondary {
             flex: 1;
             justify-content: center;
+            min-width: 0;
+            min-height: 46px;
+            padding: 12px 14px !important;
+            font-size: 13px !important;
           }
         }
       `}</style>
