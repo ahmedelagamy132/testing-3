@@ -112,7 +112,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
             letterSpacing: "0.2em",
             lineHeight: 1.7,
             textTransform: "uppercase",
-            color: theme === "dark" ? "rgba(255,255,255,0.6)" : "var(--muted)",
+            color: theme === "dark" ? "rgba(255,255,255,0.72)" : "var(--muted)",
             textShadow,
             margin: "16px 0 0",
           }}

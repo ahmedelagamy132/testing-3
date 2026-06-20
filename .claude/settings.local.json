@@ -11,7 +11,8 @@
       "Bash(npx create-next-app@latest miduva-app --typescript --tailwind --eslint --app --no-src-dir --import-alias=\"@/*\")",
       "Bash(npx shadcn@latest init --defaults)",
       "Bash(npm install *)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(node \"C:\\\\Users\\\\ahmed\\\\.claude\\\\skills\\\\impeccable\\\\scripts\\\\load-context.mjs\")"
     ]
   }
 }
