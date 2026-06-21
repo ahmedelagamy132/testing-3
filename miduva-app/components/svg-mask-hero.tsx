@@ -543,15 +543,15 @@ export default function SvgMaskHero({
           .hero-illustration { display: none; }
           .hero-illustration-mobile {
             display: block;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            transform: none;
+            inset: auto auto 26px 50%;
+            width: min(118vw, 560px);
+            height: clamp(250px, 42svh, 350px);
+            transform: translateX(-50%);
             opacity: 1;
           }
           .hero-illustration-mobile :global(img) {
-            object-fit: cover !important;
-            object-position: center bottom !important;
+            object-fit: contain !important;
+            object-position: center center !important;
           }
           .hero-desktop-scrim { display: none; }
           .hero-mobile-scrim { display: block; }
@@ -566,10 +566,10 @@ export default function SvgMaskHero({
             min-height: 590px !important;
           }
           .hero-illustration-mobile {
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            transform: none;
+            bottom: 24px;
+            width: min(122vw, 500px);
+            height: clamp(230px, 40svh, 320px);
+            transform: translateX(-50%);
           }
         }
 
