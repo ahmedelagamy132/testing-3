@@ -5,6 +5,7 @@ import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { landingPage } from './payload/globals/landing-page'
 import { subscribers } from './payload/collections/subscribers'
+import { contactSubmissions } from './payload/collections/contact-submissions'
 
 export default buildConfig({
   admin: {
@@ -103,6 +104,7 @@ export default buildConfig({
       ],
     },
     subscribers,
+    contactSubmissions,
   ],
 
   globals: [landingPage],

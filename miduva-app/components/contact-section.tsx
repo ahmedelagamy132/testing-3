@@ -56,6 +56,7 @@ function useIsDark() {
 
 type FormState  = { name: string; email: string; company: string; service: string; message: string }
 type FormErrors = Partial<Record<keyof FormState, string>>
+type SubmitStatus = "idle" | "error"
 
 const INITIAL_STATE: FormState = { name: "", email: "", company: "", service: "", message: "" }
 
@@ -364,6 +365,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
   const [touched,   setTouched]   = useState<Partial<Record<keyof FormState, boolean>>>({})
   const [submitting,setSubmitting] = useState(false)
   const [submitted, setSubmitted]  = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle")
 
   const touch = (field: keyof FormState) => {
     const next = { ...touched, [field]: true }
@@ -373,17 +375,32 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitStatus("idle")
     const allTouched = Object.fromEntries(Object.keys(values).map(k => [k, true]))
     setTouched(allTouched as typeof touched)
     const errs = validate(values)
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setSubmitting(true)
-    await new Promise(r => setTimeout(r, 1200))
-    setSubmitting(false)
-    setSubmitted(true)
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      })
+      const result = (await res.json().catch(() => null)) as { status?: string } | null
+      if (!res.ok || result?.status !== "submitted") {
+        setSubmitStatus("error")
+        return
+      }
+      setSubmitted(true)
+    } catch {
+      setSubmitStatus("error")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
-  const reset = () => { setSubmitted(false); setValues(INITIAL_STATE); setTouched({}); setErrors({}) }
+  const reset = () => { setSubmitted(false); setValues(INITIAL_STATE); setTouched({}); setErrors({}); setSubmitStatus("idle") }
 
   return (
     <section
@@ -616,14 +633,14 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
                       <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 14, marginBottom: 14 }}>
                         <ContactInput
                           label="Full Name" value={values.name} icon={User} index={0}
-                          isDark={isDark} isInView={isInView} placeholder="Ahmed Elagamy"
+                          isDark={isDark} isInView={isInView} placeholder="Your name"
                           onChange={v => setValues(p => ({ ...p, name: v }))}
                           onBlur={() => touch("name")}
                           error={touched.name ? errors.name : undefined}
                         />
                         <ContactInput
                           label="Email Address" type="email" value={values.email} icon={Mail} index={1}
-                          isDark={isDark} isInView={isInView} placeholder="ahmed@company.com"
+                          isDark={isDark} isInView={isInView} placeholder="you@company.com"
                           onChange={v => setValues(p => ({ ...p, email: v }))}
                           onBlur={() => touch("email")}
                           error={touched.email ? errors.email : undefined}
@@ -634,7 +651,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
                       <div style={{ marginBottom: 14 }}>
                         <ContactInput
                           label="Company (Optional)" value={values.company} icon={Building2} index={2}
-                          isDark={isDark} isInView={isInView} placeholder="Miduva Inc."
+                          isDark={isDark} isInView={isInView} placeholder="Company name"
                           onChange={v => setValues(p => ({ ...p, company: v }))}
                         />
                       </div>
@@ -659,12 +676,31 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
                         <ContactTextarea
                           label="Your Message" value={values.message} index={4}
                           isDark={isDark} isInView={isInView}
-                          placeholder="Tell us about your business, your goals, and where you're at right now..."
+                          placeholder="Tell us what you need help with..."
                           onChange={v => setValues(p => ({ ...p, message: v }))}
                           onBlur={() => touch("message")}
                           error={touched.message ? errors.message : undefined}
                         />
                       </div>
+
+                      <AnimatePresence>
+                        {submitStatus === "error" && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            style={{
+                              color: "#f87171",
+                              fontSize: 12,
+                              lineHeight: 1.5,
+                              margin: "-12px 0 16px",
+                              textAlign: "center",
+                            }}
+                          >
+                            We could not send your message. Please try again.
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
 
                       {/* Submit */}
                       <motion.button
