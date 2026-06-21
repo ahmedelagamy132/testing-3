@@ -81,6 +81,12 @@ export const TextStaggerHover = React.forwardRef<
   const { characters } = splitText(text)
   const isActive = activeSlide === index
   const handleMouse = () => changeSlide(index)
+  const handleClick = () => changeSlide(index)
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key !== "Enter" && event.key !== " ") return
+    event.preventDefault()
+    changeSlide(index)
+  }
   return (
     <span
       className={cn(
@@ -90,6 +96,9 @@ export const TextStaggerHover = React.forwardRef<
       {...props}
       ref={ref}
       onMouseEnter={handleMouse}
+      onFocus={handleMouse}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
     >
       {characters.map((char, index) => (
         <span

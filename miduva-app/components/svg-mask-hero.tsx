@@ -72,7 +72,8 @@ export default function SvgMaskHero({
       style={{
         position: "relative",
         width: "100%",
-        height: "100vh",
+        height: "100svh",
+        minHeight: 680,
         overflow: "hidden",
         backgroundColor: theme === "dark" ? "#05081a" : "#f4f6fb",
       }}
@@ -131,8 +132,8 @@ export default function SvgMaskHero({
         style={{
           background:
             theme === "dark"
-              ? "linear-gradient(180deg, rgba(5,8,26,0.86) 0%, rgba(5,8,26,0.68) 20%, rgba(5,8,26,0.82) 38%, rgba(5,8,26,0.88) 50%, rgba(5,8,26,0.66) 60%, rgba(5,8,26,0.34) 74%, rgba(5,8,26,0.82) 100%)"
-              : "linear-gradient(180deg, rgba(244,246,251,0.88) 0%, rgba(244,246,251,0.70) 20%, rgba(244,246,251,0.84) 38%, rgba(244,246,251,0.90) 50%, rgba(244,246,251,0.68) 60%, rgba(244,246,251,0.36) 74%, rgba(244,246,251,0.85) 100%)",
+              ? "linear-gradient(180deg, rgba(5,8,26,0.95) 0%, rgba(5,8,26,0.9) 34%, rgba(5,8,26,0.64) 52%, rgba(5,8,26,0.22) 70%, rgba(5,8,26,0.82) 100%), linear-gradient(90deg, rgba(5,8,26,0.88) 0%, rgba(5,8,26,0.58) 58%, rgba(5,8,26,0.12) 100%)"
+              : "linear-gradient(180deg, rgba(244,246,251,0.96) 0%, rgba(244,246,251,0.9) 34%, rgba(244,246,251,0.66) 52%, rgba(244,246,251,0.24) 70%, rgba(244,246,251,0.86) 100%), linear-gradient(90deg, rgba(244,246,251,0.88) 0%, rgba(244,246,251,0.58) 58%, rgba(244,246,251,0.14) 100%)",
         }}
       />
 
@@ -535,9 +536,22 @@ export default function SvgMaskHero({
         @media (max-width: 768px) {
           /* Swap the landscape desktop art for the portrait mobile art. */
           .hero-illustration { display: none; }
-          .hero-illustration-mobile { display: block; }
+          .hero-illustration-mobile {
+            display: block;
+            transform: scale(1.06) translateX(6%);
+            transform-origin: 72% 58%;
+          }
           .hero-desktop-scrim { display: none; }
           .hero-mobile-scrim { display: block; }
+          .scroll-hint {
+            bottom: 18px;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .hero-illustration-mobile {
+            transform: scale(1.1) translateX(9%);
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {

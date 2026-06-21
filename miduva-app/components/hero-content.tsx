@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import type { CSSProperties } from "react"
 import type { HeroData } from "@/lib/types"
 
 const DEFAULT_PHRASES = ["generate leads.", "drive sales.", "scale your business."]
@@ -31,6 +32,19 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
   const textShadow = theme === "dark"
     ? "0 1px 12px rgba(2,4,12,0.7), 0 1px 2px rgba(2,4,12,0.5)"
     : "0 1px 8px rgba(255,255,255,0.85)"
+  const heroStyle: CSSProperties & {
+    "--btn-secondary-hover-bg": string
+    "--btn-secondary-hover-border": string
+  } = {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-start",
+    padding: "clamp(120px, 20vh, 200px) clamp(24px, 5vw, 72px) clamp(40px, 6vh, 80px)",
+    "--btn-secondary-hover-bg": theme === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+    "--btn-secondary-hover-border": theme === "dark" ? "rgba(255, 255, 255, 0.32)" : "var(--navy-300)",
+  }
 
   useEffect(() => {
     const t = setInterval(() => {
@@ -41,21 +55,12 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
       }, 380)
     }, 2800)
     return () => clearInterval(t)
-  }, [])
+  }, [phrases.length])
 
   return (
     <div
       className="hero-section"
-      style={{
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-start",
-        padding: "clamp(120px, 20vh, 200px) clamp(24px, 5vw, 72px) clamp(40px, 6vh, 80px)",
-        ["--btn-secondary-hover-bg" as any]: theme === "dark" ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-        ["--btn-secondary-hover-border" as any]: theme === "dark" ? "rgba(255, 255, 255, 0.32)" : "var(--navy-300)",
-      }}
+      style={heroStyle}
     >
       <div className="hero-content-wrapper" style={{ maxWidth: "clamp(280px, 42vw, 620px)" }}>
         <h1
@@ -218,52 +223,73 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
         }
         @media (max-width: 768px) {
           .hero-section {
-            align-items: center !important;
-            padding: clamp(96px, 13vh, 118px) 18px 28px !important;
+            align-items: flex-start !important;
+            justify-content: flex-start !important;
+            padding: clamp(92px, 12svh, 108px) 20px 32px !important;
           }
           .hero-content-wrapper {
-            text-align: center !important;
-            max-width: min(100vw - 30px, 430px) !important;
+            text-align: left !important;
+            max-width: min(100%, 430px) !important;
           }
           .hero-headline {
-            font-size: clamp(40px, 9.2vw, 46px) !important;
-            line-height: 1 !important;
-            letter-spacing: -0.04em !important;
+            font-size: clamp(36px, 10vw, 48px) !important;
+            line-height: 0.96 !important;
+            letter-spacing: -0.035em !important;
+            max-width: 9.5em !important;
           }
           .hero-subline {
-            font-size: clamp(18px, 4.2vw, 20px) !important;
-            line-height: 1.16 !important;
+            font-size: clamp(17px, 4.5vw, 20px) !important;
+            line-height: 1.2 !important;
             margin-top: 12px !important;
+            max-width: 18em !important;
           }
           .hero-divider {
-            margin-top: 20px !important;
+            width: min(100%, 312px) !important;
+            margin-top: 18px !important;
           }
           .hero-tagline {
             font-size: 10px !important;
-            line-height: 1.55 !important;
-            letter-spacing: 0.22em !important;
+            line-height: 1.5 !important;
+            letter-spacing: 0.16em !important;
             margin-top: 14px !important;
+            max-width: 34ch !important;
           }
           .hero-body {
-            font-size: 13px !important;
-            line-height: 1.62 !important;
+            font-size: 12.5px !important;
+            line-height: 1.6 !important;
             margin-top: 12px !important;
+            max-width: 36ch !important;
           }
           .hero-cta-group {
-            justify-content: center !important;
-            flex-wrap: nowrap !important;
-            gap: 8px !important;
-            width: min(100%, 390px) !important;
-            margin: 22px auto 0 !important;
+            justify-content: flex-start !important;
+            flex-wrap: wrap !important;
+            gap: 9px !important;
+            width: min(100%, 360px) !important;
+            margin: 22px 0 0 !important;
           }
           .hero-btn-primary,
           .hero-btn-secondary {
-            flex: 1;
+            flex: 1 1 150px;
             justify-content: center;
             min-width: 0;
-            min-height: 46px;
+            min-height: 44px;
             padding: 12px 14px !important;
-            font-size: 13px !important;
+            font-size: 12.5px !important;
+          }
+        }
+        @media (max-width: 380px) {
+          .hero-section {
+            padding-inline: 16px !important;
+          }
+          .hero-headline {
+            font-size: clamp(34px, 9.8vw, 39px) !important;
+          }
+          .hero-body {
+            display: none !important;
+          }
+          .hero-btn-primary,
+          .hero-btn-secondary {
+            flex-basis: 100%;
           }
         }
       `}</style>
