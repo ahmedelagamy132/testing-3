@@ -223,73 +223,74 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
         }
         @media (max-width: 768px) {
           .hero-section {
-            align-items: flex-start !important;
+            align-items: center !important;
             justify-content: flex-start !important;
-            padding: clamp(92px, 12svh, 108px) 20px 32px !important;
+            padding: clamp(106px, 13svh, 122px) 18px 22px !important;
           }
           .hero-content-wrapper {
-            text-align: left !important;
-            max-width: min(100%, 430px) !important;
+            position: relative !important;
+            isolation: isolate !important;
+            text-align: center !important;
+            max-width: min(100%, 380px) !important;
+            margin-inline: auto !important;
           }
           .hero-headline {
-            font-size: clamp(36px, 10vw, 48px) !important;
-            line-height: 0.96 !important;
-            letter-spacing: -0.035em !important;
-            max-width: 9.5em !important;
+            max-width: 8.5em !important;
+            margin-inline: auto !important;
+            font-size: clamp(34px, 10.2vw, 45px) !important;
+            line-height: 0.94 !important;
+            letter-spacing: -0.045em !important;
           }
           .hero-subline {
-            font-size: clamp(17px, 4.5vw, 20px) !important;
-            line-height: 1.2 !important;
-            margin-top: 12px !important;
-            max-width: 18em !important;
+            max-width: 16em !important;
+            margin: 10px auto 0 !important;
+            font-size: clamp(16px, 4.3vw, 19px) !important;
+            line-height: 1.16 !important;
           }
           .hero-divider {
-            width: min(100%, 312px) !important;
-            margin-top: 18px !important;
+            width: 64px !important;
+            margin: 13px auto 0 !important;
+            background: linear-gradient(90deg, transparent, rgba(43, 200, 183, 0.85), transparent) !important;
           }
           .hero-tagline {
-            font-size: 10px !important;
-            line-height: 1.5 !important;
-            letter-spacing: 0.16em !important;
-            margin-top: 14px !important;
-            max-width: 34ch !important;
-          }
-          .hero-body {
-            font-size: 12.5px !important;
-            line-height: 1.6 !important;
-            margin-top: 12px !important;
-            max-width: 36ch !important;
-          }
-          .hero-cta-group {
-            justify-content: flex-start !important;
-            flex-wrap: wrap !important;
-            gap: 9px !important;
-            width: min(100%, 360px) !important;
-            margin: 22px 0 0 !important;
-          }
-          .hero-btn-primary,
-          .hero-btn-secondary {
-            flex: 1 1 150px;
-            justify-content: center;
-            min-width: 0;
-            min-height: 44px;
-            padding: 12px 14px !important;
-            font-size: 12.5px !important;
-          }
-        }
-        @media (max-width: 380px) {
-          .hero-section {
-            padding-inline: 16px !important;
-          }
-          .hero-headline {
-            font-size: clamp(34px, 9.8vw, 39px) !important;
+            font-size: 9.5px !important;
+            line-height: 1.38 !important;
+            letter-spacing: 0.1em !important;
+            margin: 10px auto 0 !important;
+            max-width: 31ch !important;
           }
           .hero-body {
             display: none !important;
           }
+          .hero-cta-group {
+            justify-content: center !important;
+            flex-direction: column !important;
+            flex-wrap: nowrap !important;
+            gap: 8px !important;
+            width: min(100%, 300px) !important;
+            margin: 16px auto 0 !important;
+          }
           .hero-btn-primary,
           .hero-btn-secondary {
-            flex-basis: 100%;
+            width: 100% !important;
+            flex: 0 0 auto !important;
+            justify-content: center;
+            min-width: 0;
+            min-height: 42px;
+            padding: 10px 16px !important;
+            font-size: 13px !important;
+          }
+          .hero-btn-secondary {
+            background: rgba(255, 255, 255, 0.085) !important;
+            border-color: rgba(255, 255, 255, 0.22) !important;
+          }
+        }
+        @media (max-width: 380px) {
+          .hero-section {
+            padding: clamp(96px, 12svh, 108px) 16px 20px !important;
+          }
+          .hero-headline {
+            font-size: clamp(31px, 9.8vw, 38px) !important;
           }
         }
       `}</style>
