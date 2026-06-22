@@ -37,11 +37,12 @@ export default function SvgMaskHero({
   const illustrationSrc = theme === "dark"
     ? (illustrationDarkUrl || "/assets/system-dark.png")
     : (illustrationLightUrl || "/assets/system-light.png")
-  // Mobile uses the same wide artwork so the hero keeps a consistent, natural
-  // composition instead of swapping to a tightly cropped portrait asset.
+  // Dedicated portrait artwork for small screens — the landscape desktop
+  // illustration crops badly in a phone viewport, so we swap in a framing
+  // composed for vertical space.
   const mobileIllustrationSrc = theme === "dark"
-    ? (illustrationDarkUrl || "/assets/system-dark.png")
-    : (illustrationLightUrl || "/assets/system-light.png")
+    ? "/assets/system-dark-mobile-fit.png"
+    : "/assets/system-light-mobile-fit.png"
   const [phase] = useState<Phase>("done")
   const hintRef = useRef<HTMLDivElement>(null)
 
@@ -535,22 +536,23 @@ export default function SvgMaskHero({
 
         @media (max-width: 768px) {
           .svg-mask-hero {
-            height: 100svh !important;
-            min-height: 620px !important;
-            max-height: none !important;
+            height: 90svh !important;
+            min-height: 540px !important;
+            max-height: 650px !important;
           }
-          /* Use the wide hero artwork on mobile too, with normal cover framing. */
+          /* Swap the landscape desktop art for the portrait mobile art. */
           .hero-illustration { display: none; }
           .hero-illustration-mobile {
             display: block;
-            inset: auto auto 26px 50%;
-            width: min(118vw, 560px);
-            height: clamp(250px, 42svh, 350px);
+            inset: auto auto 8px 50%;
+            width: min(126vw, 560px);
+            height: clamp(330px, 53svh, 430px);
             transform: translateX(-50%);
-            opacity: 1;
+            transform-origin: center bottom;
+            opacity: 0.98;
           }
           .hero-illustration-mobile :global(img) {
-            object-fit: contain !important;
+            object-fit: cover !important;
             object-position: center center !important;
           }
           .hero-desktop-scrim { display: none; }
@@ -562,13 +564,14 @@ export default function SvgMaskHero({
 
         @media (max-width: 380px) {
           .svg-mask-hero {
-            height: 100svh !important;
-            min-height: 590px !important;
+            height: 88svh !important;
+            min-height: 500px !important;
+            max-height: 610px !important;
           }
           .hero-illustration-mobile {
-            bottom: 24px;
-            width: min(122vw, 500px);
-            height: clamp(230px, 40svh, 320px);
+            bottom: 8px;
+            width: min(132vw, 520px);
+            height: clamp(300px, 51svh, 390px);
             transform: translateX(-50%);
           }
         }
