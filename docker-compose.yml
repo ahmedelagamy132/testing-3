@@ -17,17 +17,23 @@ services:
       - app
     restart: unless-stopped
 
-  # ── Next.js + Payload CMS ─────────────────────────────────────────────────
+  # ── Next.js app ────────────────────────────────────────────────────────────
   nextjs:
     build:
       context: ./miduva-app
     environment:
       - NODE_ENV=production
-      - PAYLOAD_SECRET=${PAYLOAD_SECRET}
-      - DATABASE_URI=file:/data/payload.db
+      - MIDUVA_DATABASE_URI=file:/data/miduva.db
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - CONTACT_FROM_EMAIL=${CONTACT_FROM_EMAIL:-}
+      - CONTACT_NOTIFICATION_EMAIL=${CONTACT_NOTIFICATION_EMAIL:-hello@miduva.com}
+      - CONTACT_WEBHOOK_URL=${CONTACT_WEBHOOK_URL:-}
+      - CONTACT_WEBHOOK_SECRET=${CONTACT_WEBHOOK_SECRET:-}
+      - PUCK_ADMIN_PASSWORD=${PUCK_ADMIN_PASSWORD:?PUCK_ADMIN_PASSWORD is required}
+      - PUCK_SESSION_SECRET=${PUCK_SESSION_SECRET:?PUCK_SESSION_SECRET is required}
+      - PUCK_MEDIA_DIR=/data/puck-media
     volumes:
-      - payload_db:/data               # persists payload.db across rebuilds
-      - payload_media:/app/public/media  # persists uploaded images
+      - miduva_data:/data              # persists submissions, Puck content, and media
     networks:
       - app
     restart: unless-stopped
@@ -60,8 +66,7 @@ services:
 
 # ── Volumes ───────────────────────────────────────────────────────────────────
 volumes:
-  payload_db:      # SQLite database file
-  payload_media:   # Payload-uploaded images
+  miduva_data:     # Next.js SQLite database and Puck media
   mysql_data:      # Perfex MySQL data
   certbot_www:     # Let's Encrypt ACME challenge webroot
   certbot_conf:    # Let's Encrypt certificates

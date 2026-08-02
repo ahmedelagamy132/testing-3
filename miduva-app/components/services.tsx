@@ -16,6 +16,7 @@ type Slide = {
   title: string
   items: string[]
   imageUrl: string
+  imageAlt?: string
 }
 
 const DEFAULT_SLIDES: Slide[] = [
@@ -57,14 +58,14 @@ const DEFAULT_SLIDES: Slide[] = [
   },
 ]
 
-function ActiveOverlay({ slides }: { slides: Slide[] }) {
+function ActiveOverlay({ slides, servicesLabel }: { slides: Slide[]; servicesLabel: string }) {
   const { activeSlide } = useHoverSliderContext()
   const slide = slides[activeSlide] ?? slides[0]
 
   return (
     <div className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/75 via-black/20 to-transparent p-5">
       <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.18em] text-white/50">
-        {slide.items.length} services
+        {slide.items.length} {servicesLabel}
       </p>
       <AnimatePresence mode="wait">
         <motion.div
@@ -92,7 +93,7 @@ function ActiveOverlay({ slides }: { slides: Slide[] }) {
   )
 }
 
-function MobileServiceDetail({ slide }: { slide: Slide }) {
+function MobileServiceDetail({ slide, activeLabel, servicesLabel }: { slide: Slide; activeLabel: string; servicesLabel: string }) {
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -107,7 +108,7 @@ function MobileServiceDetail({ slide }: { slide: Slide }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={slide.imageUrl}
-            alt={slide.title}
+            alt={slide.imageAlt || slide.title}
             className="size-full object-cover"
             loading="lazy"
             decoding="async"
@@ -115,10 +116,10 @@ function MobileServiceDetail({ slide }: { slide: Slide }) {
           <div className="absolute inset-0 bg-gradient-to-t from-[rgba(2,6,15,0.72)] via-transparent to-transparent" />
           <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3">
             <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/70">
-              Active system
+              {activeLabel}
             </p>
             <span className="rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[11px] font-semibold text-white backdrop-blur-sm">
-              {slide.items.length} services
+              {slide.items.length} {servicesLabel}
             </span>
           </div>
         </div>
@@ -140,7 +141,7 @@ function MobileServiceDetail({ slide }: { slide: Slide }) {
   )
 }
 
-function ServiceTitles({ slides }: { slides: Slide[] }) {
+function ServiceTitles({ slides, activeLabel, servicesLabel }: { slides: Slide[]; activeLabel: string; servicesLabel: string }) {
   const { activeSlide } = useHoverSliderContext()
 
   return (
@@ -157,7 +158,7 @@ function ServiceTitles({ slides }: { slides: Slide[] }) {
             text={slide.title}
           />
           <div className="md:hidden">
-            {activeSlide === index ? <MobileServiceDetail slide={slide} /> : null}
+            {activeSlide === index ? <MobileServiceDetail slide={slide} activeLabel={activeLabel} servicesLabel={servicesLabel} /> : null}
           </div>
         </div>
       ))}
@@ -169,6 +170,8 @@ export default function Services({ data }: { data?: ServicesData }) {
   const eyebrow      = data?.eyebrow      ?? "/ what we do"
   const headline     = data?.headline     ?? "Everything you need"
   const headlineAccent = data?.headlineAccent ?? "to grow."
+  const activeLabel  = data?.activeLabel  ?? "Active system"
+  const servicesLabel = data?.servicesLabel ?? "services"
   const ctaLabel     = data?.ctaLabel     ?? "Book a free strategy call"
   const ctaHref      = data?.ctaHref      ?? "#cta"
 
@@ -194,7 +197,7 @@ export default function Services({ data }: { data?: ServicesData }) {
         <HoverSlider className="grid gap-7 md:flex md:flex-wrap md:items-center md:justify-between md:gap-10 lg:gap-16">
           {/* Left — service titles */}
           <div className="flex flex-col space-y-1 flex-1 min-w-0">
-            <ServiceTitles slides={slides} />
+            <ServiceTitles slides={slides} activeLabel={activeLabel} servicesLabel={servicesLabel} />
 
             <div className="pt-6 md:pt-8">
               <a
@@ -218,14 +221,14 @@ export default function Services({ data }: { data?: ServicesData }) {
                   index={index}
                   imageUrl={slide.imageUrl}
                   src={slide.imageUrl}
-                  alt={slide.title}
+                  alt={slide.imageAlt || slide.title}
                   className="size-full object-cover"
                   loading={index === 0 ? "eager" : "lazy"}
                   decoding="async"
                 />
               ))}
             </HoverSliderImageWrap>
-            <ActiveOverlay slides={slides} />
+            <ActiveOverlay slides={slides} servicesLabel={servicesLabel} />
           </div>
         </HoverSlider>
       </div>

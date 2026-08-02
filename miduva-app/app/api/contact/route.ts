@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from '@/payload/utils/get-payload'
+import { addContactSubmission } from '@/lib/submissions'
+import { deliverContactSubmission } from '@/lib/contact-delivery'
 
 export const dynamic = 'force-dynamic'
 
@@ -46,22 +47,37 @@ export async function POST(request: Request) {
   }
 
   const userAgent = request.headers.get('user-agent')?.slice(0, 500) ?? undefined
+  const submittedAt = new Date().toISOString()
 
   try {
-    const payload = await getPayload()
-
-    await payload.create({
-      collection: 'contact-submissions',
-      data: {
-        name,
-        email,
-        company,
-        service,
-        message,
-        source: 'contact-form',
-        userAgent,
-      },
+    await addContactSubmission({
+      name,
+      email,
+      company,
+      service,
+      message,
+      userAgent,
     })
+
+    const delivery = await deliverContactSubmission({
+      name,
+      email,
+      company,
+      service,
+      message,
+      userAgent,
+      submittedAt,
+    })
+
+    if (!delivery.configured) {
+      console.warn(
+        '[api/contact] submission stored, but no notification channel is configured',
+      )
+    } else if (!delivery.delivered) {
+      console.error(
+        '[api/contact] submission stored, but every notification channel failed',
+      )
+    }
 
     return NextResponse.json<{ status: Status }>({ status: 'submitted' })
   } catch (err) {

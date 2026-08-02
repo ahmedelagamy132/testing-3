@@ -40,14 +40,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# payload cms
-payload.db
-payload.db-shm
-payload.db-wal
-payload-types.ts
-
-# uploaded media (persisted as Docker volume in production)
-/public/media/
+# local form-submission database
+miduva.db
+miduva.db-shm
+miduva.db-wal
+.puck-media/
 
 # Tool-generated artifacts
 .impeccable/

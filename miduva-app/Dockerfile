@@ -1,17 +1,16 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# Stage 1: install ALL dependencies (incl. native modules like better-sqlite3)
+# Stage 1: install dependencies
 # ─────────────────────────────────────────────────────────────────────────────
 FROM node:20-alpine AS deps
 WORKDIR /app
 
-# better-sqlite3 needs a C++ build toolchain
-RUN apk add --no-cache libc6-compat python3 make g++
+RUN apk add --no-cache libc6-compat
 
 COPY package*.json ./
 RUN npm ci
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Stage 2: build Next.js + Payload
+# Stage 2: build Next.js
 # ─────────────────────────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
 WORKDIR /app
@@ -20,10 +19,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
-# Payload reads PAYLOAD_SECRET at runtime; a placeholder here keeps the build
-# from crashing on import. Override with the real secret at runtime via .env.
-ENV PAYLOAD_SECRET=build-placeholder-not-used-at-runtime
-ENV DATABASE_URI=file:/data/payload.db
 
 RUN npm run build
 
@@ -44,25 +39,21 @@ RUN addgroup --system --gid 1001 nodejs \
 COPY --from=builder /app/.next      ./.next
 COPY --from=builder /app/public     ./public
 
-# Copy payload source + tsconfig so `npm run payload:seed` works at runtime
-# (tsconfig provides the @payload-config path alias that tsx needs)
-COPY --from=builder /app/payload        ./payload
-COPY --from=builder /app/payload.config.ts ./payload.config.ts
-COPY --from=builder /app/tsconfig.json  ./tsconfig.json
-
-# Copy node_modules with native bindings (better-sqlite3 .node files)
+# Copy production dependencies
 COPY --from=deps /app/node_modules ./node_modules
 
 COPY package*.json ./
 
-# Media upload directory — also mounted as a Docker volume
-RUN mkdir -p public/media \
+# SQLite and Puck media directory — mount `/data` as a volume in production.
+RUN mkdir -p /data/puck-media \
  && chown -R nextjs:nodejs /app
+RUN chown -R nextjs:nodejs /data
 
 USER nextjs
 EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+ENV MIDUVA_DATABASE_URI=file:/data/miduva.db
 
 CMD ["npm", "start"]

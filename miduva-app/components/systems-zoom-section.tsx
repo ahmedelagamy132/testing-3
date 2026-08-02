@@ -4,6 +4,11 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { SystemBackgroundImage, SystemsSectionData } from '@/lib/types';
+import {
+	bindFrameScrollProgress,
+	STICKY_SCROLL_RANGE,
+	useFrameRuntime,
+} from '@/components/puck/frame-runtime';
 
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  DATA                                                                        */
@@ -16,6 +21,7 @@ type System = {
 	title: string;
 	description: string;
 	imageUrl: string;
+	imageAlt?: string;
 };
 
 const DEFAULT_SYSTEMS: System[] = [
@@ -88,7 +94,7 @@ type Side = 'left' | 'right';
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  SHARED TEXT BLOCK                                                           */
 /* ─────────────────────────────────────────────────────────────────────────── */
-function SystemText({ system }: { system: System }) {
+function SystemText({ system, ctaLabel, ctaHref }: { system: System; ctaLabel: string; ctaHref: string }) {
 	return (
 		<div className="relative">
 			{/* Ghost number — upper-right architectural anchor, in open space above heading */}
@@ -123,10 +129,10 @@ function SystemText({ system }: { system: System }) {
 
 			{/* CTA */}
 			<a
-				href="#cta"
+				href={ctaHref}
 				className="group/btn inline-flex items-center gap-3 pl-6 pr-2 py-2 rounded-full text-[13px] font-semibold text-white bg-[#0F2349] dark:bg-white dark:text-[#050E1E] transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--teal-500)] focus-visible:ring-offset-2"
 			>
-				<span>Explore Your System</span>
+				<span>{ctaLabel}</span>
 				<span className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover/btn:translate-x-1 group-hover/btn:-translate-y-[1px] group-hover/btn:scale-105">
 					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 						<path d="M7 17 17 7" />
@@ -146,11 +152,19 @@ function SystemGridCard({
 	side,
 	imgRef,
 	textRef,
+	initialImageStyle,
+	initialTextStyle,
+	ctaLabel,
+	ctaHref,
 }: {
 	system: System;
 	side: Side;
 	imgRef: React.RefCallback<HTMLDivElement>;
 	textRef: React.RefCallback<HTMLDivElement>;
+	initialImageStyle?: React.CSSProperties;
+	initialTextStyle?: React.CSSProperties;
+	ctaLabel: string;
+	ctaHref: string;
 }) {
 	return (
 		<div className="absolute inset-0 flex items-center">
@@ -160,11 +174,11 @@ function SystemGridCard({
 				}`}
 			>
 				{/* Image column */}
-				<div ref={imgRef} className="md:[direction:ltr] order-1 will-change-transform">
+				<div ref={imgRef} className="md:[direction:ltr] order-1 will-change-transform" style={initialImageStyle}>
 					<div className="overflow-hidden rounded-[28px] border border-[var(--line)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)]">
 						<img
 							src={system.imageUrl || undefined}
-							alt={system.label}
+							alt={system.imageAlt || system.label}
 							className="w-full h-[44vh] md:h-[62vh] object-cover"
 							loading="lazy"
 							decoding="async"
@@ -173,8 +187,8 @@ function SystemGridCard({
 				</div>
 
 				{/* Text column */}
-				<div ref={textRef} className="md:[direction:ltr] order-2 will-change-transform">
-					<SystemText system={system} />
+				<div ref={textRef} className="md:[direction:ltr] order-2 will-change-transform" style={initialTextStyle}>
+					<SystemText system={system} ctaLabel={ctaLabel} ctaHref={ctaHref} />
 				</div>
 			</div>
 		</div>
@@ -187,9 +201,13 @@ function SystemGridCard({
 function SystemsSection({
 	systems,
 	backgroundImages,
+	ctaLabel,
+	ctaHref,
 }: {
 	systems: System[];
 	backgroundImages: SystemBackgroundImage[];
+	ctaLabel: string;
+	ctaHref: string;
 }) {
 	const outerRef = useRef<HTMLDivElement>(null);
 
@@ -205,11 +223,13 @@ function SystemsSection({
 	const imgRefs  = useRef<(HTMLDivElement | null)[]>([]);
 	const textRefs = useRef<(HTMLDivElement | null)[]>([]);
 	const dotRefs  = useRef<(HTMLDivElement | null)[]>([]);
+	const runtime = useFrameRuntime();
 
 	React.useLayoutEffect(() => {
+		if (!runtime) return;
 		gsap.registerPlugin(ScrollTrigger);
 
-		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		if (runtime.window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 			gsap.set([s1GridImgRef.current, s1GridTextRef.current], { opacity: 1, x: 0 });
 			imgRefs.current.forEach((el) => el && gsap.set(el, { opacity: 1, scale: 1, x: 0, y: 0 }));
 			textRefs.current.forEach((el) => el && gsap.set(el, { opacity: 1, x: 0, y: 0 }));
@@ -217,24 +237,27 @@ function SystemsSection({
 			return;
 		}
 
+		let stopFrameProgress: (() => void) | undefined;
 		const ctx = gsap.context(() => {
 
 			const gridImgEl   = s1GridImgRef.current;
 			const gridImgRect = gridImgEl?.getBoundingClientRect();
-			const vw          = window.innerWidth;
+			const vw          = runtime.window.innerWidth;
 			const colWidth    = gridImgRect?.width ?? vw * 0.4;
 			const s1XShift = gridImgRect
 				? (gridImgRect.left + gridImgRect.width / 2) - vw / 2 - colWidth * 0.12
 				: -vw * 0.345;
 
-			const tl = gsap.timeline({
-				scrollTrigger: {
-					trigger: outerRef.current,
-					start: 'top top',
-					end: 'bottom bottom',
-					scrub: 0.6,
-				},
-			});
+			const tl = gsap.timeline(runtime.isIframe
+				? { paused: true }
+				: {
+					scrollTrigger: {
+						trigger: outerRef.current,
+						start: 'top top',
+						end: 'bottom bottom',
+						scrub: 0.6,
+					},
+				});
 
 			gsap.set(dotRefs.current, { scale: 1, opacity: 0.3 });
 			gsap.set(s1GridImgRef.current,  { opacity: 0 });
@@ -310,10 +333,22 @@ function SystemsSection({
 
 			tl.to({}, { duration: T.END - T.S3_SETTLED }, T.S3_SETTLED);
 
+			if (runtime.isIframe && outerRef.current) {
+				stopFrameProgress = bindFrameScrollProgress(
+					runtime,
+					outerRef.current,
+					STICKY_SCROLL_RANGE,
+					(progress) => tl.progress(progress),
+				);
+			}
+
 		}, outerRef);
 
-		return () => ctx.revert();
-	}, []);
+		return () => {
+			stopFrameProgress?.();
+			ctx.revert();
+		};
+	}, [runtime]);
 
 	return (
 		<div ref={outerRef} id="systems-scroll" className="relative h-[700vh] w-full">
@@ -327,6 +362,7 @@ function SystemsSection({
 							key={i}
 							ref={(el) => { bgRefs.current[i] = el; }}
 							className={`absolute inset-0 flex h-full w-full items-center justify-center ${BG_POSITION_CLASSES[i] ?? ''}`}
+							style={{ transform: 'scale(1)', transformOrigin: 'center center' }}
 						>
 							<div className="relative h-[25vh] w-[25vw]">
 								<img src={img.url} alt={img.alt} className="h-full w-full object-cover" />
@@ -339,14 +375,16 @@ function SystemsSection({
 				<div
 					ref={s1OverlayRef}
 					className="absolute inset-0 z-10 flex h-full w-full items-center justify-center will-change-transform"
+					style={{ opacity: 1, transform: 'scale(0.3)', transformOrigin: 'center center' }}
 				>
 					<div
 						ref={s1CardBoxRef}
 						className="overflow-hidden h-[62vh] w-[40vw] border border-[var(--line)] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.35)]"
+						style={{ borderRadius: 0 }}
 					>
 						<img
 							src={systems[0].imageUrl || undefined}
-							alt={systems[0].label}
+							alt={systems[0].imageAlt || systems[0].label}
 							className="h-full w-full object-cover"
 						/>
 					</div>
@@ -358,6 +396,10 @@ function SystemsSection({
 					side="left"
 					imgRef={(el) => { s1GridImgRef.current = el; }}
 					textRef={(el) => { s1GridTextRef.current = el; }}
+					initialImageStyle={{ opacity: 0 }}
+					initialTextStyle={{ opacity: 0, transform: 'translateX(50px)' }}
+					ctaLabel={ctaLabel}
+					ctaHref={ctaHref}
 				/>
 
 				{/* ── Systems 2 & 3 — grid cards ── */}
@@ -371,6 +413,10 @@ function SystemsSection({
 							side={side}
 							imgRef={(el) => { imgRefs.current[localI] = el; }}
 							textRef={(el) => { textRefs.current[localI] = el; }}
+							initialImageStyle={{ opacity: 0, transform: 'translateY(12vh) scale(1.35)' }}
+							initialTextStyle={{ opacity: 0, transform: `translate(${side === 'right' ? '-10vw' : '10vw'}, 6vh)` }}
+							ctaLabel={ctaLabel}
+							ctaHref={ctaHref}
 						/>
 					);
 				})}
@@ -396,7 +442,7 @@ function SystemsSection({
 /* ─────────────────────────────────────────────────────────────────────────── */
 /*  MOBILE FALLBACK                                                             */
 /* ─────────────────────────────────────────────────────────────────────────── */
-function MobileSystemsSection({ systems }: { systems: System[] }) {
+function MobileSystemsSection({ systems, ctaLabel, ctaHref }: { systems: System[]; ctaLabel: string; ctaHref: string }) {
 	if (systems.length === 0) return null;
 	return (
 		<div className="md:hidden bg-white dark:bg-[#020204] py-10 px-6">
@@ -405,13 +451,13 @@ function MobileSystemsSection({ systems }: { systems: System[] }) {
 					<div className="overflow-hidden rounded-[28px] border border-[var(--line)] mb-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)]">
 						<img
 							src={system.imageUrl || undefined}
-							alt={system.label}
+							alt={system.imageAlt || system.label}
 							className="w-full h-[240px] sm:h-[300px] object-cover"
 							loading="lazy"
 							decoding="async"
 						/>
 					</div>
-					<SystemText system={system} />
+					<SystemText system={system} ctaLabel={ctaLabel} ctaHref={ctaHref} />
 				</div>
 			))}
 		</div>
@@ -425,6 +471,8 @@ export default function SystemsZoomSection({ data }: { data?: SystemsSectionData
 	const eyebrow        = data?.eyebrow        ?? '/ our systems'
 	const headline       = data?.headline       ?? 'Three systems.'
 	const headlineAccent = data?.headlineAccent ?? 'One growth machine.'
+	const ctaLabel       = data?.ctaLabel       ?? 'Explore Your System'
+	const ctaHref        = data?.ctaHref        ?? '#cta'
 	const cmsSystems = (data?.systems ?? []).filter((s): s is System => Boolean(s.imageUrl))
 	const systems: System[] = cmsSystems.length >= 3 ? cmsSystems : DEFAULT_SYSTEMS
 	const cmsBackgroundImages = data?.backgroundImages ?? []
@@ -447,11 +495,11 @@ export default function SystemsZoomSection({ data }: { data?: SystemsSectionData
 
 			{/* Desktop: animated zoom scroll */}
 			<div className="hidden md:block">
-				<SystemsSection systems={systems} backgroundImages={backgroundImages} />
+				<SystemsSection systems={systems} backgroundImages={backgroundImages} ctaLabel={ctaLabel} ctaHref={ctaHref} />
 			</div>
 
 			{/* Mobile: simple stacked cards */}
-			<MobileSystemsSection systems={systems} />
+			<MobileSystemsSection systems={systems} ctaLabel={ctaLabel} ctaHref={ctaHref} />
 		</section>
 	);
 }

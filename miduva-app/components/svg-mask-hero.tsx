@@ -3,6 +3,7 @@
 import type React from "react"
 import Image from "next/image"
 import { useEffect, useRef, useState } from "react"
+import { useFrameRuntime } from "@/components/puck/frame-runtime"
 
 interface SvgMaskHeroProps {
   text?: string
@@ -17,6 +18,7 @@ interface SvgMaskHeroProps {
   theme?: "dark" | "light"
   illustrationDarkUrl?: string
   illustrationLightUrl?: string
+  illustrationAlt?: string
 }
 
 type Phase = "intro" | "split" | "done"
@@ -33,6 +35,7 @@ export default function SvgMaskHero({
   theme = "dark",
   illustrationDarkUrl,
   illustrationLightUrl,
+  illustrationAlt = "",
 }: SvgMaskHeroProps) {
   const illustrationSrc = theme === "dark"
     ? (illustrationDarkUrl || "/assets/system-dark.png")
@@ -45,6 +48,7 @@ export default function SvgMaskHero({
     : "/assets/system-light-mobile-fit.png"
   const [phase] = useState<Phase>("done")
   const hintRef = useRef<HTMLDivElement>(null)
+  const runtime = useFrameRuntime()
 
   // Signal nav immediately since intro animation is disabled
   useEffect(() => {
@@ -55,15 +59,16 @@ export default function SvgMaskHero({
   useEffect(() => {
     // if (phase !== "done") return
     const hint = hintRef.current
-    if (!hint) return
+    if (!hint || !runtime) return
+    const frameWindow = runtime.window
     const onScroll = () => {
-      const y = window.scrollY
+      const y = frameWindow.scrollY
       const o = Math.max(0, 1 - y / 220)
       hint.style.opacity = String(o)
     }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [phase])
+    frameWindow.addEventListener("scroll", onScroll, { passive: true })
+    return () => frameWindow.removeEventListener("scroll", onScroll)
+  }, [phase, runtime])
 
   const letters = Array.from(text)
 
@@ -89,10 +94,10 @@ export default function SvgMaskHero({
       </div>
 
       {/* Background illustration — desktop (landscape) */}
-      <div className="hero-illustration" aria-hidden>
+      <div className="hero-illustration" aria-hidden={!illustrationAlt}>
         <Image
           src={illustrationSrc}
-          alt=""
+          alt={illustrationAlt}
           fill
           priority
           sizes="100vw"

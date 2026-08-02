@@ -52,7 +52,7 @@ export function SubscribeForm() {
   if (status === "subscribed" || status === "already") {
     return (
       <div className={`${styles.successWrap} ${styles.enter} ${styles.enter4}`}>
-        <p className={styles.successSub}>// Confirmed</p>
+        <p className={styles.successSub}>{"// Confirmed"}</p>
         <p className={styles.successHead}>{COPY[status]}</p>
       </div>
     )

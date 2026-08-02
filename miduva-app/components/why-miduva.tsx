@@ -1,27 +1,19 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef } from "react"
 import {
   motion,
   useMotionValue,
   useSpring,
   useTransform,
-  useInView,
-  useScroll,
 } from "motion/react"
 import type { WhyMiduvaData, DifferentiatorCard as DiffCardData } from "@/lib/types"
-
-function useIsDark() {
-  const [isDark, setIsDark] = useState(true)
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
-    check()
-    const observer = new MutationObserver(check)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
-    return () => observer.disconnect()
-  }, [])
-  return isDark
-}
+import {
+  useFrameInView,
+  useFrameIsDark,
+  useFrameScrollProgress,
+  VIEWPORT_SCROLL_RANGE,
+} from "@/components/puck/frame-runtime"
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    DATA
@@ -74,14 +66,6 @@ const DEFAULT_DIFFERENTIATORS: DiffDisplay[] = [
     grid: GRID_CLASSES[3],
   },
 ]
-
-const PHRASES = [
-  { text: "We don't sell", dim: false, shine: false, strike: false },
-  { text: "services.", dim: true, shine: false, strike: true },
-  { text: "We build", dim: false, shine: false, strike: false },
-  { text: "systems", dim: false, shine: true, strike: false },
-  { text: "designed to grow your business.", dim: false, shine: false, strike: false },
-] as const
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    ULTRA-THIN CUSTOM ICONS
@@ -149,14 +133,18 @@ function DifferentiatorCard({
   index,
   isParentInView,
   isDark,
+  wideStatValue,
+  wideStatLabel,
 }: {
   diff: DiffDisplay
   index: number
   isParentInView: boolean
   isDark: boolean
+  wideStatValue: string
+  wideStatLabel: string
 }) {
   const cardRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(cardRef, { once: true, margin: "-60px" })
+  const isInView = useFrameInView(cardRef, { once: true, margin: "-60px" })
 
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
@@ -255,10 +243,10 @@ function DifferentiatorCard({
                 </div>
                 <div className="flex items-baseline justify-between gap-3 md:block md:text-right">
                   <div className={`text-[32px] md:text-[36px] font-extrabold tracking-[-0.04em] leading-none ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
-                    4.8×
+                    {wideStatValue}
                   </div>
                   <div className={`text-[10px] uppercase tracking-[0.18em] mono md:mt-1 ${isDark ? "text-white/25" : "text-[var(--muted)]"}`}>
-                    Avg. ROAS
+                    {wideStatLabel}
                   </div>
                 </div>
               </div>
@@ -284,19 +272,25 @@ function DifferentiatorCard({
 
 export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
   const eyebrow = data?.eyebrow ?? "Why Miduva"
+  const watermark = data?.watermark ?? "WHY"
+  const wideStatValue = data?.wideStatValue ?? "4.8×"
+  const wideStatLabel = data?.wideStatLabel ?? "Avg. ROAS"
+  const phrases = [
+    { text: data?.statementLead ?? "We don't sell", dim: false, shine: false, strike: false },
+    { text: data?.statementOldWay ?? "services.", dim: true, shine: false, strike: true },
+    { text: data?.statementBridge ?? "We build", dim: false, shine: false, strike: false },
+    { text: data?.statementAccent ?? "systems", dim: false, shine: true, strike: false },
+    { text: data?.statementTail ?? "designed to grow your business.", dim: false, shine: false, strike: false },
+  ]
 
   const differentiators: DiffDisplay[] = data?.differentiators?.length
     ? data.differentiators.map((d, i) => ({ ...d, grid: GRID_CLASSES[i] ?? "md:col-span-6" }))
     : DEFAULT_DIFFERENTIATORS
 
   const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView   = useInView(sectionRef, { once: true, margin: "-100px" })
-  const isDark     = useIsDark()
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  })
+  const isInView   = useFrameInView(sectionRef, { once: true, margin: "-100px" })
+  const isDark     = useFrameIsDark()
+  const scrollYProgress = useFrameScrollProgress(sectionRef, VIEWPORT_SCROLL_RANGE)
 
   const yOrb1       = useTransform(scrollYProgress, [0, 1], [0, -140])
   const yOrb2       = useTransform(scrollYProgress, [0, 1], [0, -80])
@@ -317,7 +311,7 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
       {/* Giant watermark */}
       <motion.div aria-hidden className="absolute top-[10%] left-1/2 -translate-x-1/2 pointer-events-none select-none z-0" style={{ y: yWatermark }}>
         <span className="block text-[clamp(96px,22vw,380px)] font-extrabold tracking-[-0.06em] leading-none mono" style={{ color: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,35,73,0.10)" }}>
-          WHY
+          {watermark}
         </span>
       </motion.div>
 
@@ -345,7 +339,7 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
         {/* Headline — cinematic word reveal */}
         <motion.div className="mb-10 md:mb-28" style={{ y: yHeadline }}>
           <h2 className={`text-[clamp(32px,5vw,56px)] font-extrabold tracking-[-0.04em] leading-[1.1] ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
-            {PHRASES.map((phrase, i) => (
+            {phrases.map((phrase, i) => (
               <span key={i} className="inline-block overflow-hidden mr-[0.28em] align-bottom relative">
                 <motion.span
                   className={`inline-block relative ${phrase.shine ? "shine" : ""}`}
@@ -379,6 +373,8 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
               index={i}
               isParentInView={isInView}
               isDark={isDark}
+              wideStatValue={wideStatValue}
+              wideStatLabel={wideStatLabel}
             />
           ))}
         </div>

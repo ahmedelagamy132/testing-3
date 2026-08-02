@@ -2,6 +2,7 @@
 
 import { forwardRef, useState, useEffect } from "react"
 import type { BrandingData, NavData } from "@/lib/types"
+import { useFrameRuntime } from "@/components/puck/frame-runtime"
 
 const DEFAULT_LEFT = [
   { n: "Services",     h: "#services"    },
@@ -29,23 +30,27 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(false)
+  const runtime = useFrameRuntime()
 
   useEffect(() => {
+    if (!runtime) return
+    const frameWindow = runtime.window
+    const frameDocument = runtime.document
     const on = () => {
-      const scrollPosition = window.scrollY
+      const scrollPosition = frameWindow.scrollY
       // Only expand when at the very top of the page (hero section)
       setScrolled(scrollPosition > 4)
 
-      const windowHeight = window.innerHeight
-      const docHeight = document.documentElement.scrollHeight
+      const windowHeight = frameWindow.innerHeight
+      const docHeight = frameDocument.documentElement.scrollHeight
 
       // Hide navigation when scrolled into the last ~50% of the viewport (during the cinematic footer reveal)
       setIsHidden(docHeight - (scrollPosition + windowHeight) < windowHeight * 0.5)
     }
     on()
-    window.addEventListener("scroll", on, { passive: true })
-    return () => window.removeEventListener("scroll", on)
-  }, [])
+    frameWindow.addEventListener("scroll", on, { passive: true })
+    return () => frameWindow.removeEventListener("scroll", on)
+  }, [runtime])
 
   const leftItems = data?.leftLinks?.length
     ? data.leftLinks.map((l) => ({ n: l.label, h: l.href }))
@@ -70,12 +75,13 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
   const logoSrc = useWhite
     ? (branding?.logoLightUrl || "/assets/miduva-logo-white.png")
     : (branding?.logoDarkUrl || "/assets/miduva-logo.png")
+  const logoAlt = branding?.logoAlt || "Miduva"
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!href.startsWith("#")) return
     e.preventDefault()
     const id = href.replace("#", "")
-    const el = document.getElementById(id)
+    const el = runtime?.document.getElementById(id)
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" })
       setOpen(false)
@@ -107,7 +113,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
 
           <a href="#" className="flex items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoSrc} alt="Miduva" className="h-7 w-auto" />
+            <img src={logoSrc} alt={logoAlt} className="h-7 w-auto" />
           </a>
 
           <div className="flex items-center justify-end gap-8">
@@ -144,7 +150,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
         <div className="lg:hidden flex items-center justify-between px-5 py-3">
           <a href="#" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoSrc} alt="Miduva" className="h-7 w-auto" />
+            <img src={logoSrc} alt={logoAlt} className="h-7 w-auto" />
           </a>
 
           <div className="flex items-center gap-2">

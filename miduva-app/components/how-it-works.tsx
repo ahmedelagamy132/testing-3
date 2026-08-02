@@ -1,32 +1,16 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef } from "react"
 import Image from "next/image"
-import { motion, useScroll, useTransform } from "motion/react"
+import { motion, useTransform } from "motion/react"
+import type { MotionValue } from "motion/react"
 import type { HowItWorksData } from "@/lib/types"
-
-function useIsDark() {
-  const [isDark, setIsDark] = useState(true)
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
-    check()
-    const observer = new MutationObserver(check)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
-    return () => observer.disconnect()
-  }, [])
-  return isDark
-}
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false)
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768)
-    check()
-    window.addEventListener("resize", check)
-    return () => window.removeEventListener("resize", check)
-  }, [])
-  return isMobile
-}
+import {
+  STICKY_SCROLL_RANGE,
+  useFrameIsDark,
+  useFrameMediaQuery,
+  useFrameScrollProgress,
+} from "@/components/puck/frame-runtime"
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 type Step = {
@@ -35,6 +19,7 @@ type Step = {
   title: string
   description: string
   imageUrl: string
+  imageAlt?: string
 }
 
 const DEFAULT_STEPS: Step[] = [
@@ -87,7 +72,7 @@ function StepSlide({
 }: {
   step: Step
   index: number
-  progress: ReturnType<typeof useScroll>["scrollYProgress"]
+  progress: MotionValue<number>
   isDark: boolean
   isMobile?: boolean
   totalSteps: number
@@ -142,7 +127,7 @@ function StepSlide({
           {step.imageUrl && (
             <Image
               src={step.imageUrl}
-              alt={step.title}
+              alt={step.imageAlt || step.title}
               fill
               unoptimized
               style={{
@@ -319,7 +304,7 @@ function StepSlide({
 }
 
 // ─── Progress Bar ─────────────────────────────────────────────────────────────
-function ProgressBar({ progress, isDark }: { progress: ReturnType<typeof useScroll>["scrollYProgress"], isDark: boolean }) {
+function ProgressBar({ progress, isDark }: { progress: MotionValue<number>, isDark: boolean }) {
   const scaleX = useTransform(progress, [0, 1], [0, 1])
 
   return (
@@ -351,6 +336,7 @@ function ProgressBar({ progress, isDark }: { progress: ReturnType<typeof useScro
 export default function HowItWorks({ data }: { data?: HowItWorksData }) {
   const eyebrow  = data?.eyebrow  ?? "/ how it works"
   const headline = data?.headline ?? "From audit to scale —"
+  const headlineAccent = data?.headlineAccent ?? "four steps."
   const steps: Step[] = data?.steps?.length
     ? data.steps.map((s, i) => ({
         ...(s as Step),
@@ -359,12 +345,9 @@ export default function HowItWorks({ data }: { data?: HowItWorksData }) {
     : DEFAULT_STEPS
 
   const sectionRef = useRef<HTMLElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  })
-  const isDark = useIsDark()
-  const isMobile = useIsMobile()
+  const scrollYProgress = useFrameScrollProgress(sectionRef, STICKY_SCROLL_RANGE)
+  const isDark = useFrameIsDark()
+  const isMobile = useFrameMediaQuery("(max-width: 767px)")
   const bg = isDark ? "#020204" : "var(--paper)"
 
   return (
@@ -467,7 +450,7 @@ export default function HowItWorks({ data }: { data?: HowItWorksData }) {
               }}
             >
               {headline}{" "}
-              <span className="shine">four steps.</span>
+              <span className="shine">{headlineAccent}</span>
             </h2>
           </div>
 

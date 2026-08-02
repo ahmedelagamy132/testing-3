@@ -2,11 +2,15 @@
 
 import { useRef, useEffect } from "react"
 import type { ParallaxData } from "@/lib/types"
+import { useFrameRuntime } from "@/components/puck/frame-runtime"
 
 export default function ParallaxSection({ data }: { data?: ParallaxData }) {
   const ref = useRef<HTMLDivElement>(null)
+  const runtime = useFrameRuntime()
 
   useEffect(() => {
+    if (!runtime) return
+    const frameWindow = runtime.window
     let raf = 0
     const update = () => {
       raf = 0
@@ -16,10 +20,10 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
       const header = el.querySelector(".parallax__header")
       if (!layers || !header) return
       const rect = (header as HTMLElement).getBoundingClientRect()
-      const scrollable = (header as HTMLElement).offsetHeight - window.innerHeight
+      const scrollable = (header as HTMLElement).offsetHeight - frameWindow.innerHeight
       if (scrollable <= 0) return
       const p = Math.min(1, Math.max(0, -rect.top / scrollable))
-      const isMobile = window.matchMedia("(max-width: 700px)").matches
+      const isMobile = frameWindow.matchMedia("(max-width: 700px)").matches
       const config = isMobile
         ? [
             { sel: '[data-parallax-layer="1"]', y: -8 },
@@ -38,27 +42,29 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
         if (n) n.style.transform = `translateY(${p * c.y}%)`
       })
     }
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+    const onScroll = () => { if (!raf) raf = frameWindow.requestAnimationFrame(update) }
     update()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll)
+    frameWindow.addEventListener("scroll", onScroll, { passive: true })
+    frameWindow.addEventListener("resize", onScroll)
     return () => {
-      window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
-      if (raf) cancelAnimationFrame(raf)
+      frameWindow.removeEventListener("scroll", onScroll)
+      frameWindow.removeEventListener("resize", onScroll)
+      if (raf) frameWindow.cancelAnimationFrame(raf)
     }
-  }, [])
+  }, [runtime])
 
   const eyebrow         = data?.eyebrow         ?? "The Miduva Difference"
   const headline        = data?.headline        ?? "Built as a"
+  const headlineAccent  = data?.headlineAccent  ?? "system."
   const description     = data?.description     ?? "Not a one-off campaign, not a template. A connected machine — ads → funnels → automation → data — tuned for your business."
   const pipelineLabel   = data?.pipelineLabel   ?? "Pipeline · live"
   const pipelineValue   = data?.pipelineValue   ?? "$482,120"
   const pipelineDelta   = data?.pipelineDelta   ?? "▲ 21.4%"
+  const pipelineComparison = data?.pipelineComparison ?? "vs last Q"
   const bottomLabel     = data?.bottomLabel     ?? "Eight modules · one OS"
   const bottomDesc      = data?.bottomDescription ?? "Every lever connected, every number visible, every dollar accounted for."
 
-  const bars = [42, 58, 51, 64, 72, 69, 81, 88, 83, 92, 97, 104]
+  const bars = data?.chartValues?.length ? data.chartValues : [42, 58, 51, 64, 72, 69, 81, 88, 83, 92, 97, 104]
 
   return (
     <div className="parallax" ref={ref}>
@@ -104,7 +110,7 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
                 </div>
                 <h2 className="parallax__title">
                   {headline}<br />
-                  <em>system.</em>
+                  <em>{headlineAccent}</em>
                 </h2>
                 <div className="parallax__description">
                   {description}
@@ -140,7 +146,7 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, fontSize: 12, color: "var(--teal-500)", fontWeight: 600 }}>
                   <span>{pipelineDelta}</span>
-                  <span style={{ color: "var(--muted)", fontWeight: 400 }}>vs last Q</span>
+                  <span style={{ color: "var(--muted)", fontWeight: 400 }}>{pipelineComparison}</span>
                 </div>
                 <div style={{ height: 1, background: "var(--line)", margin: "12px 0" }} />
                 <div className="parallax__pipeline-bars">
