@@ -1,8 +1,9 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
-import { motion, useInView } from "motion/react"
+import { motion } from "motion/react"
 import type { ResultsData } from "@/lib/types"
+import { useFrameInView, useFrameMediaQuery } from "@/components/puck/frame-runtime"
 
 // ─── Count-up hook (ease-out cubic, RAF-driven) ───────────────────────────────
 function useCountUp(target: number, duration = 1900, started: boolean) {
@@ -23,17 +24,6 @@ function useCountUp(target: number, duration = 1900, started: boolean) {
     return () => cancelAnimationFrame(frame)
   }, [started, target, duration])
   return count
-}
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false)
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768)
-    check()
-    window.addEventListener("resize", check)
-    return () => window.removeEventListener("resize", check)
-  }, [])
-  return isMobile
 }
 
 // ─── Local display type (adds animation timing to StatCard) ──────────────────
@@ -150,8 +140,8 @@ export default function ResultsStats({ data }: { data?: ResultsData }) {
 
   const sectionRef = useRef<HTMLDivElement>(null)
   const statsRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(statsRef, { once: true, margin: "0px 0px -10% 0px" })
-  const isMobile = useIsMobile()
+  const isInView = useFrameInView(statsRef, { once: true, margin: "0px 0px -10% 0px" })
+  const isMobile = useFrameMediaQuery("(max-width: 767px)")
 
   return (
     <section id="results" style={{ background: "var(--paper)", position: "relative", overflow: "hidden" }}>

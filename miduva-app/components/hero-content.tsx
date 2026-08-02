@@ -13,6 +13,7 @@ interface HeroContentProps {
 
 export default function HeroContent({ theme = "dark", data }: HeroContentProps) {
   const phrases    = data?.phrases?.length ? data.phrases : DEFAULT_PHRASES
+  const phrasePrefix = data?.phrasePrefix ?? "Engineered to"
   const headline   = data?.headline    ?? "We build custom growth systems."
   const tagline    = data?.tagline     ?? "A system that learns, adapts, and accelerates your growth."
   const body       = data?.body        ?? "No generic services. We design tailored systems using ads, funnels, automation, and data — engineered end-to-end, owned by you."
@@ -94,7 +95,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
             textShadow,
           }}
         >
-          Engineered to{" "}
+          {phrasePrefix}{" "}
           <span
             className={`phrase-wrap inline-block ${visible ? "p-in" : "p-out"}`}
             style={{ color: theme === "dark" ? "rgba(255,255,255,0.9)" : "var(--navy-700)" }}
@@ -225,7 +226,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
           .hero-section {
             align-items: center !important;
             justify-content: flex-start !important;
-            padding: clamp(106px, 13svh, 122px) 18px 22px !important;
+            padding: clamp(166px, 20svh, 188px) 18px 22px !important;
           }
           .hero-content-wrapper {
             position: relative !important;
@@ -287,7 +288,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
         }
         @media (max-width: 380px) {
           .hero-section {
-            padding: clamp(96px, 12svh, 108px) 16px 20px !important;
+            padding: clamp(146px, 18svh, 164px) 16px 20px !important;
           }
           .hero-headline {
             font-size: clamp(31px, 9.8vw, 38px) !important;

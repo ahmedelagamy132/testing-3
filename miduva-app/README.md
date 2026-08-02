@@ -1,5 +1,48 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Puck landing-page editor
+
+The protected editor is available at `/admin`. It uses the Puck UI to edit drafts,
+reorder singleton landing-page sections around the fixed dashboard, upload media,
+review the latest 20 published revisions, and publish both `/` and `/main-site`.
+
+Configure these server-only values before opening the editor:
+
+```bash
+PUCK_ADMIN_PASSWORD=choose-at-least-16-characters
+PUCK_SESSION_SECRET=use-at-least-32-random-characters
+```
+
+Production refuses editor logins when either value is absent. Docker Compose passes
+both values through and stores uploaded Puck media in the persistent `/data` volume.
+
+## Contact form delivery
+
+Contact submissions are always saved to the configured SQLite database. They can
+also be delivered immediately by email, to a webhook, or to both.
+
+For email delivery, set these server-side environment variables:
+
+```bash
+RESEND_API_KEY=re_...
+CONTACT_FROM_EMAIL=Miduva Website <website@miduva.com>
+CONTACT_NOTIFICATION_EMAIL=hello@miduva.com
+```
+
+`CONTACT_FROM_EMAIL` must use a sender domain verified in Resend. Multiple
+notification addresses can be supplied as a comma-separated list.
+
+To deliver the same submission to a CRM or automation platform, set:
+
+```bash
+CONTACT_WEBHOOK_URL=https://example.com/contact-webhook
+CONTACT_WEBHOOK_SECRET=optional-bearer-token
+```
+
+The webhook receives `{ "event": "contact.submitted", "data": { ... } }`. A
+notification failure never discards the lead because the database write happens
+first.
+
 ## Getting Started
 
 First, run the development server:

@@ -1,7 +1,7 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
-import { motion, useInView, AnimatePresence } from "motion/react"
+import { useRef, useState } from "react"
+import { motion, AnimatePresence } from "motion/react"
 import {
   Mail,
   Building2,
@@ -13,6 +13,7 @@ import {
   Send,
 } from "lucide-react"
 import type { ContactData } from "@/lib/types"
+import { useFrameInView, useFrameIsDark } from "@/components/puck/frame-runtime"
 
 const EASE_FLUID  = [0.32, 0.72, 0, 1] as const
 const EASE_SMOOTH = [0.22, 1, 0.36, 1] as const
@@ -42,32 +43,25 @@ const DEFAULT_CONTACT_INFO: { icon: keyof typeof ICON_BY_NAME; label: string }[]
   { icon: "building",  label: "Available Worldwide · Remote-First" },
 ]
 
-function useIsDark() {
-  const [isDark, setIsDark] = useState(true)
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
-    check()
-    const observer = new MutationObserver(check)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
-    return () => observer.disconnect()
-  }, [])
-  return isDark
-}
-
 type FormState  = { name: string; email: string; company: string; service: string; message: string }
 type FormErrors = Partial<Record<keyof FormState, string>>
 type SubmitStatus = "idle" | "error"
 
 const INITIAL_STATE: FormState = { name: "", email: "", company: "", service: "", message: "" }
 
-function validate(v: FormState): FormErrors {
+type ValidationMessages = {
+  nameRequired: string; emailRequired: string; emailInvalid: string
+  serviceRequired: string; messageRequired: string; messageTooShort: string
+}
+
+function validate(v: FormState, messages: ValidationMessages): FormErrors {
   const e: FormErrors = {}
-  if (!v.name.trim())    e.name    = "Name is required"
-  if (!v.email.trim())   e.email   = "Email is required"
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) e.email = "Enter a valid email"
-  if (!v.service)        e.service = "Please select a service"
-  if (!v.message.trim()) e.message = "Message is required"
-  else if (v.message.trim().length < 20) e.message = "Please write at least 20 characters"
+  if (!v.name.trim())    e.name    = messages.nameRequired
+  if (!v.email.trim())   e.email   = messages.emailRequired
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) e.email = messages.emailInvalid
+  if (!v.service)        e.service = messages.serviceRequired
+  if (!v.message.trim()) e.message = messages.messageRequired
+  else if (v.message.trim().length < 20) e.message = messages.messageTooShort
   return e
 }
 
@@ -264,7 +258,7 @@ function ContactTextarea({
   )
 }
 
-function SuccessState({ isDark, onReset }: { isDark: boolean; onReset: () => void }) {
+function SuccessState({ isDark, onReset, headline, body, resetLabel }: { isDark: boolean; onReset: () => void; headline: string; body: string; resetLabel: string }) {
   return (
     <motion.div
       key="success"
@@ -312,7 +306,7 @@ function SuccessState({ isDark, onReset }: { isDark: boolean; onReset: () => voi
         style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em",
           color: isDark ? "white" : "var(--ink)", margin: 0 }}
       >
-        Message Sent.
+        {headline}
       </motion.h3>
 
       <motion.p
@@ -321,7 +315,7 @@ function SuccessState({ isDark, onReset }: { isDark: boolean; onReset: () => voi
         transition={{ duration: 0.5, delay: 0.35, ease: EASE_SMOOTH }}
         style={{ fontSize: 15, color: "var(--muted)", margin: 0, maxWidth: 320, lineHeight: 1.6 }}
       >
-        We&apos;ll be in touch within 24 hours with a tailored plan — not a sales pitch.
+        {body}
       </motion.p>
 
       <motion.button
@@ -335,7 +329,7 @@ function SuccessState({ isDark, onReset }: { isDark: boolean; onReset: () => voi
           textDecoration: "underline", textUnderlineOffset: 3, padding: 0,
         }}
       >
-        Send another message
+        {resetLabel}
       </motion.button>
     </motion.div>
   )
@@ -343,8 +337,8 @@ function SuccessState({ isDark, onReset }: { isDark: boolean; onReset: () => voi
 
 export default function ContactSection({ data }: { data?: ContactData } = {}) {
   const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView   = useInView(sectionRef, { once: true, margin: "-80px" })
-  const isDark     = useIsDark()
+  const isInView   = useFrameInView(sectionRef, { once: true, margin: "-80px" })
+  const isDark     = useFrameIsDark()
 
   const eyebrow         = data?.eyebrow         ?? "/ get in touch"
   const headline        = data?.headline        ?? "Let's build something"
@@ -354,11 +348,34 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
   const trustStats      = data?.trustStats?.length  ? data.trustStats  : DEFAULT_TRUST_ITEMS
   const formHeadline    = data?.formHeadline    ?? "Start the conversation"
   const formSubheadline = data?.formSubheadline ?? "We respond within 24 hours · No spam, ever"
+  const servicePlaceholder = data?.servicePlaceholder ?? "Select a service..."
   const serviceOptions  = data?.serviceOptions?.length
-    ? [{ value: "", label: "Select a service..." }, ...data.serviceOptions]
+    ? (data.serviceOptions.some((option) => option.value === "") ? data.serviceOptions : [{ value: "", label: servicePlaceholder }, ...data.serviceOptions])
     : DEFAULT_SERVICE_OPTIONS
+  const nameLabel       = data?.nameLabel       ?? "Full Name"
+  const namePlaceholder = data?.namePlaceholder ?? "Your name"
+  const emailLabel      = data?.emailLabel      ?? "Email Address"
+  const emailPlaceholder = data?.emailPlaceholder ?? "you@company.com"
+  const companyLabel    = data?.companyLabel    ?? "Company (Optional)"
+  const companyPlaceholder = data?.companyPlaceholder ?? "Company name"
+  const serviceLabel    = data?.serviceLabel    ?? "Service Interest"
+  const messageLabel    = data?.messageLabel    ?? "Your Message"
+  const messagePlaceholder = data?.messagePlaceholder ?? "Tell us what you need help with..."
   const submitLabel     = data?.submitLabel     ?? "Send Message"
+  const submittingLabel = data?.submittingLabel ?? "Sending..."
   const finePrint       = data?.finePrint       ?? "No commitment · No credit card · 100% Confidential"
+  const successHeadline = data?.successHeadline ?? "Message Sent."
+  const successBody     = data?.successBody ?? "We'll be in touch within 24 hours with a tailored plan — not a sales pitch."
+  const resetLabel      = data?.resetLabel ?? "Send another message"
+  const errorMessage    = data?.errorMessage ?? "We could not send your message. Please try again."
+  const validationMessages: ValidationMessages = {
+    nameRequired: data?.nameRequiredMessage ?? "Name is required",
+    emailRequired: data?.emailRequiredMessage ?? "Email is required",
+    emailInvalid: data?.emailInvalidMessage ?? "Enter a valid email",
+    serviceRequired: data?.serviceRequiredMessage ?? "Please select a service",
+    messageRequired: data?.messageRequiredMessage ?? "Message is required",
+    messageTooShort: data?.messageTooShortMessage ?? "Please write at least 20 characters",
+  }
 
   const [values,    setValues]    = useState<FormState>(INITIAL_STATE)
   const [errors,    setErrors]    = useState<FormErrors>({})
@@ -370,7 +387,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
   const touch = (field: keyof FormState) => {
     const next = { ...touched, [field]: true }
     setTouched(next)
-    setErrors(validate(values))
+    setErrors(validate(values, validationMessages))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -378,7 +395,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
     setSubmitStatus("idle")
     const allTouched = Object.fromEntries(Object.keys(values).map(k => [k, true]))
     setTouched(allTouched as typeof touched)
-    const errs = validate(values)
+    const errs = validate(values, validationMessages)
     if (Object.keys(errs).length > 0) { setErrors(errs); return }
     setSubmitting(true)
     try {
@@ -600,7 +617,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
 
                 <AnimatePresence mode="wait">
                   {submitted ? (
-                    <SuccessState key="success" isDark={isDark} onReset={reset} />
+                    <SuccessState key="success" isDark={isDark} onReset={reset} headline={successHeadline} body={successBody} resetLabel={resetLabel} />
                   ) : (
                     <motion.form
                       key="form"
@@ -632,15 +649,15 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
                       {/* Name + Email row */}
                       <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 14, marginBottom: 14 }}>
                         <ContactInput
-                          label="Full Name" value={values.name} icon={User} index={0}
-                          isDark={isDark} isInView={isInView} placeholder="Your name"
+                          label={nameLabel} value={values.name} icon={User} index={0}
+                          isDark={isDark} isInView={isInView} placeholder={namePlaceholder}
                           onChange={v => setValues(p => ({ ...p, name: v }))}
                           onBlur={() => touch("name")}
                           error={touched.name ? errors.name : undefined}
                         />
                         <ContactInput
-                          label="Email Address" type="email" value={values.email} icon={Mail} index={1}
-                          isDark={isDark} isInView={isInView} placeholder="you@company.com"
+                          label={emailLabel} type="email" value={values.email} icon={Mail} index={1}
+                          isDark={isDark} isInView={isInView} placeholder={emailPlaceholder}
                           onChange={v => setValues(p => ({ ...p, email: v }))}
                           onBlur={() => touch("email")}
                           error={touched.email ? errors.email : undefined}
@@ -650,8 +667,8 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
                       {/* Company */}
                       <div style={{ marginBottom: 14 }}>
                         <ContactInput
-                          label="Company (Optional)" value={values.company} icon={Building2} index={2}
-                          isDark={isDark} isInView={isInView} placeholder="Company name"
+                          label={companyLabel} value={values.company} icon={Building2} index={2}
+                          isDark={isDark} isInView={isInView} placeholder={companyPlaceholder}
                           onChange={v => setValues(p => ({ ...p, company: v }))}
                         />
                       </div>
@@ -659,13 +676,13 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
                       {/* Service select */}
                       <div style={{ marginBottom: 14 }}>
                         <ContactSelect
-                          label="Service Interest" value={values.service}
+                          label={serviceLabel} value={values.service}
                           options={serviceOptions} index={3}
                           isDark={isDark} isInView={isInView}
                           onChange={v => {
                             setValues(p => ({ ...p, service: v }))
                             setTouched(p => ({ ...p, service: true }))
-                            setErrors(validate({ ...values, service: v }))
+                            setErrors(validate({ ...values, service: v }, validationMessages))
                           }}
                           error={touched.service ? errors.service : undefined}
                         />
@@ -674,9 +691,9 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
                       {/* Message */}
                       <div style={{ marginBottom: 26 }}>
                         <ContactTextarea
-                          label="Your Message" value={values.message} index={4}
+                          label={messageLabel} value={values.message} index={4}
                           isDark={isDark} isInView={isInView}
-                          placeholder="Tell us what you need help with..."
+                          placeholder={messagePlaceholder}
                           onChange={v => setValues(p => ({ ...p, message: v }))}
                           onBlur={() => touch("message")}
                           error={touched.message ? errors.message : undefined}
@@ -697,7 +714,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
                               textAlign: "center",
                             }}
                           >
-                            We could not send your message. Please try again.
+                            {errorMessage}
                           </motion.p>
                         )}
                       </AnimatePresence>
@@ -743,7 +760,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
                                 <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
                               </svg>
                             </motion.div>
-                            Sending...
+                            {submittingLabel}
                           </>
                         ) : (
                           <>

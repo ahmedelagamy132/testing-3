@@ -4,11 +4,11 @@ node_modules
 # Build output (rebuilt inside Docker)
 .next
 
-# Local database & uploads (mounted as Docker volumes in production)
-payload.db
-payload.db-shm
-payload.db-wal
-public/media
+# Local form-submission database (mounted as a Docker volume in production)
+miduva.db
+miduva.db-shm
+miduva.db-wal
+.puck-media
 
 # Secrets
 .env

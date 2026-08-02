@@ -1,20 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion } from "motion/react"
 import type { GrowthOsData, GrowthOsModule } from "@/lib/types"
-
-function useIsDark() {
-  const [isDark, setIsDark] = useState(true)
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
-    check()
-    const observer = new MutationObserver(check)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
-    return () => observer.disconnect()
-  }, [])
-  return isDark
-}
+import { useFrameInView, useFrameIsDark } from "@/components/puck/frame-runtime"
 
 const DEFAULT_MODULES: GrowthOsModule[] = [
   { name: "Paid Ads",      tag: "Meta · Google · TikTok",   description: "Multi-channel acquisition tuned for CAC efficiency.",       color: "teal", span: 2, visual: "bars"   },
@@ -506,7 +495,9 @@ function ModuleCard({
 }
 
 export default function SystemRibbon({ data }: { data?: GrowthOsData } = {}) {
-  const isDark = useIsDark()
+  const sectionRef = useRef<HTMLElement>(null)
+  const isInView = useFrameInView(sectionRef, { once: true, margin: "-60px" })
+  const isDark = useFrameIsDark()
 
   const eyebrow        = data?.eyebrow        ?? "/ growth os"
   const headline       = data?.headline       ?? "Six modules."
@@ -517,14 +508,13 @@ export default function SystemRibbon({ data }: { data?: GrowthOsData } = {}) {
   const modules        = data?.modules?.length ? data.modules : DEFAULT_MODULES
 
   return (
-    <section id="growth-os" className="mt-16 md:mt-20">
+    <section ref={sectionRef} id="growth-os" className="mt-16 md:mt-20">
       {/* Header */}
       <div className="max-w-6xl mx-auto px-6">
         <motion.div
           className="flex items-end justify-between flex-wrap gap-4 mb-10"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-60px" }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
           <div>
@@ -558,8 +548,7 @@ export default function SystemRibbon({ data }: { data?: GrowthOsData } = {}) {
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
               transition={{ duration: 0.5, delay: i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
               className={m.span === 2 ? "sm:col-span-2" : "col-span-1"}
             >

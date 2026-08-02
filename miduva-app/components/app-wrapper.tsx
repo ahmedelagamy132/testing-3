@@ -57,6 +57,7 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
           scanTarget={navRef}
           illustrationDarkUrl={data.hero?.illustrationDarkUrl}
           illustrationLightUrl={data.hero?.illustrationLightUrl}
+          illustrationAlt={data.hero?.illustrationAlt}
         >
           <HeroContent theme={theme} data={data.hero} />
         </SvgMaskHero>
@@ -66,7 +67,7 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
     "problem-solution": () => <ProblemSolution data={data.problemSolution} />,
     "how-it-works": () => <HowItWorks data={data.howItWorks} />,
     results: () => <ResultsStats data={data.results} />,
-    "our-work": () => <OurWork />,
+    "our-work": () => <OurWork data={data.ourWork} />,
     "why-miduva": () => <WhyMiduva data={data.whyMiduva} />,
     parallax: () => <ParallaxSection data={data.parallax} />,
     dashboard: () => (

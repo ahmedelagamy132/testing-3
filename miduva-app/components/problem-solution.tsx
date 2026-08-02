@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useLayoutEffect, useEffect } from "react"
+import { useRef, useLayoutEffect } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import {
@@ -8,38 +8,19 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-  useInView,
 } from "motion/react"
 import type { ProblemSolutionData, ProblemCard as ProblemCardData } from "@/lib/types"
+import {
+  bindFrameScrollProgress,
+  STICKY_SCROLL_RANGE,
+  useFrameInView,
+  useFrameIsDark,
+  useFrameMediaQuery,
+  useFrameRuntime,
+} from "@/components/puck/frame-runtime"
 
 /* ─── Register GSAP plugin ─── */
 gsap.registerPlugin(ScrollTrigger)
-
-/* ─── Dark-mode hook ─── */
-function useIsDark() {
-  const [isDark, setIsDark] = useState(true)
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
-    check()
-    const observer = new MutationObserver(check)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
-    return () => observer.disconnect()
-  }, [])
-  return isDark
-}
-
-/* ─── Mobile breakpoint hook (matches Tailwind `md`) ─── */
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)")
-    const apply = () => setIsMobile(mq.matches)
-    apply()
-    mq.addEventListener("change", apply)
-    return () => mq.removeEventListener("change", apply)
-  }, [])
-  return isMobile
-}
 
 /* ─── Default Data ─── */
 const DEFAULT_PROBLEMS: ProblemCardData[] = [
@@ -180,8 +161,8 @@ function ProblemCard({
 }) {
   const entranceRef = useRef<HTMLDivElement>(null)
   const hoverRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(entranceRef, { once: true, margin: "-60px" })
-  const isDark = useIsDark()
+  const isInView = useFrameInView(entranceRef, { once: true, margin: "-60px" })
+  const isDark = useFrameIsDark()
   const Icon = problem.icon === "alert" ? IconAlert : IconClose
 
   const mouseX = useMotionValue(0)
@@ -350,10 +331,12 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
   const bulletsRef = useRef<HTMLDivElement>(null)
   const ctaRef = useRef<HTMLDivElement>(null)
 
-  const isMobile = useIsMobile()
+  const runtime = useFrameRuntime()
+  const isMobile = useFrameMediaQuery("(max-width: 767px)")
 
   useLayoutEffect(() => {
-    if (isMobile) return
+    if (!runtime || isMobile) return
+    let stopFrameProgress: (() => void) | undefined
     const ctx = gsap.context(() => {
       const solutionEls = [
         eyebrowRef.current,
@@ -366,14 +349,16 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
       gsap.set(solutionRef.current, { scale: 0.65, opacity: 0, y: "35vh" })
       gsap.set(solutionEls, { opacity: 0, y: 24 })
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: outerRef.current,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 0.6,
-        },
-      })
+      const tl = gsap.timeline(runtime.isIframe
+        ? { paused: true }
+        : {
+            scrollTrigger: {
+              trigger: outerRef.current,
+              start: "top top",
+              end: "bottom bottom",
+              scrub: 0.6,
+            },
+          })
 
       tl.to(card1Ref.current, { y: "-4vh",  duration: 0.18, ease: "none" }, 0.22)
       tl.to(card2Ref.current, { y: "-10vh", duration: 0.18, ease: "none" }, 0.22)
@@ -390,10 +375,22 @@ export default function ProblemSolution({ data }: { data?: ProblemSolutionData }
       tl.to(subheadRef.current,  { opacity: 1, y: 0, duration: 0.07, ease: easeCustom }, 0.82)
       tl.to(bulletsRef.current,  { opacity: 1, y: 0, duration: 0.07, ease: easeCustom }, 0.86)
       tl.to(ctaRef.current,      { opacity: 1, y: 0, duration: 0.06, ease: easeCustom }, 0.91)
+
+      if (runtime.isIframe && outerRef.current) {
+        stopFrameProgress = bindFrameScrollProgress(
+          runtime,
+          outerRef.current,
+          STICKY_SCROLL_RANGE,
+          (progress) => tl.progress(progress),
+        )
+      }
     }, outerRef)
 
-    return () => ctx.revert()
-  }, [isMobile])
+    return () => {
+      stopFrameProgress?.()
+      ctx.revert()
+    }
+  }, [isMobile, runtime])
 
   return (
     <section id="problem-solution" className="relative">

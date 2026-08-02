@@ -2,15 +2,9 @@
 
 import Image from "next/image"
 import type { CSSProperties } from "react"
+import type { ClientLogoData, OurWorkData } from "@/lib/types"
 
-type ClientLogo = {
-  src: string
-  name: string
-  category: string
-  size?: "wide" | "compact" | "tall"
-}
-
-const logos: ClientLogo[] = [
+const DEFAULT_LOGOS: ClientLogoData[] = [
   { src: "/client-logos/19.png", name: "DEZ", category: "B2B systems" },
   { src: "/client-logos/20.png", name: "Dr. Mohamed Hany Mahour", category: "Healthcare" },
   { src: "/client-logos/21.png", name: "Mas Eye Center", category: "Healthcare", size: "wide" },
@@ -30,9 +24,7 @@ const logos: ClientLogo[] = [
   { src: "/client-logos/35.png", name: "Madinet Masr", category: "Real estate", size: "wide" },
 ]
 
-const marqueeRows = [logos.slice(0, 9), logos.slice(8)]
-
-function LogoTile({ logo, index }: { logo: ClientLogo; index: number }) {
+function LogoTile({ logo, index }: { logo: ClientLogoData; index: number }) {
   return (
     <figure
       className="our-work-tile group"
@@ -52,7 +44,7 @@ function LogoTile({ logo, index }: { logo: ClientLogo; index: number }) {
   )
 }
 
-function MarqueeRow({ row, reverse = false }: { row: ClientLogo[]; reverse?: boolean }) {
+function MarqueeRow({ row, reverse = false }: { row: ClientLogoData[]; reverse?: boolean }) {
   const loop = [...row, ...row]
   return (
     <div className="our-work-marquee" data-reverse={reverse}>
@@ -65,15 +57,22 @@ function MarqueeRow({ row, reverse = false }: { row: ClientLogo[]; reverse?: boo
   )
 }
 
-export default function OurWork() {
+export default function OurWork({ data }: { data?: OurWorkData } = {}) {
+  const logos = data?.logos?.length ? data.logos : DEFAULT_LOGOS
+  const split = Math.ceil(logos.length / 2)
+  const marqueeRows = [logos.slice(0, split), logos.slice(Math.max(0, split - 1))]
+  const eyebrow = data?.eyebrow ?? "/ our clients"
+  const headline = data?.headline ?? "Selected client systems."
+  const ariaLabel = data?.ariaLabel ?? "Selected Miduva client logos"
+
   return (
     <section id="our-work" className="our-work-section">
       <div className="our-work-copy">
-        <p className="mono our-work-kicker">/ our clients</p>
-        <h2>Selected client systems.</h2>
+        <p className="mono our-work-kicker">{eyebrow}</p>
+        <h2>{headline}</h2>
       </div>
 
-      <div className="our-work-rails" aria-label="Selected Miduva client logos">
+      <div className="our-work-rails" aria-label={ariaLabel}>
         <MarqueeRow row={marqueeRows[0]} />
         <MarqueeRow row={marqueeRows[1]} reverse />
       </div>

@@ -1,9 +1,10 @@
 "use client"
 
 import { useRef } from "react"
-import { motion, useInView } from "motion/react"
+import { motion } from "motion/react"
 import { CalendarCheck, ArrowRight } from "lucide-react"
 import type { FreeOfferData } from "@/lib/types"
+import { useFrameInView } from "@/components/puck/frame-runtime"
 
 const DEFAULT_INCLUDES = [
   "Full Business Audit",
@@ -13,7 +14,7 @@ const DEFAULT_INCLUDES = [
 
 export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | "light"; data?: FreeOfferData }) {
   const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" })
+  const isInView = useFrameInView(sectionRef, { once: true, margin: "-80px" })
   const isDark = theme === "dark"
 
   const eyebrow        = data?.eyebrow        ?? "/ free offer"

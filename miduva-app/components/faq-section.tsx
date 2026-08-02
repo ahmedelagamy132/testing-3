@@ -1,21 +1,10 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
-import { motion, useInView } from "motion/react"
+import { useRef, useState } from "react"
+import { motion } from "motion/react"
 import { ChevronDown } from "lucide-react"
 import type { FaqData, FaqItem } from "@/lib/types"
-
-function useIsDark() {
-  const [isDark, setIsDark] = useState(true)
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains("dark"))
-    check()
-    const observer = new MutationObserver(check)
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] })
-    return () => observer.disconnect()
-  }, [])
-  return isDark
-}
+import { useFrameInView, useFrameIsDark } from "@/components/puck/frame-runtime"
 
 const EASE_FLUID  = [0.32, 0.72, 0, 1] as const
 const EASE_SMOOTH = [0.22, 1, 0.36, 1] as const
@@ -238,11 +227,14 @@ function AccordionItem({
 // ─── Main export ─────────────────────────────────────────────────────────────
 
 export default function FaqSection({ data }: { data?: FaqData }) {
+  const eyebrow = data?.eyebrow ?? "Common questions"
+  const headline = data?.headline ?? "What founders ask before they book."
+  const body = data?.body ?? "If your question isn't here, it will be in the call."
   const items = data?.items?.length ? data.items : DEFAULT_FAQ
   const [openId, setOpenId] = useState<string | null>(null)
   const sectionRef = useRef<HTMLDivElement>(null)
-  const isInView = useInView(sectionRef, { once: true, margin: "-80px" })
-  const isDark = useIsDark()
+  const isInView = useFrameInView(sectionRef, { once: true, margin: "-80px" })
+  const isDark = useFrameIsDark()
   const triggerRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   const handleToggle = (id: string) =>
@@ -324,7 +316,7 @@ export default function FaqSection({ data }: { data?: FaqData }) {
           transition={{ duration: 0.55, ease: EASE_FLUID }}
         >
           <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-3">
-            Common questions
+            {eyebrow}
           </div>
           <h2
             className={`text-[clamp(26px,3.2vw,40px)] font-extrabold tracking-[-0.04em] leading-[1.1] ${
@@ -332,7 +324,7 @@ export default function FaqSection({ data }: { data?: FaqData }) {
             }`}
             style={{ textWrap: "balance" } as React.CSSProperties}
           >
-            What founders ask before they book.
+            {headline}
           </h2>
           <p
             className="mt-3 leading-[1.65]"
@@ -342,7 +334,7 @@ export default function FaqSection({ data }: { data?: FaqData }) {
               maxWidth: "44ch",
             }}
           >
-            If your question isn't here, it will be in the call.
+            {body}
           </p>
         </motion.div>
 

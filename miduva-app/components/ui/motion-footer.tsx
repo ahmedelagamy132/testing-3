@@ -7,6 +7,11 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
 import { Phone, ArrowRight } from "lucide-react";
 import type { FooterData } from "@/lib/types";
+import {
+  bindFrameScrollProgress,
+  useFrameRuntime,
+} from "@/components/puck/frame-runtime";
+import type { FrameScrollRange } from "@/components/puck/frame-runtime";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -204,6 +209,9 @@ const DEFAULT_SECONDARY_LINKS = [
   { label: "Support", href: "#" },
 ];
 
+const FOOTER_GIANT_RANGE: FrameScrollRange = { start: [0, 0.8], end: [1, 1] };
+const FOOTER_CONTENT_RANGE: FrameScrollRange = { start: [0, 0.6], end: [0, 0] };
+
 const MarqueeItem = ({ items }: { items: string[] }) => (
   <div className="flex items-center space-x-12 px-6">
     {items.map((label, i) => (
@@ -220,51 +228,60 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
   const giantTextRef = useRef<HTMLDivElement>(null);
   const headingRef  = useRef<HTMLHeadingElement>(null);
   const linksRef    = useRef<HTMLDivElement>(null);
+  const runtime = useFrameRuntime();
 
   useEffect(() => {
-    if (typeof window === "undefined" || !wrapperRef.current) return;
-
-    // Refresh after a tick so Framer Motion transforms from SectionReveal
-    // above are already applied before GSAP measures positions.
-    const refreshId = setTimeout(() => ScrollTrigger.refresh(), 100);
+    if (!runtime || !wrapperRef.current) return;
+    const frameProgressCleanups: Array<() => void> = [];
+    let refreshId: ReturnType<typeof setTimeout> | undefined;
 
     const ctx = gsap.context(() => {
-      // Parallax: giant text rises on scroll (no opacity — always visible)
-      gsap.fromTo(
-        giantTextRef.current,
-        { y: "8vh", scale: 0.88 },
-        {
-          y: "0vh", scale: 1,
-          ease: "power1.out",
-          scrollTrigger: {
-            trigger: wrapperRef.current,
-            start: "top 80%", end: "bottom bottom", scrub: 1.2,
-          },
-        }
-      );
+      if (runtime.isIframe) {
+        const giantTween = gsap.fromTo(
+          giantTextRef.current,
+          { y: "8vh", scale: 0.88 },
+          { y: "0vh", scale: 1, ease: "power1.out", paused: true },
+        );
+        const contentTween = gsap.fromTo(
+          [headingRef.current, linksRef.current],
+          { y: 40 },
+          { y: 0, stagger: 0.1, ease: "power2.out", paused: true },
+        );
+        frameProgressCleanups.push(
+          bindFrameScrollProgress(runtime, wrapperRef.current!, FOOTER_GIANT_RANGE, (progress) => giantTween.progress(progress)),
+          bindFrameScrollProgress(runtime, wrapperRef.current!, FOOTER_CONTENT_RANGE, (progress) => contentTween.progress(progress)),
+        );
+        return;
+      }
 
-      // Heading & links: y-only parallax (opacity always 1 — never hidden)
-      gsap.fromTo(
-        [headingRef.current, linksRef.current],
-        { y: 40 },
-        {
-          y: 0,
-          stagger: 0.1, ease: "power2.out",
-          scrollTrigger: {
-            trigger: wrapperRef.current,
-            start: "top 60%", end: "top top", scrub: 1.2,
-          },
-        }
-      );
+      // Refresh after a tick so transforms above are applied before GSAP measures.
+      refreshId = setTimeout(() => ScrollTrigger.refresh(), 100);
+
+      gsap.fromTo(giantTextRef.current, { y: "8vh", scale: 0.88 }, {
+        y: "0vh", scale: 1, ease: "power1.out",
+        scrollTrigger: {
+          trigger: wrapperRef.current,
+          start: "top 80%", end: "bottom bottom", scrub: 1.2,
+        },
+      });
+
+      gsap.fromTo([headingRef.current, linksRef.current], { y: 40 }, {
+        y: 0, stagger: 0.1, ease: "power2.out",
+        scrollTrigger: {
+          trigger: wrapperRef.current,
+          start: "top 60%", end: "top top", scrub: 1.2,
+        },
+      });
     }, wrapperRef);
 
     return () => {
-      clearTimeout(refreshId);
+      if (refreshId) clearTimeout(refreshId);
+      frameProgressCleanups.forEach((cleanup) => cleanup());
       ctx.revert();
     };
-  }, []);
+  }, [runtime]);
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  const scrollToTop = () => runtime?.window.scrollTo({ top: 0, behavior: "smooth" });
 
   const giantBgText     = data?.giantBgText     ?? "MIDUVA";
   const heading         = data?.heading         ?? "Ready to grow?";
@@ -273,6 +290,8 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
   const secondaryLinks  = data?.secondaryLinks?.length  ? data.secondaryLinks  : DEFAULT_SECONDARY_LINKS;
   const copyright       = data?.copyright       ?? "© 2026 Miduva. All rights reserved.";
   const createdByLabel  = data?.createdByLabel  ?? "Created by";
+  const createdByName   = data?.createdByName   ?? "Miduva";
+  const backToTopLabel  = data?.backToTopLabel  ?? "Back to top";
 
   return (
     <>
@@ -361,12 +380,13 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
 
             <div className="hidden md:flex footer-glass-pill px-6 py-3 rounded-full items-center gap-2 order-2 cursor-default border-border/50">
               <span className="text-muted-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest">{createdByLabel}</span>
-              <span className="text-foreground font-black text-xs md:text-sm tracking-normal ml-1">Miduva</span>
+              <span className="text-foreground font-black text-xs md:text-sm tracking-normal ml-1">{createdByName}</span>
             </div>
 
             <MagneticButton
               as="button"
               onClick={scrollToTop}
+              aria-label={backToTopLabel}
               className="w-12 h-12 rounded-full footer-glass-pill flex items-center justify-center text-muted-foreground hover:text-foreground group order-3 shrink-0"
             >
               <svg className="w-5 h-5 transform group-hover:-translate-y-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

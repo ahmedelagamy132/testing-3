@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getPayload } from '@/payload/utils/get-payload'
+import { addSubscriber } from '@/lib/submissions'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,29 +23,10 @@ export async function POST(request: Request) {
   const userAgent = request.headers.get('user-agent')?.slice(0, 500) ?? undefined
 
   try {
-    const payload = await getPayload()
-
-    const existing = await payload.find({
-      collection: 'subscribers',
-      where: { email: { equals: email } },
-      limit: 1,
-      depth: 0,
+    const created = await addSubscriber({ email, userAgent })
+    return NextResponse.json<{ status: Status }>({
+      status: created ? 'subscribed' : 'already',
     })
-
-    if (existing.docs.length > 0) {
-      return NextResponse.json<{ status: Status }>({ status: 'already' })
-    }
-
-    await payload.create({
-      collection: 'subscribers',
-      data: {
-        email,
-        source: 'coming-soon',
-        userAgent,
-      },
-    })
-
-    return NextResponse.json<{ status: Status }>({ status: 'subscribed' })
   } catch (err) {
     const message = err instanceof Error ? err.message : ''
     if (/unique/i.test(message)) {
