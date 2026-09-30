@@ -262,6 +262,18 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
       text('headline', 'Headline'),
       text('headlineAccent', 'Headline accent'),
       area('body', 'Intro text'),
+      {
+        kind: 'group', label: 'Free strategy call',
+        fields: [
+          text('bookingUrl', 'Calendar booking link', 'Your Cal.com (or Calendly) link, e.g. https://cal.com/miduva/strategy-call. Leave empty to send people to the form instead.'),
+          text('bookingEyebrow', 'Eyebrow'),
+          text('bookingHeadline', 'Headline'),
+          text('bookingAccent', 'Headline accent'),
+          area('bookingBody', 'Text'),
+          text('bookingCtaLabel', 'Button'),
+          text('bookingNote', 'Small print'),
+        ],
+      },
       text('infoHeadline', 'Direct contact headline'),
       area('infoBody', 'Direct contact text'),
       {

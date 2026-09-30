@@ -137,6 +137,10 @@ export interface ContactTrustStat { stat: string; label: string }
 export interface ContactServiceOption { value: string; label: string }
 export interface ContactData {
   eyebrow?: string; headline?: string; headlineAccent?: string; body?: string
+  /** Free strategy call banner (merged from the old Free Offer section). */
+  bookingUrl?: string
+  bookingEyebrow?: string; bookingHeadline?: string; bookingAccent?: string
+  bookingBody?: string; bookingCtaLabel?: string; bookingNote?: string
   infoHeadline?: string; infoBody?: string
   contactInfo?: ContactInfoRow[]
   trustStats?: ContactTrustStat[]

@@ -256,6 +256,13 @@ export const DEFAULT_SECTION_PROPS = {
     trustNote: 'No commitment · No credit card · Just real strategy',
   },
   ContactSection: {
+    bookingUrl: '',
+    bookingEyebrow: '/ free offer',
+    bookingHeadline: 'Get a free',
+    bookingAccent: 'growth strategy.',
+    bookingBody: 'A 30-minute call with a strategist. We review your channels, spot the biggest leaks and leave you with a clear plan — whether you work with us or not.',
+    bookingCtaLabel: 'Book your free call',
+    bookingNote: 'No commitment · No credit card · Just real strategy',
     eyebrow: '/ get in touch',
     headline: "Let's build something",
     headlineAccent: 'that actually works.',
@@ -307,7 +314,6 @@ const defaultData: LandingPagePuckData = {
       afterDashboard: [
         { type: 'ServicesSection', props: { id: 'services-section', ...DEFAULT_SECTION_PROPS.ServicesSection } },
         { type: 'FaqSection', props: { id: 'faq-section', ...DEFAULT_SECTION_PROPS.FaqSection } },
-        { type: 'FreeOfferSection', props: { id: 'free-offer-section', ...DEFAULT_SECTION_PROPS.FreeOfferSection } },
         { type: 'ContactSection', props: { id: 'contact-section', ...DEFAULT_SECTION_PROPS.ContactSection } },
         { type: 'FooterSection', props: { id: 'footer-section', ...DEFAULT_SECTION_PROPS.FooterSection } },
       ],

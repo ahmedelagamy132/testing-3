@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import {
   Mail,
@@ -8,11 +8,13 @@ import {
   ArrowRight,
   CheckCircle2,
   Check,
+  CalendarCheck,
 } from "lucide-react"
 import type { ContactData } from "@/lib/types"
 import { trackLead } from "@/lib/analytics"
 import { useFrameInView, useFrameIsDark } from "@/components/puck/frame-runtime"
 import { FormDots, GlobeWireframe } from "@/components/ui/globe-wireframe"
+import { BookingModal, safeBookingUrl } from "@/components/booking-modal"
 
 const EASE_FLUID  = [0.32, 0.72, 0, 1] as const
 const EASE_SMOOTH = [0.22, 1, 0.36, 1] as const
@@ -266,6 +268,20 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
   const isInView   = useFrameInView(sectionRef, { once: true, margin: "-80px" })
   const isDark     = useFrameIsDark()
 
+  const bookingUrl      = safeBookingUrl(data?.bookingUrl)
+  const bookingEyebrow  = data?.bookingEyebrow  ?? "/ free offer"
+  const bookingHeadline = data?.bookingHeadline ?? "Get a free"
+  const bookingAccent   = data?.bookingAccent   ?? "growth strategy."
+  const bookingBody     = data?.bookingBody     ?? "A 30-minute call with a strategist. We review your channels, spot the biggest leaks and leave you with a clear plan — whether you work with us or not."
+  const bookingCtaLabel = data?.bookingCtaLabel ?? "Book your free call"
+  const bookingNote     = data?.bookingNote     ?? "No commitment · No credit card · Just real strategy"
+  const [bookingOpen, setBookingOpen] = useState(false)
+  const closeBooking = useCallback(() => setBookingOpen(false), [])
+  const formRef = useRef<HTMLDivElement>(null)
+  const onBook = () => {
+    if (bookingUrl) setBookingOpen(true)
+    else formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+  }
   const eyebrow         = data?.eyebrow         ?? "/ get in touch"
   const headline        = data?.headline        ?? "Let's build something"
   const headlineAccent  = data?.headlineAccent  ?? "that actually works."
@@ -407,6 +423,36 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
 
         </div>
 
+        {/* ── Free strategy call (merged Free Offer). id="cta" keeps older "#cta" buttons landing here. ── */}
+        <motion.div
+          {...reveal(0.18, 24)}
+          id="cta"
+          className="relative mx-auto mb-14 max-w-5xl overflow-hidden rounded-[24px] p-px md:mb-16"
+          style={{ scrollMarginTop: 110, background: "linear-gradient(135deg, rgba(43,200,183,0.65) 0%, rgba(255,255,255,0.08) 35%, rgba(255,255,255,0.04) 65%, rgba(43,200,183,0.35) 100%)", boxShadow: "0 30px 80px -30px rgba(43,200,183,0.35)" }}
+        >
+          <div className="relative overflow-hidden rounded-[23px] px-6 py-9 md:px-12 md:py-11" style={{ background: "linear-gradient(140deg, #0B1A34 0%, #060F20 60%, #030812 100%)" }}>
+            <div aria-hidden className="pointer-events-none absolute -left-24 -top-32 h-[420px] w-[420px] rounded-full" style={{ background: "radial-gradient(circle, rgba(43,200,183,0.2) 0%, transparent 65%)", filter: "blur(60px)" }} />
+            <div className="relative grid items-center gap-8 md:grid-cols-12">
+              <div className="md:col-span-7">
+                <div className="mono mb-3 text-[12px] uppercase tracking-[0.22em] text-[var(--teal-500)]" data-edit-path="bookingEyebrow">{bookingEyebrow}</div>
+                <p className="text-[30px] font-extrabold leading-[1.04] tracking-[-0.04em] text-white md:text-[42px]" data-edit-path="bookingHeadline">
+                  {bookingHeadline}<br />
+                  <span className="shine" data-edit-path="bookingAccent">{bookingAccent}</span>
+                </p>
+                <p className="mt-4 max-w-[48ch] text-[15px] leading-[1.6] text-white/60" data-edit-path="bookingBody">{bookingBody}</p>
+              </div>
+              <div className="flex flex-col items-stretch gap-3 md:col-span-5 md:items-end">
+                <button type="button" onClick={onBook} className="site-btn site-btn--solid gap-2.5 md:min-w-[250px]" data-edit-path="bookingCtaLabel">
+                  <CalendarCheck style={{ width: 17, height: 17 }} strokeWidth={2} />
+                  {bookingCtaLabel}
+                </button>
+                <p className="mono text-center text-[10.5px] uppercase tracking-[0.14em] text-white/45 md:text-right" data-edit-path="bookingNote">{bookingNote}</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+        {bookingOpen && bookingUrl && <BookingModal url={bookingUrl} onClose={closeBooking} />}
+
         <div className="mx-auto grid max-w-5xl grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-14">
           {/* ── LEFT: direct contact + globe ── */}
           <motion.div {...reveal(0.25, 28)} className="flex flex-col gap-7 lg:pt-6">
@@ -474,8 +520,9 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
 
           {/* ── RIGHT: form card ── */}
           <motion.div
+            ref={formRef}
             {...reveal(0.35, 28)}
-            className="relative overflow-hidden rounded-[22px]"
+            className="relative scroll-mt-28 overflow-hidden rounded-[22px]"
             style={{
               background: isDark ? "#060E1E" : "white",
               border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "var(--line)"}`,

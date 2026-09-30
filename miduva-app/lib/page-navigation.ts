@@ -27,7 +27,8 @@ const WORKING_FOOTER_LINKS = [
   { label: 'FAQ', href: '#faq' },
 ]
 
-const RETIRED_SECTIONS = new Set(['WhyMiduvaSection', 'GrowthOsSection'])
+// Free Offer now lives inside the Contact section as the booking banner.
+const RETIRED_SECTIONS = new Set(['WhyMiduvaSection', 'GrowthOsSection', 'FreeOfferSection'])
 
 const STOCK_RIGHT_NAV = [
   { label: 'Our Work', href: '#our-work' },

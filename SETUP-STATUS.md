@@ -93,11 +93,25 @@ META_PIXEL_ID=123456789012345    # business.facebook.com → Events Manager
 3. Add `GOOGLE_SITE_VERIFICATION=that-value` to `.env`, apply (below), click **Verify**.
 4. Then **Sitemaps** → submit `https://miduva.com/sitemap.xml`.
 
-### 5. Publish blog posts
+### 5. Calendar for "Book your free call"
+The Free Offer now lives inside **Get in touch** as a "Get a free growth
+strategy" banner. Its **Book your free call** button opens your booking
+calendar in a popup — once you add the link:
+
+1. Create a free account at **cal.com** and connect your Google/Outlook calendar.
+2. Create an event type, e.g. *Strategy call*, 30 minutes, with a video link.
+3. Copy its public link (e.g. `https://cal.com/miduva/strategy-call`).
+4. In the **site editor** → *Contact* section → *Free strategy call* →
+   **Calendar booking link**, paste it and **Publish**.
+
+Until then the button scrolls visitors to the contact form. A Calendly link
+works too.
+
+### 6. Publish blog posts
 Review the four drafts at `/wp-admin` → Posts, edit, and **Publish**. The blog
 starts building search traffic only once posts are live.
 
-### 6. CRM (crm.miduva.com)
+### 7. CRM (crm.miduva.com)
 The CRM returns *403 Forbidden*: the Perfex CRM files were never uploaded to
 `perfex/html/`. Upload your Perfex package there, then ask me to finish the
 install and add HTTPS for `crm.miduva.com`.
