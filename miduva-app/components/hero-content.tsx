@@ -1,8 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import type { CSSProperties } from "react"
+import { useState, useEffect, useCallback } from "react"
+import type { CSSProperties, MouseEvent } from "react"
 import type { HeroData } from "@/lib/types"
+import { LeadModal, LEAD_MODAL_HREFS } from "@/components/lead-modal"
+import type { LeadModalKind } from "@/components/lead-modal"
 
 const DEFAULT_PHRASES = ["generate leads.", "drive sales.", "scale your business."]
 
@@ -17,10 +19,19 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
   const headline   = data?.headline    ?? "We build custom growth systems."
   const tagline    = data?.tagline     ?? "A system that learns, adapts, and accelerates your growth."
   const body       = data?.body        ?? "No generic services. We design tailored systems using ads, funnels, automation, and data — engineered end-to-end, owned by you."
-  const primaryLabel  = data?.primaryCta?.label  ?? "Get Started"
-  const primaryHref   = data?.primaryCta?.href   ?? "#contact"
-  const secondaryLabel = data?.secondaryCta?.label ?? "See Our Work"
-  const secondaryHref  = data?.secondaryCta?.href  ?? "#our-work"
+  const primaryLabel  = data?.primaryCta?.label  ?? "Let’s talk!"
+  const primaryHref   = data?.primaryCta?.href   ?? "#lets-talk"
+  const secondaryLabel = data?.secondaryCta?.label ?? "RFP"
+  const secondaryHref  = data?.secondaryCta?.href  ?? "#rfp"
+
+  const [modal, setModal] = useState<LeadModalKind | null>(null)
+  const closeModal = useCallback(() => setModal(null), [])
+  const openModalFor = (href: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+    const kind = LEAD_MODAL_HREFS[href]
+    if (!kind) return
+    e.preventDefault()
+    setModal(kind)
+  }
 
   const [idx, setIdx] = useState(0)
   const [visible, setVisible] = useState(true)
@@ -158,11 +169,12 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
             flexWrap: "wrap",
           }}
         >
-          {/* Secondary — outlined, sits first like NP Digital's "RFP" */}
+          {/* Secondary — outlined "RFP", sits first like NP Digital's */}
           <a
             href={secondaryHref}
             data-edit-path="secondaryCta"
             className="hero-btn hero-btn-secondary"
+            onClick={openModalFor(secondaryHref)}
           >
             {secondaryLabel}
           </a>
@@ -172,11 +184,14 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
             href={primaryHref}
             data-edit-path="primaryCta"
             className="hero-btn hero-btn-primary"
+            onClick={openModalFor(primaryHref)}
           >
             {primaryLabel}
           </a>
         </div>
       </div>
+
+      {modal && <LeadModal key={modal} kind={modal} onClose={closeModal} />}
 
       <style jsx>{`
         .hero-btn {

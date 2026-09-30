@@ -12,6 +12,16 @@ type ContactBody = {
   company?: unknown
   service?: unknown
   message?: unknown
+  // Hero lead modals ("RFP" / "Let's talk!") send these instead of a message.
+  form?: unknown
+  website?: unknown
+  budget?: unknown
+  phone?: unknown
+}
+
+const LEAD_FORMS: Record<string, string> = {
+  rfp: 'Request for Proposal',
+  talk: "Let's talk",
 }
 
 type Status = 'submitted' | 'invalid' | 'error'
@@ -31,9 +41,20 @@ export async function POST(request: Request) {
 
   const name = cleanText(body.name, 160)
   const email = cleanText(body.email, 254).toLowerCase()
-  const company = cleanText(body.company, 160)
-  const service = cleanText(body.service, 120)
-  const message = cleanText(body.message, 4000)
+  const company = cleanText(body.company, 160) || cleanText(body.website, 160)
+  const leadForm = typeof body.form === 'string' ? LEAD_FORMS[body.form] : undefined
+  const website = cleanText(body.website, 200)
+  const budget = cleanText(body.budget, 60)
+  const phone = cleanText(body.phone, 40)
+  const service = leadForm ?? cleanText(body.service, 120)
+  const message = leadForm
+    ? [
+        `${leadForm} request from the website hero.`,
+        `Website: ${website || '—'}`,
+        `Monthly marketing budget: ${budget || '—'}`,
+        `Phone: ${phone || '—'}`,
+      ].join('\n')
+    : cleanText(body.message, 4000)
 
   if (
     !name ||

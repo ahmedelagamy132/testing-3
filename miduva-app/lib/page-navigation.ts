@@ -102,8 +102,16 @@ export function migrateLegacyPageLinks(input: LandingPagePuckData): LandingPageP
 
     if (component.type === 'HeroSection') {
       const primaryCta = component.props.primaryCta as EditableLink | undefined
-      if (primaryCta?.label === 'Get Started' && primaryCta.href === '#get-started') {
-        primaryCta.href = '#contact'
+      if (primaryCta?.label === 'Get Started' && (primaryCta.href === '#get-started' || primaryCta.href === '#contact')) {
+        primaryCta.label = 'Let’s talk!'
+        primaryCta.href = '#lets-talk'
+      }
+      // Hero buttons now mirror NP Digital's "RFP" / "Let's talk!" pair, each
+      // opening a lead form modal. Only the stock labels are replaced.
+      const secondaryCta = component.props.secondaryCta as EditableLink | undefined
+      if (secondaryCta?.label === 'See Our Work' && secondaryCta.href === '#our-work') {
+        secondaryCta.label = 'RFP'
+        secondaryCta.href = '#rfp'
       }
     }
 
