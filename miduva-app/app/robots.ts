@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/api/'],
+      disallow: ['/admin', '/api/', '/wp-admin/', '/wp-login.php'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

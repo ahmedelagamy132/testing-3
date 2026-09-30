@@ -24,6 +24,7 @@ services:
     depends_on:
       - nextjs
       - perfex
+      - wordpress
     networks:
       - app
     restart: unless-stopped
@@ -65,6 +66,8 @@ services:
       - SITE_URL=${SITE_URL:-https://miduva.com}
       - GA_MEASUREMENT_ID=${GA_MEASUREMENT_ID:-}
       - META_PIXEL_ID=${META_PIXEL_ID:-}
+      - WORDPRESS_API_URL=http://wordpress/wp-json
+      - WP_REVALIDATE_SECRET=${WP_REVALIDATE_SECRET:-}
     volumes:
       - miduva_data:/data              # persists submissions, Puck content, and media
     networks:
@@ -84,6 +87,37 @@ services:
     restart: unless-stopped
 
   # ── MySQL (Perfex database only) ──────────────────────────────────────────
+  # ── WordPress (headless blog CMS) ──────────────────────────────────────────
+  # Editors use miduva.com/wp-admin; nginx routes only WordPress paths here.
+  # The public /blog pages are rendered by Next.js from the REST API.
+  wordpress:
+    image: wordpress:6-php8.3-apache
+    environment:
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DB_USER=wordpress
+      - WORDPRESS_DB_PASSWORD=${WP_DB_PASSWORD:?WP_DB_PASSWORD is required}
+      - WP_REVALIDATE_SECRET=${WP_REVALIDATE_SECRET:-}
+      - |
+        WORDPRESS_CONFIG_EXTRA=
+        define('WP_HOME', 'https://miduva.com');
+        define('WP_SITEURL', 'https://miduva.com');
+        if (($$_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https') { $$_SERVER['HTTPS'] = 'on'; }
+        define('FORCE_SSL_ADMIN', true);
+        define('DISALLOW_FILE_EDIT', true);
+        define('WP_POST_REVISIONS', 20);
+        define('AUTOMATIC_UPDATER_DISABLED', false);
+        define('WP_AUTO_UPDATE_CORE', 'minor');
+    volumes:
+      - wp_data:/var/www/html
+      - ./wordpress/mu-plugins:/var/www/html/wp-content/mu-plugins:ro
+      - ./wordpress/php.ini:/usr/local/etc/php/conf.d/miduva.ini:ro
+    depends_on:
+      - mysql
+    networks:
+      - app
+    restart: unless-stopped
+
   mysql:
     image: mysql:8.0
     environment:
@@ -100,7 +134,8 @@ services:
 # ── Volumes ───────────────────────────────────────────────────────────────────
 volumes:
   miduva_data:     # Next.js SQLite database and Puck media
-  mysql_data:      # Perfex MySQL data
+  mysql_data:      # Perfex + WordPress MySQL data
+  wp_data:         # WordPress core, plugins and uploaded media
   certbot_www:     # Let's Encrypt ACME challenge webroot
   certbot_conf:    # Let's Encrypt certificates
 

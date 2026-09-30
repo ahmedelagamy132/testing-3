@@ -42,6 +42,7 @@ export const DEFAULT_ROOT_PROPS = {
     ],
     rightLinks: [
       { label: 'Our Work', href: '#our-work' },
+      { label: 'Blog', href: '/blog' },
       { label: 'About', href: '#parallax' },
       { label: 'Get Started', href: '#contact' },
     ],

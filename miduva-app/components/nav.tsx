@@ -12,6 +12,7 @@ const DEFAULT_LEFT = [
 ]
 const DEFAULT_RIGHT = [
   { n: "Our Work",     h: "#our-work"    },
+  { n: "Blog",         h: "/blog"        },
   { n: "About",        h: "#parallax"    },
   { n: "Get Started",  h: "#contact"     },
 ]
@@ -23,10 +24,12 @@ interface NavProps {
   heroRevealed?: boolean
   data?: NavData
   branding?: BrandingData
+  /** Where the logo points. The landing page scrolls to its hero; other pages link home. */
+  homeHref?: string
 }
 
 const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
-  { theme, setTheme, heroRevealed = true, data, branding },
+  { theme, setTheme, heroRevealed = true, data, branding, homeHref = "#hero" },
   ref,
 ) {
   const [scrolled, setScrolled] = useState(false)
@@ -108,7 +111,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
             ))}
           </ul>
 
-          <a href="#hero" onClick={(e) => handleNavClick(e, "#hero")} className="flex items-center justify-center" aria-label={`${logoAlt} home`}>
+          <a href={homeHref} onClick={(e) => handleNavClick(e, homeHref)} className="flex items-center justify-center" aria-label={`${logoAlt} home`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={logoSrc} alt={logoAlt} className="h-7 w-auto" data-edit-scope="branding" data-edit-path={useWhite ? "logoLightUrl" : "logoDarkUrl"} />
           </a>
@@ -147,7 +150,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
         </div>
 
         <div className="lg:hidden flex items-center justify-between px-5 py-3">
-          <a href="#hero" onClick={(e) => handleNavClick(e, "#hero")} className="flex items-center" aria-label={`${logoAlt} home`}>
+          <a href={homeHref} onClick={(e) => handleNavClick(e, homeHref)} className="flex items-center" aria-label={`${logoAlt} home`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={logoSrc} alt={logoAlt} className="h-7 w-auto" data-edit-scope="branding" data-edit-path={useWhite ? "logoLightUrl" : "logoDarkUrl"} />
           </a>

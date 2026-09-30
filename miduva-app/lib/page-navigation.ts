@@ -27,6 +27,12 @@ const WORKING_FOOTER_LINKS = [
   { label: 'FAQ', href: '#faq' },
 ]
 
+const STOCK_RIGHT_NAV = [
+  { label: 'Our Work', href: '#our-work' },
+  { label: 'About', href: '#why-miduva' },
+  { label: 'Get Started', href: '#contact' },
+]
+
 function anchorId(href: string) {
   if (!href.startsWith('#')) return null
   try {
@@ -84,6 +90,13 @@ export function migrateLegacyPageLinks(input: LandingPagePuckData): LandingPageP
     (link) => link.label === 'Get Started' && link.href === '#cta',
   )
   if (getStartedNavLink) getStartedNavLink.href = '#contact'
+
+  // Add the blog to the stock right-hand nav. A menu the editor has customised
+  // is left alone.
+  const aboutOnParallax = STOCK_RIGHT_NAV.map((link) => (link.href === '#why-miduva' ? { ...link, href: '#parallax' } : link))
+  if (rootProps?.nav && (matchesLinks(rootProps.nav.rightLinks, STOCK_RIGHT_NAV) || matchesLinks(rootProps.nav.rightLinks, aboutOnParallax))) {
+    rootProps.nav.rightLinks!.splice(1, 0, { label: 'Blog', href: '/blog' })
+  }
 
   // The Why Miduva section was retired; drop it from saved pages and point
   // the About link at the Miduva Difference (parallax) section instead.
