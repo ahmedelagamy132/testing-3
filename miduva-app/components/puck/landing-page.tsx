@@ -96,10 +96,14 @@ const SECTIONS: Record<SectionType, { anchor: string; render: (data: any) => Rea
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
+// Sections shown on a bright background to break up the dark page.
+const LIGHT_SECTIONS = new Set<SectionType>(["ProblemSolutionSection", "HowItWorksSection", "ServicesSection"])
+
 function Section({ section }: { section: SectionEntry }) {
   const definition = SECTIONS[section.type]
+  const light = LIGHT_SECTIONS.has(section.type)
   return (
-    <div id={`anchor-${definition.anchor}`} className="preview-anchor" data-edit-section={section.id}>
+    <div id={`anchor-${definition.anchor}`} className={`preview-anchor${light ? " theme-light" : ""}`} data-edit-section={section.id}>
       {definition.render(section.props)}
     </div>
   )
