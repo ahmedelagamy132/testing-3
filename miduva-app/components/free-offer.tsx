@@ -6,12 +6,6 @@ import { CalendarCheck, ArrowRight } from "lucide-react"
 import type { FreeOfferData } from "@/lib/types"
 import { useFrameInView, useFrameIsDark } from "@/components/puck/frame-runtime"
 
-const DEFAULT_INCLUDES = [
-  "Full Business Audit",
-  "Custom Growth Plan",
-  "Expert Recommendations",
-]
-
 export default function FreeOffer({ theme, data }: { theme?: "dark" | "light"; data?: FreeOfferData }) {
   const sectionRef = useRef<HTMLDivElement>(null)
   const isInView = useFrameInView(sectionRef, { once: true, margin: "-80px" })
@@ -22,7 +16,6 @@ export default function FreeOffer({ theme, data }: { theme?: "dark" | "light"; d
   const headlineLine1  = data?.headlineLine1  ?? "Get a Free"
   const headlineAccent = data?.headlineAccent ?? "Growth Strategy"
   const headlineLine3  = data?.headlineLine3  ?? "for Your Business."
-  const includes       = data?.includes?.length ? data.includes : DEFAULT_INCLUDES
   const ctaLabel       = data?.ctaLabel       ?? "Book Your Free Call"
   const ctaHref        = data?.ctaHref        ?? "#contact"
   const trustNote      = data?.trustNote      ?? "No commitment · No credit card · Just real strategy"
@@ -122,7 +115,7 @@ export default function FreeOffer({ theme, data }: { theme?: "dark" | "light"; d
             letterSpacing: "-0.04em",
             color: "var(--ink)",
             lineHeight: 1.02,
-            margin: "0 0 32px",
+            margin: "0 0 48px",
           }}
           initial={{ opacity: 0, y: 36 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 36 }}
@@ -132,51 +125,6 @@ export default function FreeOffer({ theme, data }: { theme?: "dark" | "light"; d
           <span className="shine" data-edit-path="headlineAccent">{headlineAccent}</span><br />
           {headlineLine3}
         </motion.h2>
-
-        {/* Include chips */}
-        <motion.div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            flexWrap: "wrap",
-            gap: 10,
-            marginBottom: 52,
-          }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.55, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {includes.map((label, index) => (
-            <div
-              key={label}
-              data-edit-path={`includes.${index}`}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "9px 18px",
-                borderRadius: 100,
-                background: isDark ? "rgba(43,200,183,0.08)" : "var(--card)",
-                border: isDark ? "1px solid rgba(43,200,183,0.25)" : "1px solid var(--line)",
-                fontSize: 13,
-                fontWeight: 500,
-                color: isDark ? "rgba(240,244,255,0.78)" : "var(--ink)",
-              }}
-            >
-              <span
-                style={{
-                  width: 7,
-                  height: 7,
-                  borderRadius: "50%",
-                  background: "var(--teal-500)",
-                  flexShrink: 0,
-                  display: "block",
-                }}
-              />
-              {label}
-            </div>
-          ))}
-        </motion.div>
 
         {/* CTA group */}
         <motion.div

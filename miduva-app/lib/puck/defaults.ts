@@ -306,7 +306,6 @@ const defaultData: LandingPagePuckData = {
       ],
       afterDashboard: [
         { type: 'ServicesSection', props: { id: 'services-section', ...DEFAULT_SECTION_PROPS.ServicesSection } },
-        { type: 'GrowthOsSection', props: { id: 'growth-os-section', ...DEFAULT_SECTION_PROPS.GrowthOsSection } },
         { type: 'FaqSection', props: { id: 'faq-section', ...DEFAULT_SECTION_PROPS.FaqSection } },
         { type: 'FreeOfferSection', props: { id: 'free-offer-section', ...DEFAULT_SECTION_PROPS.FreeOfferSection } },
         { type: 'ContactSection', props: { id: 'contact-section', ...DEFAULT_SECTION_PROPS.ContactSection } },

@@ -26,7 +26,7 @@ interface AppWrapperProps {
 
 const DEFAULT_ORDER: SectionId[] = [
   "hero", "systems", "problem-solution", "how-it-works", "results",
-  "our-work", "parallax", "dashboard", "services", "growth-os",
+  "our-work", "parallax", "dashboard", "services",
   "faq", "free-offer", "contact", "footer",
 ]
 

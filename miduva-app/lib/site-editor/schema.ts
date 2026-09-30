@@ -249,7 +249,6 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
       text('headlineLine1', 'Headline line 1'),
       text('headlineAccent', 'Headline accent'),
       text('headlineLine3', 'Headline line 3'),
-      strings('includes', 'What’s included'),
       text('ctaLabel', 'Button label'),
       text('ctaHref', 'Button link'),
       text('trustNote', 'Trust note'),

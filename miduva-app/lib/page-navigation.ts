@@ -27,6 +27,8 @@ const WORKING_FOOTER_LINKS = [
   { label: 'FAQ', href: '#faq' },
 ]
 
+const RETIRED_SECTIONS = new Set(['WhyMiduvaSection', 'GrowthOsSection'])
+
 const STOCK_RIGHT_NAV = [
   { label: 'Our Work', href: '#our-work' },
   { label: 'About', href: '#why-miduva' },
@@ -98,12 +100,12 @@ export function migrateLegacyPageLinks(input: LandingPagePuckData): LandingPageP
     rootProps.nav.rightLinks!.splice(1, 0, { label: 'Blog', href: '/blog' })
   }
 
-  // The Why Miduva section was retired; drop it from saved pages and point
-  // the About link at the Miduva Difference (parallax) section instead.
+  // Retired sections (Why Miduva, Growth OS) are dropped from saved pages, and
+  // the About link points at the Miduva Difference (parallax) section instead.
   if (rootProps) {
     for (const zone of ['beforeDashboard', 'afterDashboard'] as const) {
       const sections = rootProps[zone]
-      if (sections) rootProps[zone] = sections.filter((section) => section.type !== 'WhyMiduvaSection') as typeof sections
+      if (sections) rootProps[zone] = sections.filter((section) => !RETIRED_SECTIONS.has(String(section.type))) as typeof sections
     }
     for (const link of [...(rootProps.nav?.leftLinks ?? []), ...(rootProps.nav?.rightLinks ?? [])]) {
       if (link.href === '#why-miduva') link.href = '#parallax'
