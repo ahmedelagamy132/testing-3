@@ -58,6 +58,7 @@
 .ve-button.is-publish:disabled { background: rgba(255,255,255,.12); color: #8193ad; opacity: 1; }
 .ve-button.is-ghost { border-color: rgba(255,255,255,.2); background: transparent; color: #d7e2f1; }
 .ve-button.is-ghost:hover:not(:disabled) { border-color: #fda4af; color: #fecdd3; }
+.ve-button.is-ghost.is-link:hover:not(:disabled) { border-color: #2bc8b7; color: #8ee5db; }
 .ve-icon-button { display: inline-grid; width: 30px; height: 30px; flex: none; place-items: center; border: 0; border-radius: 7px; background: transparent; color: var(--ve-muted); cursor: pointer; }
 .ve-icon-button:hover:not(:disabled) { background: var(--ve-soft); color: var(--ve-ink); }
 .ve-icon-button:disabled { opacity: .3; cursor: not-allowed; }

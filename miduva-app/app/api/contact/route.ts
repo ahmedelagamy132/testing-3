@@ -26,6 +26,17 @@ const LEAD_FORMS: Record<string, string> = {
 
 type Status = 'submitted' | 'invalid' | 'error'
 
+/** The page the form was sent from (same-origin Referer), e.g. "/" or "/blog/some-post". */
+function pagePath(request: Request) {
+  const referer = request.headers.get('referer')
+  if (!referer) return undefined
+  try {
+    return new URL(referer).pathname.slice(0, 200)
+  } catch {
+    return undefined
+  }
+}
+
 function cleanText(value: unknown, maxLength: number) {
   return typeof value === 'string' ? value.trim().slice(0, maxLength) : ''
 }
@@ -47,9 +58,11 @@ export async function POST(request: Request) {
   const budget = cleanText(body.budget, 60)
   const phone = cleanText(body.phone, 40)
   const service = leadForm ?? cleanText(body.service, 120)
+  const formType = body.form === 'rfp' || body.form === 'talk' ? body.form : 'contact'
+  const page = pagePath(request)
   const message = leadForm
     ? [
-        `${leadForm} request from the website hero.`,
+        `${leadForm} request from ${page ?? 'the website'}.`,
         `Website: ${website || '—'}`,
         `Monthly marketing budget: ${budget || '—'}`,
         `Phone: ${phone || '—'}`,
@@ -76,6 +89,11 @@ export async function POST(request: Request) {
       company,
       service,
       message,
+      phone,
+      website,
+      budget,
+      formType,
+      page,
       userAgent,
     })
 

@@ -16,13 +16,18 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ["400", "500"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  applicationName: SITE_NAME,
-  title: "Miduva — We Build Custom Growth Systems",
-  description:
-    "No generic services. We design tailored systems using ads, funnels, automation & data to grow your business — engineered end-to-end, owned by you.",
-};
+// Read per request so the Search Console code can be set in .env without a rebuild.
+export async function generateMetadata(): Promise<Metadata> {
+  const google = process.env.GOOGLE_SITE_VERIFICATION?.trim();
+  return {
+    metadataBase: new URL(SITE_URL),
+    applicationName: SITE_NAME,
+    title: "Miduva — We Build Custom Growth Systems",
+    description:
+      "No generic services. We design tailored systems using ads, funnels, automation & data to grow your business — engineered end-to-end, owned by you.",
+    ...(google && /^[\w-]+$/.test(google) ? { verification: { google } } : {}),
+  };
+}
 
 export default function SiteLayout({
   children,

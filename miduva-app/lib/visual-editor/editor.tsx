@@ -365,6 +365,7 @@ export function VisualEditor({ config, backend, initialContent, publishedContent
             <button type="button" className="ve-icon-button is-dark" aria-label="Undo" title="Undo (Ctrl+Z)" disabled={!undoStack.past.length} onClick={undo}><Icon name="undo" /></button>
             <button type="button" className="ve-icon-button is-dark" aria-label="Redo" title="Redo (Ctrl+Shift+Z)" disabled={!undoStack.future.length} onClick={redo}><Icon name="redo" /></button>
             {backend.listHistory ? <button type="button" className="ve-icon-button is-dark" aria-label="Earlier versions" title="Earlier versions" onClick={() => void openHistory()}><Icon name="history" /></button> : null}
+            {config.links?.map((link) => <a key={link.href} className="ve-button is-ghost is-link" href={link.href}>{link.label}</a>)}
             {config.liveUrl ? <a className="ve-icon-button is-dark" href={config.liveUrl} target="_blank" rel="noreferrer" aria-label="Open live site" title="Open live site"><Icon name="external" /></a> : null}
             {backend.signOut ? <button type="button" className="ve-icon-button is-dark" aria-label="Sign out" title="Sign out" onClick={() => void backend.signOut!()}><Icon name="logout" /></button> : null}
             {hasUnpublished ? <button type="button" className="ve-button is-ghost" onClick={discard}>Discard</button> : null}

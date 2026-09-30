@@ -66,6 +66,7 @@ services:
       - SITE_URL=${SITE_URL:-https://miduva.com}
       - GA_MEASUREMENT_ID=${GA_MEASUREMENT_ID:-}
       - META_PIXEL_ID=${META_PIXEL_ID:-}
+      - GOOGLE_SITE_VERIFICATION=${GOOGLE_SITE_VERIFICATION:-}
       - WORDPRESS_API_URL=http://wordpress/wp-json
       - WP_REVALIDATE_SECRET=${WP_REVALIDATE_SECRET:-}
     volumes:

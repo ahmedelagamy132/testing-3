@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 
-export function PuckLoginForm({ configured }: { configured: boolean }) {
+export function PuckLoginForm({ configured, next = "/admin" }: { configured: boolean; next?: string }) {
   const router = useRouter()
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -23,7 +23,7 @@ export function PuckLoginForm({ configured }: { configured: boolean }) {
       })
       const result = (await response.json()) as { error?: string }
       if (!response.ok) throw new Error(result.error || "Could not sign in")
-      router.replace("/admin")
+      router.replace(next)
       router.refresh()
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Could not sign in")

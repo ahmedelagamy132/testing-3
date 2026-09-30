@@ -15,6 +15,7 @@ const config = defineEditor({
   settings: { label: "Site settings", description: "Logo, menu, search & sharing", fields: SETTINGS_SCHEMA },
   previewUrl: "/admin/preview",
   liveUrl: "/",
+  links: [{ label: "Leads", href: "/admin/leads" }],
 })
 
 export function SiteEditor({ draft, published, version }: { draft: LandingContent; published: LandingContent; version: number }) {

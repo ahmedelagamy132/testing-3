@@ -70,6 +70,8 @@ export type EditorConfig = {
   previewUrl: string
   /** Link for the "open live site" button. */
   liveUrl?: string
+  /** Extra admin pages linked from the top bar, e.g. a leads inbox. */
+  links?: { label: string; href: string }[]
   /** Preview widths. Defaults to desktop 1440 / tablet 820 / mobile 390. */
   devices?: { id: string; label: string; width: number; icon?: 'desktop' | 'tablet' | 'mobile' }[]
 }

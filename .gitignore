@@ -13,3 +13,4 @@ studio-hello-world/
 # Local backups and bulky exports — keep out of git
 artifacts/
 miduva-website-components.zip
+backups/
