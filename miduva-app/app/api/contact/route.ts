@@ -39,7 +39,6 @@ export async function POST(request: Request) {
     !name ||
     !email ||
     !EMAIL_RE.test(email) ||
-    !service ||
     !message ||
     message.length < 20
   ) {

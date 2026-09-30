@@ -18,7 +18,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
   const tagline    = data?.tagline     ?? "A system that learns, adapts, and accelerates your growth."
   const body       = data?.body        ?? "No generic services. We design tailored systems using ads, funnels, automation, and data — engineered end-to-end, owned by you."
   const primaryLabel  = data?.primaryCta?.label  ?? "Get Started"
-  const primaryHref   = data?.primaryCta?.href   ?? "#get-started"
+  const primaryHref   = data?.primaryCta?.href   ?? "#contact"
   const secondaryLabel = data?.secondaryCta?.label ?? "See Our Work"
   const secondaryHref  = data?.secondaryCta?.href  ?? "#our-work"
 
@@ -66,6 +66,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
       <div className="hero-content-wrapper" style={{ maxWidth: "clamp(280px, 42vw, 620px)" }}>
         <h1
           className="hero-headline"
+          data-edit-path="headline"
           style={{
             fontFamily:
               "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
@@ -83,6 +84,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
 
         <p
           className="hero-subline"
+          data-edit-path="phrasePrefix"
           style={{
             fontFamily:
               "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
@@ -98,6 +100,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
           {phrasePrefix}{" "}
           <span
             className={`phrase-wrap inline-block ${visible ? "p-in" : "p-out"}`}
+            data-edit-path={`phrases.${idx}`}
             style={{ color: theme === "dark" ? "rgba(255,255,255,0.9)" : "var(--navy-700)" }}
           >
             {phrases[idx]}
@@ -115,6 +118,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
 
         <p
           className="hero-tagline"
+          data-edit-path="tagline"
           style={{
             fontFamily:
               "var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, monospace",
@@ -132,6 +136,7 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
 
         <p
           className="hero-body"
+          data-edit-path="body"
           style={{
             fontSize: "clamp(12px, 0.9vw, 14px)",
             lineHeight: 1.75,
@@ -149,78 +154,61 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
           style={{
             marginTop: "clamp(24px, 4vh, 44px)",
             display: "flex",
-            gap: 14,
+            gap: "clamp(16px, 2.4vw, 40px)",
             flexWrap: "wrap",
           }}
         >
-          {/* Primary */}
-          <a
-            href={primaryHref}
-            className="hero-btn-primary"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "clamp(10px,1.1vh,14px) clamp(20px,2vw,32px)",
-              borderRadius: 999,
-              background: "linear-gradient(135deg, #00d4ff 0%, #0066ff 100%)",
-              color: "#fff",
-              fontFamily:
-                "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
-              fontWeight: 600,
-              fontSize: "clamp(13px, 0.95vw, 15px)",
-              letterSpacing: "-0.01em",
-              textDecoration: "none",
-              boxShadow: "0 0 28px rgba(0,180,255,0.35)",
-              transition: "transform 0.18s ease, box-shadow 0.18s ease",
-            }}
-          >
-            {primaryLabel}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </a>
-
-          {/* Secondary */}
+          {/* Secondary — outlined, sits first like NP Digital's "RFP" */}
           <a
             href={secondaryHref}
-            className="hero-btn-secondary"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "clamp(10px,1.1vh,14px) clamp(20px,2vw,32px)",
-              borderRadius: 999,
-              background: theme === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)",
-              border: theme === "dark" ? "1px solid rgba(255,255,255,0.18)" : "1px solid var(--line)",
-              color: theme === "dark" ? "rgba(255,255,255,0.85)" : "var(--navy-700)",
-              fontFamily:
-                "var(--font-jakarta), ui-sans-serif, system-ui, sans-serif",
-              fontWeight: 500,
-              fontSize: "clamp(13px, 0.95vw, 15px)",
-              letterSpacing: "-0.01em",
-              textDecoration: "none",
-              backdropFilter: "blur(8px)",
-              transition: "background 0.18s ease, border-color 0.18s ease, transform 0.18s ease",
-            }}
+            data-edit-path="secondaryCta"
+            className="hero-btn hero-btn-secondary"
           >
             {secondaryLabel}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
+          </a>
+
+          {/* Primary — solid fill */}
+          <a
+            href={primaryHref}
+            data-edit-path="primaryCta"
+            className="hero-btn hero-btn-primary"
+          >
+            {primaryLabel}
           </a>
         </div>
       </div>
 
       <style jsx>{`
+        .hero-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: clamp(120px, 10vw, 150px);
+          padding: clamp(14px, 1.6vh, 20px) clamp(28px, 2.6vw, 44px);
+          border-radius: 0;
+          font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+          font-weight: 500;
+          font-size: clamp(15px, 1.15vw, 19px);
+          letter-spacing: -0.01em;
+          line-height: 1;
+          text-decoration: none;
+          color: #fff;
+          transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+        }
+        .hero-btn-primary {
+          background: #0066ff;
+          border: 1px solid #0066ff;
+        }
         .hero-btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 0 42px rgba(0, 180, 255, 0.55);
+          background: #1f7bff;
+          border-color: #1f7bff;
+        }
+        .hero-btn-secondary {
+          background: transparent;
+          border: 1px solid #0066ff;
         }
         .hero-btn-secondary:hover {
-          background: var(--btn-secondary-hover-bg);
-          border-color: var(--btn-secondary-hover-border);
-          transform: translateY(-2px);
+          background: rgba(0, 102, 255, 0.14);
         }
         @media (max-width: 768px) {
           .hero-section {
@@ -265,9 +253,9 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
           }
           .hero-cta-group {
             justify-content: center !important;
-            flex-direction: column !important;
+            flex-direction: column-reverse !important;
             flex-wrap: nowrap !important;
-            gap: 8px !important;
+            gap: 10px !important;
             width: min(100%, 300px) !important;
             margin: 16px auto 0 !important;
           }
@@ -277,13 +265,9 @@ export default function HeroContent({ theme = "dark", data }: HeroContentProps) 
             flex: 0 0 auto !important;
             justify-content: center;
             min-width: 0;
-            min-height: 42px;
-            padding: 10px 16px !important;
-            font-size: 13px !important;
-          }
-          .hero-btn-secondary {
-            background: rgba(255, 255, 255, 0.085) !important;
-            border-color: rgba(255, 255, 255, 0.22) !important;
+            min-height: 46px;
+            padding: 12px 16px !important;
+            font-size: 15px !important;
           }
         }
         @media (max-width: 380px) {

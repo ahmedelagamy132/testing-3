@@ -67,7 +67,7 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                   <span className="h-2.5 w-2.5 rounded-full bg-[#FF6159]" />
                   <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
                   <span className="h-2.5 w-2.5 rounded-full bg-[#28C940]" />
-                  <div className="ml-4 mono text-[11px] text-[var(--muted)] flex items-center gap-2">
+                  <div className="ml-4 mono text-[11px] text-[var(--muted)] flex items-center gap-2" data-edit-path="urlLabel">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <rect x="3" y="11" width="18" height="10" rx="2"/>
                       <path d="M7 11V7a5 5 0 1 1 10 0v4"/>
@@ -75,11 +75,11 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                     {urlLabel}
                   </div>
                   <div className="ml-auto flex items-center gap-2 mono text-[10px] text-[var(--muted)]">
-                    <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1.5" data-edit-path="statusLabel">
                       <span className="h-1.5 w-1.5 rounded-full bg-[var(--teal-500)]" />
                       {statusLabel}
                     </span>
-                    <span className="hidden sm:inline">· {syncLabel}</span>
+                    <span className="hidden sm:inline" data-edit-path="syncLabel">· {syncLabel}</span>
                   </div>
                 </div>
 
@@ -88,10 +88,11 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                   {/* Sidebar */}
                   <aside className="hidden md:block col-span-2 border-r border-[var(--line)] bg-[var(--card-2)] p-4 space-y-4">
                     <div>
-                      <div className="mono text-[9px] uppercase tracking-[0.14em] text-[var(--muted)] mb-2">{systemLabel}</div>
+                      <div className="mono text-[9px] uppercase tracking-[0.14em] text-[var(--muted)] mb-2" data-edit-path="systemLabel">{systemLabel}</div>
                       {navItems.map((n, i) => (
                         <div
                           key={n}
+                          data-edit-path={`navItems.${i}`}
                           className={`flex items-center gap-2 text-[12px] py-1.5 px-2 rounded-md ${
                             i === 0
                               ? "bg-[var(--card)] text-[var(--navy-900)] font-semibold border border-[var(--line)]"
@@ -104,7 +105,7 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                       ))}
                     </div>
                     <div className="pt-3 border-t border-[var(--line)]">
-                      <div className="mono text-[9px] uppercase tracking-[0.14em] text-[var(--muted)] mb-2">{clientsLabel}</div>
+                      <div className="mono text-[9px] uppercase tracking-[0.14em] text-[var(--muted)] mb-2" data-edit-path="clientsLabel">{clientsLabel}</div>
                       <div className="space-y-1.5 text-[11px] text-[var(--muted)]">
                         {clients.map((c, i) => {
                           const tone = i % 3 === 0
@@ -113,7 +114,7 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                               ? "bg-[var(--navy-700)]/10 text-[var(--navy-700)]"
                               : "bg-[#F5B84C]/20 text-[#C17A00]"
                           return (
-                            <div key={c.name} className="flex items-center gap-2">
+                            <div key={c.name} className="flex items-center gap-2" data-edit-path={`clients.${i}`}>
                               <span className={`h-4 w-4 rounded-md ${tone} text-[8px] font-bold flex items-center justify-center`}>{c.initials}</span>
                               {c.name}
                             </div>
@@ -127,13 +128,14 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                   <section className="col-span-12 md:col-span-10 p-5 lg:p-6">
                     <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
                       <div>
-                        <div className="mono text-[10px] uppercase tracking-[0.14em] text-[var(--muted)]">{eyebrow}</div>
-                        <div className="text-[19px] font-bold text-[var(--navy-900)] tracking-tight">{title}</div>
+                        <div className="mono text-[10px] uppercase tracking-[0.14em] text-[var(--muted)]" data-edit-path="eyebrow">{eyebrow}</div>
+                        <div className="text-[19px] font-bold text-[var(--navy-900)] tracking-tight" data-edit-path="title">{title}</div>
                       </div>
                       <div className="flex items-center gap-2">
                         {rangeLabels.map((t, i) => (
                           <button
                             key={t}
+                            data-edit-path={`rangeLabels.${i}`}
                             className={`text-[11px] mono px-2.5 py-1 rounded-md border ${
                               i === activeRangeIndex
                                 ? "bg-[var(--navy-700)] text-[var(--card)] border-[var(--navy-700)]"
@@ -148,7 +150,7 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
 
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
                       {kpis.map((k, i) => (
-                        <div key={i} className="rounded-xl border border-[var(--line)] bg-[var(--card)] p-3">
+                        <div key={i} className="rounded-xl border border-[var(--line)] bg-[var(--card)] p-3" data-edit-path={`kpis.${i}`}>
                           <div className="flex items-center justify-between">
                             <div className="mono text-[10px] uppercase tracking-[0.12em] text-[var(--muted)]">{k.label}</div>
                             <span className={`text-[10px] mono px-1.5 py-0.5 rounded ${k.color === "teal" ? "bg-[var(--teal-50)] text-[var(--teal-500)]" : "bg-[var(--navy-900)]/5 text-[var(--navy-700)]"}`}>
@@ -171,12 +173,12 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                       <div className="lg:col-span-3 rounded-xl border border-[var(--line)] bg-[var(--card)] p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div>
-                            <div className="text-[13px] font-semibold text-[var(--navy-900)]">{chartTitle}</div>
-                            <div className="mono text-[10px] text-[var(--muted)]">{chartSubtitle}</div>
+                            <div className="text-[13px] font-semibold text-[var(--navy-900)]" data-edit-path="chartTitle">{chartTitle}</div>
+                            <div className="mono text-[10px] text-[var(--muted)]" data-edit-path="chartSubtitle">{chartSubtitle}</div>
                           </div>
                           <div className="flex items-center gap-3 text-[10px] mono text-[var(--muted)]">
                             {chartLegend.slice(0, 3).map((label, i) => (
-                              <span key={`${label}-${i}`} className="inline-flex items-center gap-1">
+                              <span key={`${label}-${i}`} className="inline-flex items-center gap-1" data-edit-path={`chartLegend.${i}`}>
                                 <span className={`h-1.5 w-2.5 rounded-sm ${i === 0 ? "bg-[var(--teal-500)]" : i === 1 ? "bg-[var(--navy-700)]" : "bg-[var(--teal-300)]"}`}/>{label}
                               </span>
                             ))}
@@ -184,7 +186,7 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                         </div>
                         <div ref={chartRef} className="relative h-36 flex items-stretch gap-1.5 pl-6">
                           <div className="absolute left-0 inset-y-0 flex flex-col justify-between mono text-[9px] text-[var(--muted)] py-1">
-                            {chartAxisLabels.slice(0, 4).map((label, i) => <span key={`${label}-${i}`}>{label}</span>)}
+                            {chartAxisLabels.slice(0, 4).map((label, i) => <span key={`${label}-${i}`} data-edit-path={`chartAxisLabels.${i}`}>{label}</span>)}
                           </div>
                           <div className="absolute inset-0 left-6 pointer-events-none flex flex-col justify-between py-1">
                             {[0, 1, 2, 3].map((i) => <div key={i} className="h-px bg-[var(--line)]"/>)}
@@ -192,6 +194,7 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                           {chartValues.map((h, i) => (
                             <div
                               key={i}
+                              data-edit-path={`chartValues.${i}`}
                               className={`relative flex-1 flex flex-col justify-end gap-px ${chartVisible ? "bar-grow" : ""}`}
                               style={{ animationDelay: `${0.6 + i * 0.05}s` }}
                             >
@@ -202,8 +205,8 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                           ))}
                         </div>
                         <div className="mt-2 pl-6 flex justify-between mono text-[9px] text-[var(--muted)]">
-                          {chartWeekLabels.slice(0, chartValues.length).map((w) => (
-                            <span key={w}>{w}</span>
+                          {chartWeekLabels.slice(0, chartValues.length).map((w, i) => (
+                            <span key={w} data-edit-path={`chartWeekLabels.${i}`}>{w}</span>
                           ))}
                         </div>
                       </div>
@@ -211,12 +214,12 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                       {/* Funnel */}
                       <div className="lg:col-span-2 rounded-xl border border-[var(--line)] bg-[var(--card)] p-4">
                         <div className="flex items-center justify-between mb-3">
-                          <div className="text-[13px] font-semibold text-[var(--navy-900)]">{funnelTitle}</div>
-                          <span className="mono text-[10px] text-[var(--teal-500)] bg-[var(--teal-50)] px-1.5 py-0.5 rounded">{optimizedLabel}</span>
+                          <div className="text-[13px] font-semibold text-[var(--navy-900)]" data-edit-path="funnelTitle">{funnelTitle}</div>
+                          <span className="mono text-[10px] text-[var(--teal-500)] bg-[var(--teal-50)] px-1.5 py-0.5 rounded" data-edit-path="optimizedLabel">{optimizedLabel}</span>
                         </div>
                         <div className="space-y-2.5">
                           {funnelStages.map((s, i) => (
-                            <div key={i}>
+                            <div key={i} data-edit-path={`funnelStages.${i}`}>
                               <div className="flex items-center justify-between text-[11px]">
                                 <span className="text-[var(--muted)]">{s.name}</span>
                                 <span className="mono text-[var(--navy-900)] font-semibold">{s.value}</span>
@@ -228,12 +231,12 @@ export default function Dashboard({ data }: { data?: DashboardData } = {}) {
                           ))}
                         </div>
                         <div className="mt-4 pt-3 border-t border-dashed border-[var(--line)] flex items-center justify-between">
-                          <div className="text-[11px] text-[var(--muted)]">{automationLabel}</div>
+                          <div className="text-[11px] text-[var(--muted)]" data-edit-path="automationLabel">{automationLabel}</div>
                           <div className="flex items-center gap-1">
                             {[1, 1, 1, 1, 0.4].map((v, i) => (
                               <span key={i} className="h-3 w-1.5 rounded-sm" style={{ background: `rgba(43,200,183,${v})` }}/>
                             ))}
-                            <span className="mono text-[10px] text-[var(--muted)] ml-1">{automationHealth}%</span>
+                            <span className="mono text-[10px] text-[var(--muted)] ml-1" data-edit-path="automationHealth">{automationHealth}%</span>
                           </div>
                         </div>
                       </div>

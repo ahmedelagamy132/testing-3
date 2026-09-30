@@ -1,17 +1,21 @@
 import type { Metadata } from 'next'
 import { PublicLandingPage } from '@/components/puck/public-landing-page'
 import { getPublishedLandingPageData } from '@/lib/puck/storage'
+import { contentFromDocument } from '@/lib/site-editor/content'
+import { buildLandingJsonLd, buildLandingMetadata, JsonLd } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const data = await getPublishedLandingPageData()
-  return {
-    title: data.root.props?.seo?.title,
-    description: data.root.props?.seo?.description,
-  }
+  return buildLandingMetadata(await getPublishedLandingPageData())
 }
 
 export default async function Home() {
-  return <PublicLandingPage data={await getPublishedLandingPageData()} />
+  const data = await getPublishedLandingPageData()
+  return (
+    <>
+      <JsonLd data={buildLandingJsonLd(data)} />
+      <PublicLandingPage content={contentFromDocument(data)} />
+    </>
+  )
 }

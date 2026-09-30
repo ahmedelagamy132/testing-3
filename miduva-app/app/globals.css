@@ -56,11 +56,6 @@ html {
   scroll-padding-top: 80px;
 }
 
-html:has(#frame-root),
-html:has(#frame-root) body {
-  overscroll-behavior-y: contain;
-}
-
 html, body {
   background: var(--paper);
   color: var(--ink);
@@ -454,12 +449,6 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
   background: var(--teal-500);
   border-radius: 2px;
 }
-.parallax__content {
-  position: relative; padding: 90px 24px 120px;
-  display: flex; flex-direction: column; align-items: center;
-  gap: 20px; text-align: center; background: var(--paper);
-}
-.parallax__content .mark { width: 56px; height: 56px; color: var(--teal-500); }
 
 @media (max-width: 700px) {
   .parallax__header {
@@ -527,14 +516,6 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
     height: 34px;
     gap: 3px;
   }
-  .parallax__content {
-    padding: 62px 22px 76px;
-    gap: 16px;
-  }
-  .parallax__content .mark {
-    width: 42px;
-    height: 42px;
-  }
 }
 
 @media (max-width: 700px) and (max-height: 760px) {
@@ -579,10 +560,6 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
   background:
     linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 52%, var(--paper) 100%);
   padding: 96px 0 104px;
-}
-
-.free-offer-section {
-  min-height: 100vh;
 }
 
 .our-work-section::before {
@@ -781,10 +758,6 @@ html.dark .our-work-tile:hover .our-work-logo {
 @media (max-width: 900px) {
   .our-work-section {
     padding: 58px 0 62px;
-  }
-
-  .free-offer-section {
-    min-height: auto;
   }
 
   .our-work-copy {
@@ -1009,3 +982,28 @@ body[data-focus-section="footer"] #anchor-footer { display: block !important; }
   0%, 100% { box-shadow: 0 0 0 4px rgba(43, 200, 183, 0.18); }
   50%      { box-shadow: 0 0 0 8px rgba(43, 200, 183, 0.05); }
 }
+
+/* Contact form */
+.contact-field::placeholder { color: rgba(90, 107, 136, 0.55); font-weight: 400; }
+html.dark .contact-field::placeholder { color: rgba(110, 133, 168, 0.5); }
+.contact-field:-webkit-autofill { -webkit-text-fill-color: currentColor; transition: background-color 9999s ease 0s; }
+.contact-submit-icon { transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1); }
+.contact-submit:hover .contact-submit-icon { transform: translateX(3px); }
+.module-card:hover { box-shadow: 0 0 0 1px rgba(43, 200, 183, 0.25), 0 30px 60px -30px var(--module-accent-glow) !important; }
+.contact-link, .contact-link-icon { transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease; }
+a.contact-link:hover { color: var(--ink) !important; }
+a.contact-link:hover .contact-link-icon { color: var(--teal-500); border-color: rgba(43, 200, 183, 0.4) !important; background: rgba(43, 200, 183, 0.08) !important; }
+
+/* Legal pages (privacy, terms) */
+.legal-prose { font-size: 15px; line-height: 1.75; color: var(--muted); }
+.legal-prose h2 { margin: 2.5rem 0 0.75rem; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; color: var(--ink); scroll-margin-top: 2rem; }
+.legal-prose h3 { margin: 1.5rem 0 0.5rem; font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.legal-prose p { margin: 0.75rem 0; }
+.legal-prose ul { margin: 0.75rem 0; padding-left: 1.25rem; list-style: disc; }
+.legal-prose li { margin: 0.35rem 0; }
+.legal-prose strong { color: var(--ink); font-weight: 600; }
+.legal-prose a { color: var(--teal-500); text-decoration: underline; text-underline-offset: 2px; }
+.legal-prose table { width: 100%; margin: 1rem 0; border-collapse: collapse; font-size: 14px; }
+.legal-prose th, .legal-prose td { padding: 0.6rem 0.75rem; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+.legal-prose th { color: var(--ink); font-weight: 600; background: var(--card); }
+.legal-prose .table-wrap { overflow-x: auto; }

@@ -9,3 +9,7 @@ nginx/ssl/
 
 # Scratch / non-production sub-projects
 studio-hello-world/
+
+# Local backups and bulky exports — keep out of git
+artifacts/
+miduva-website-components.zip

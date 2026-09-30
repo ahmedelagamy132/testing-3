@@ -78,7 +78,7 @@ export function PuckLoginForm({ configured }: { configured: boolean }) {
         </span>
       </label>
       {!configured ? (
-        <p className="puck-login-error" role="alert">Set a PUCK_ADMIN_PASSWORD of at least 16 characters and a PUCK_SESSION_SECRET of at least 32 characters.</p>
+        <p className="puck-login-error" role="alert">Miduva Editor is not configured. Contact the site administrator.</p>
       ) : null}
       {error ? <p className="puck-login-error" role="alert">{error}</p> : null}
       <button disabled={!configured || loading} type="submit">{loading ? "Signing in…" : "Open editor"}</button>

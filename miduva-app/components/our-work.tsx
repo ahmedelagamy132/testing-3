@@ -24,10 +24,12 @@ const DEFAULT_LOGOS: ClientLogoData[] = [
   { src: "/client-logos/35.png", name: "Madinet Masr", category: "Real estate", size: "wide" },
 ]
 
-function LogoTile({ logo, index }: { logo: ClientLogoData; index: number }) {
+function LogoTile({ logo, index, controlIndex }: { logo: ClientLogoData; index: number; controlIndex: number }) {
   return (
     <figure
       className="our-work-tile group"
+      data-edit-path={`logos.${controlIndex}`}
+      data-miduva-native-id={`logo:${(logo as ClientLogoData & { __nativeId?: string }).__nativeId ?? controlIndex}`}
       style={{ "--tile-index": index } as CSSProperties}
       aria-label={`${logo.name}, ${logo.category}`}
     >
@@ -44,13 +46,13 @@ function LogoTile({ logo, index }: { logo: ClientLogoData; index: number }) {
   )
 }
 
-function MarqueeRow({ row, reverse = false }: { row: ClientLogoData[]; reverse?: boolean }) {
+function MarqueeRow({ row, offset, reverse = false }: { row: ClientLogoData[]; offset: number; reverse?: boolean }) {
   const loop = [...row, ...row]
   return (
     <div className="our-work-marquee" data-reverse={reverse}>
       <div className="our-work-marquee__track">
         {loop.map((logo, index) => (
-          <LogoTile key={`${logo.src}-${index}`} logo={logo} index={index} />
+          <LogoTile key={`${logo.src}-${index}`} logo={logo} index={index} controlIndex={offset + (index % row.length)} />
         ))}
       </div>
     </div>
@@ -68,13 +70,13 @@ export default function OurWork({ data }: { data?: OurWorkData } = {}) {
   return (
     <section id="our-work" className="our-work-section">
       <div className="our-work-copy">
-        <p className="mono our-work-kicker">{eyebrow}</p>
-        <h2>{headline}</h2>
+        <p className="mono our-work-kicker" data-edit-path="eyebrow">{eyebrow}</p>
+        <h2 data-edit-path="headline">{headline}</h2>
       </div>
 
       <div className="our-work-rails" aria-label={ariaLabel}>
-        <MarqueeRow row={marqueeRows[0]} />
-        <MarqueeRow row={marqueeRows[1]} reverse />
+        <MarqueeRow row={marqueeRows[0]} offset={0} />
+        <MarqueeRow row={marqueeRows[1]} offset={Math.max(0, split - 1)} reverse />
       </div>
     </section>
   )

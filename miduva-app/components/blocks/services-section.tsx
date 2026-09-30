@@ -24,7 +24,7 @@ const SLIDES = [
       "Advanced Growth Strategies",
     ],
     imageUrl:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2815&auto=format&fit=crop",
+      "/assets/visuals/growth-marketing.webp",
   },
   {
     id: "conversion-funnels",
@@ -39,7 +39,7 @@ const SLIDES = [
       "Personalization Systems",
     ],
     imageUrl:
-      "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=2076&auto=format&fit=crop",
+      "/assets/visuals/conversion-funnels.webp",
   },
   {
     id: "websites-dev",
@@ -54,7 +54,7 @@ const SLIDES = [
       "SaaS Development",
     ],
     imageUrl:
-      "https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=2064&auto=format&fit=crop",
+      "/assets/visuals/websites-development.webp",
   },
   {
     id: "ecommerce",
@@ -68,7 +68,7 @@ const SLIDES = [
       "Conversion Optimization",
     ],
     imageUrl:
-      "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=2070&auto=format&fit=crop",
+      "/assets/visuals/ecommerce.webp",
   },
   {
     id: "ai-automation",
@@ -84,7 +84,7 @@ const SLIDES = [
       "Custom AI",
     ],
     imageUrl:
-      "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?q=80&w=2832&auto=format&fit=crop",
+      "/assets/visuals/ai-automation.webp",
   },
   {
     id: "data-analytics",
@@ -99,7 +99,7 @@ const SLIDES = [
       "Revenue Forecasting",
     ],
     imageUrl:
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop",
+      "/assets/visuals/data-analytics.webp",
   },
 ]
 

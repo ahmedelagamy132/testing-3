@@ -1,9 +1,8 @@
 "use client"
 
-import { Render } from '@puckeditor/core'
-import { landingPageConfig } from '@/lib/puck/config'
-import type { LandingPagePuckData } from '@/lib/puck/types'
+import { LandingPage } from '@/components/puck/landing-page'
+import type { LandingContent } from '@/lib/site-editor/content'
 
-export function PublicLandingPage({ data }: { data: LandingPagePuckData }) {
-  return <Render config={landingPageConfig} data={data} />
+export function PublicLandingPage({ content }: { content: LandingContent }) {
+  return <LandingPage content={content} />
 }

@@ -137,6 +137,7 @@ export interface ContactTrustStat { stat: string; label: string }
 export interface ContactServiceOption { value: string; label: string }
 export interface ContactData {
   eyebrow?: string; headline?: string; headlineAccent?: string; body?: string
+  infoHeadline?: string; infoBody?: string
   contactInfo?: ContactInfoRow[]
   trustStats?: ContactTrustStat[]
   formHeadline?: string; formSubheadline?: string

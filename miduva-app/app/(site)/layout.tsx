@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "../globals.css";
+import { Analytics } from "@/components/analytics";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -15,6 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
   title: "Miduva — We Build Custom Growth Systems",
   description:
     "No generic services. We design tailored systems using ads, funnels, automation & data to grow your business — engineered end-to-end, owned by you.",
@@ -30,7 +34,10 @@ export default function SiteLayout({
       lang="en"
       className={`${plusJakartaSans.variable} ${jetbrainsMono.variable} dark`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

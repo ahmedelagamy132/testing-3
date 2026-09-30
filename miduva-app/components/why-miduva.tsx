@@ -1,19 +1,9 @@
 "use client"
 
 import { useRef } from "react"
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from "motion/react"
+import { motion } from "motion/react"
 import type { WhyMiduvaData, DifferentiatorCard as DiffCardData } from "@/lib/types"
-import {
-  useFrameInView,
-  useFrameIsDark,
-  useFrameScrollProgress,
-  VIEWPORT_SCROLL_RANGE,
-} from "@/components/puck/frame-runtime"
+import { useFrameInView } from "@/components/puck/frame-runtime"
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    DATA
@@ -132,28 +122,17 @@ function DifferentiatorCard({
   diff,
   index,
   isParentInView,
-  isDark,
   wideStatValue,
   wideStatLabel,
 }: {
   diff: DiffDisplay
   index: number
   isParentInView: boolean
-  isDark: boolean
   wideStatValue: string
   wideStatLabel: string
 }) {
   const cardRef = useRef<HTMLDivElement>(null)
   const isInView = useFrameInView(cardRef, { once: true, margin: "-60px" })
-
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-  const liftY  = useMotionValue(0)
-
-  const springCfg = { stiffness: 120, damping: 18 }
-  const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-5, 5]), springCfg)
-  const rotateX = useSpring(useTransform(mouseY, [-1, 1], [5, -5]), springCfg)
-  const springY = useSpring(liftY, springCfg)
 
   const Icon   = ICONS[diff.id] ?? IconLayers
   const isWide = diff.grid.includes("col-span-12")
@@ -161,107 +140,82 @@ function DifferentiatorCard({
   return (
     <motion.div
       ref={cardRef}
-      className={`${diff.grid} group`}
-      initial={{ opacity: 0, y: 60, scale: 0.96, filter: "blur(8px)" }}
-      animate={
-        isParentInView
-          ? { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
-          : { opacity: 0, y: 60, scale: 0.96, filter: "blur(8px)" }
-      }
-      transition={{ duration: 0.8, delay: 0.15 + index * 0.12, ease: EASE_FLUID }}
-      style={{ perspective: 900 }}
+      data-edit-path={`differentiators.${index}`}
+      data-miduva-native-id={`differentiator:${diff.id}`}
+      className={`${diff.grid} group relative overflow-hidden rounded-[20px] border border-[var(--line)] bg-[var(--card)] shadow-[0_1px_2px_rgba(15,35,73,0.04)] transition-[border-color,box-shadow] duration-300 hover:border-[rgba(43,200,183,0.35)] hover:shadow-[0_0_40px_rgba(43,200,183,0.06)]`}
+      initial={{ opacity: 0, y: 18 }}
+      animate={isParentInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+      transition={{ duration: 0.55, delay: 0.08 + index * 0.055, ease: EASE_FLUID }}
     >
-      {/* ── Double-Bezel Outer Shell ── */}
-      <motion.div
-        className={`relative h-full p-[5px] rounded-[2rem] ring-1 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDark ? "bg-white/[0.03] ring-white/[0.08] group-hover:ring-white/[0.16] group-hover:bg-white/[0.05]" : "bg-[var(--chip)] ring-[var(--line)] group-hover:ring-[var(--teal-500)]/30 group-hover:bg-[var(--paper-2)]"}`}
-        style={{ rotateX, rotateY, y: springY, transformStyle: "preserve-3d" }}
-        onMouseMove={(e) => {
-          const rect = cardRef.current?.getBoundingClientRect()
-          if (!rect) return
-          mouseX.set((e.clientX - rect.left) / rect.width * 2 - 1)
-          mouseY.set((e.clientY - rect.top)  / rect.height * 2 - 1)
-        }}
-        onMouseEnter={() => liftY.set(-8)}
-        onMouseLeave={() => { mouseX.set(0); mouseY.set(0); liftY.set(0) }}
-      >
-        {/* ── Inner Core ── */}
-        <div className={`relative h-full overflow-hidden rounded-[calc(2rem-5px)] transition-shadow duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${isDark ? "bg-[#08080c] shadow-[inset_0_1px_1px_rgba(255,255,255,0.06)] group-hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_0_40px_rgba(43,200,183,0.06)]" : "bg-[var(--card)] shadow-[inset_0_1px_1px_rgba(15,35,73,0.06)] group-hover:shadow-[inset_0_1px_1px_rgba(15,35,73,0.1),0_0_40px_rgba(43,200,183,0.06)]"}`}>
-          <div aria-hidden className="absolute -top-16 -right-16 w-48 h-48 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(43,200,183,0.10) 0%, transparent 70%)", filter: "blur(40px)" }} />
-
-          <div className={`relative z-10 h-full flex flex-col ${isWide ? "md:flex-row md:items-center md:justify-between md:gap-10" : ""} p-6 md:p-8`}>
-            <div className="flex flex-col flex-1">
-              <div className="flex items-center gap-3 mb-5">
-                <div className={`w-10 h-10 rounded-xl ring-1 flex items-center justify-center flex-shrink-0 transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:ring-teal-500/30 group-hover:bg-teal-500/10 ${isDark ? "bg-white/[0.04] ring-white/[0.1]" : "bg-[var(--chip)] ring-[var(--line)]"}`}>
-                  <Icon className="w-[18px] h-[18px] text-teal-400/80 transition-colors duration-500 group-hover:text-teal-400" />
-                </div>
-                <span className={`text-[10px] uppercase tracking-[0.2em] font-medium mono ${isDark ? "text-white/30" : "text-[var(--muted)]"}`}>
-                  {diff.subtitle}
-                </span>
-              </div>
-
-              <h3 className={`text-[clamp(18px,1.8vw,26px)] font-extrabold tracking-[-0.03em] leading-[1.15] mb-3 ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
-                {diff.title}
-              </h3>
-
-              <div className={`h-[2px] rounded-full overflow-hidden mb-5 max-w-[120px] ${isDark ? "bg-white/[0.06]" : "bg-[var(--line)]"}`}>
-                <motion.div
-                  className="h-full bg-teal-500 rounded-full origin-left"
-                  initial={{ scaleX: 0 }}
-                  animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
-                  transition={{ duration: 1.2, delay: 0.4 + index * 0.12, ease: EASE_SMOOTH }}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <span className={`text-[13px] line-through leading-relaxed ${isDark ? "text-white/25 decoration-white/15" : "text-[var(--muted)]/50 decoration-[var(--muted)]/30"}`}>
-                  {diff.oldWay}
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-teal-500/50 mono">↓</span>
-                  <span className="text-[13px] font-semibold text-teal-400 leading-relaxed">{diff.newWay}</span>
-                </div>
-              </div>
+      <div className={`relative z-10 h-full flex flex-col ${isWide ? "md:flex-row md:items-center md:justify-between md:gap-10" : ""} p-6 md:p-8`}>
+        <div className="flex flex-col flex-1">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-10 h-10 rounded-xl ring-1 ring-[var(--line)] bg-[var(--chip)] flex items-center justify-center flex-shrink-0 transition-colors duration-300 group-hover:ring-teal-500/30 group-hover:bg-teal-500/10">
+              <Icon className="w-[18px] h-[18px] text-[var(--teal-500)]" />
             </div>
-
-            {/* Wide card stat — a full-width band on mobile (bars stretch, the
-                figure pairs with its label on one baseline), an inline cluster
-                on desktop. The bar chart stays visible on mobile instead of
-                leaving the figure stranded. */}
-            {isWide && (
-              <div className={`flex flex-col gap-4 md:flex-row md:items-center md:gap-6 md:flex-shrink-0 w-full md:w-auto mt-6 md:mt-0 pt-6 md:pt-0 border-t md:border-t-0 ${isDark ? "border-white/[0.08]" : "border-[var(--line)]"}`}>
-                <div className="flex items-end gap-[5px] md:gap-[6px] h-12 md:h-14 flex-1 md:flex-none">
-                  {[32, 48, 40, 64, 72, 56, 80, 88, 76, 92, 84, 96].map((h, i) => (
-                    <motion.div
-                      key={i}
-                      className="flex-1 md:flex-none md:w-[6px] rounded-full bg-teal-500/25 md:bg-teal-500/20"
-                      style={{ height: `${h}%` }}
-                      initial={{ scaleY: 0 }}
-                      animate={isInView ? { scaleY: 1 } : { scaleY: 0 }}
-                      transition={{ duration: 0.6, delay: 0.6 + i * 0.04, ease: EASE_SMOOTH }}
-                    />
-                  ))}
-                </div>
-                <div className="flex items-baseline justify-between gap-3 md:block md:text-right">
-                  <div className={`text-[32px] md:text-[36px] font-extrabold tracking-[-0.04em] leading-none ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
-                    {wideStatValue}
-                  </div>
-                  <div className={`text-[10px] uppercase tracking-[0.18em] mono md:mt-1 ${isDark ? "text-white/25" : "text-[var(--muted)]"}`}>
-                    {wideStatLabel}
-                  </div>
-                </div>
-              </div>
-            )}
+            <span className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">
+              {diff.subtitle}
+            </span>
           </div>
 
-          {/* Giant ambient number */}
-          <div
-            aria-hidden
-            className={`absolute bottom-[-12px] right-2 md:bottom-[-16px] text-[clamp(60px,10vw,140px)] font-extrabold leading-none tracking-[-0.06em] pointer-events-none select-none mono transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:translate-x-[-4px] ${isDark ? "text-white/[0.04] group-hover:text-white/[0.06]" : "text-[var(--ink)]/[0.04] group-hover:text-[var(--ink)]/[0.06]"}`}
-          >
-            {diff.num}
+          <h3 className="text-[clamp(18px,1.8vw,24px)] font-extrabold tracking-[-0.03em] leading-[1.15] mb-3 text-[var(--ink)]">
+            {diff.title}
+          </h3>
+
+          <div className="h-[2px] rounded-full overflow-hidden mb-5 max-w-[120px] bg-[var(--line)]">
+            <motion.div
+              className="h-full bg-[var(--teal-500)] rounded-full origin-left"
+              initial={{ scaleX: 0 }}
+              animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
+              transition={{ duration: 1.2, delay: 0.3 + index * 0.08, ease: EASE_SMOOTH }}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-[13px] line-through leading-relaxed text-[var(--muted)] decoration-[var(--muted)]/40">
+              {diff.oldWay}
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] text-[var(--teal-500)]/60 mono">↓</span>
+              <span className="text-[14px] font-semibold text-[var(--teal-500)] leading-relaxed">{diff.newWay}</span>
+            </div>
           </div>
         </div>
-      </motion.div>
+
+        {/* Wide card stat — full-width band on mobile, inline cluster on desktop. */}
+        {isWide && (
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-6 md:flex-shrink-0 w-full md:w-auto mt-6 md:mt-0 pt-6 md:pt-0 border-t md:border-t-0 border-[var(--line)]">
+            <div className="flex items-end gap-[5px] md:gap-[6px] h-12 md:h-14 flex-1 md:flex-none">
+              {[32, 48, 40, 64, 72, 56, 80, 88, 76, 92, 84, 96].map((h, i) => (
+                <motion.div
+                  key={i}
+                  className="flex-1 md:flex-none md:w-[6px] rounded-full bg-teal-500/25 origin-bottom"
+                  style={{ height: `${h}%` }}
+                  initial={{ scaleY: 0 }}
+                  animate={isInView ? { scaleY: 1 } : { scaleY: 0 }}
+                  transition={{ duration: 0.6, delay: 0.5 + i * 0.04, ease: EASE_SMOOTH }}
+                />
+              ))}
+            </div>
+            <div className="flex items-baseline justify-between gap-3 md:block md:text-right">
+              <div className="text-[32px] md:text-[36px] font-extrabold tracking-[-0.04em] leading-none text-[var(--navy-900)]" data-edit-path="wideStatValue">
+                {wideStatValue}
+              </div>
+              <div className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--muted)] md:mt-1" data-edit-path="wideStatLabel">
+                {wideStatLabel}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Ambient number */}
+      <div
+        aria-hidden
+        className="absolute bottom-[-12px] right-3 md:bottom-[-16px] text-[clamp(60px,9vw,120px)] font-extrabold leading-none tracking-[-0.06em] pointer-events-none select-none mono text-[var(--ink)]/[0.04]"
+      >
+        {diff.num}
+      </div>
     </motion.div>
   )
 }
@@ -271,8 +225,7 @@ function DifferentiatorCard({
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
-  const eyebrow = data?.eyebrow ?? "Why Miduva"
-  const watermark = data?.watermark ?? "WHY"
+  const eyebrow = data?.eyebrow ?? "/ why miduva"
   const wideStatValue = data?.wideStatValue ?? "4.8×"
   const wideStatLabel = data?.wideStatLabel ?? "Avg. ROAS"
   const phrases = [
@@ -289,90 +242,60 @@ export default function WhyMiduva({ data }: { data?: WhyMiduvaData }) {
 
   const sectionRef = useRef<HTMLDivElement>(null)
   const isInView   = useFrameInView(sectionRef, { once: true, margin: "-100px" })
-  const isDark     = useFrameIsDark()
-  const scrollYProgress = useFrameScrollProgress(sectionRef, VIEWPORT_SCROLL_RANGE)
-
-  const yOrb1       = useTransform(scrollYProgress, [0, 1], [0, -140])
-  const yOrb2       = useTransform(scrollYProgress, [0, 1], [0, -80])
-  const yOrb3       = useTransform(scrollYProgress, [0, 1], [0, -40])
-  const yWatermark  = useTransform(scrollYProgress, [0, 1], [0, -60])
-  const yHeadline   = useTransform(scrollYProgress, [0, 1], [0, -30])
 
   return (
-    <section
-      ref={sectionRef}
-      id="why-miduva"
-      className="relative overflow-hidden"
-      style={{ background: isDark ? "#020204" : "var(--paper)" }}
-    >
-      {/* Grain overlay */}
-      <div aria-hidden className="absolute inset-0 pointer-events-none z-[1]" style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)", backgroundSize: "3px 3px" }} />
-
-      {/* Giant watermark */}
-      <motion.div aria-hidden className="absolute top-[10%] left-1/2 -translate-x-1/2 pointer-events-none select-none z-0" style={{ y: yWatermark }}>
-        <span className="block text-[clamp(96px,22vw,380px)] font-extrabold tracking-[-0.06em] leading-none mono" style={{ color: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,35,73,0.10)" }}>
-          {watermark}
-        </span>
-      </motion.div>
-
-      {/* Orbs */}
-      <motion.div aria-hidden className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full pointer-events-none z-0" style={{ y: yOrb1, background: "radial-gradient(circle, rgba(43,200,183,0.07) 0%, transparent 60%)", filter: "blur(80px)" }} />
-      <motion.div aria-hidden className="absolute top-[30%] -right-24 w-[480px] h-[480px] rounded-full pointer-events-none z-0" style={{ y: yOrb2, background: "radial-gradient(circle, rgba(43,200,183,0.04) 0%, transparent 60%)", filter: "blur(70px)" }} />
-      <motion.div aria-hidden className="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] rounded-full pointer-events-none z-0" style={{ y: yOrb3, background: "radial-gradient(circle, rgba(43,200,183,0.05) 0%, transparent 55%)", filter: "blur(90px)" }} />
-
+    <section id="why-miduva" className="relative overflow-hidden" style={{ background: "var(--paper)" }}>
       {/* Top hairline */}
-      <div aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px pointer-events-none z-10" style={{ background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.25), transparent)" }} />
+      <div aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px pointer-events-none" style={{ background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.25), transparent)" }} />
 
-      {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-14 md:py-40">
+      {/* Ambient glow */}
+      <div aria-hidden className="absolute -top-[120px] -left-[120px] w-[560px] h-[560px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(43,200,183,0.07) 0%, transparent 60%)", filter: "blur(80px)" }} />
 
-        {/* Eyebrow tag */}
+      <div ref={sectionRef} className="relative z-10 max-w-6xl mx-auto px-6 py-20 md:py-28">
+        {/* Header */}
         <motion.div
-          className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4"
-          initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
-          animate={isInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 20, filter: "blur(6px)" }}
-          transition={{ duration: 0.7, ease: EASE_FLUID }}
+          className="mb-12 md:mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.55, ease: EASE_FLUID }}
         >
-          {eyebrow}
-        </motion.div>
-
-        {/* Headline — cinematic word reveal */}
-        <motion.div className="mb-10 md:mb-28" style={{ y: yHeadline }}>
-          <h2 className={`text-[clamp(32px,5vw,56px)] font-extrabold tracking-[-0.04em] leading-[1.1] ${isDark ? "text-white" : "text-[var(--ink)]"}`}>
+          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-3" data-edit-path="eyebrow">
+            {eyebrow}
+          </div>
+          <h2
+            className="text-[34px] md:text-[52px] font-extrabold tracking-[-0.04em] leading-[1.05] text-[var(--navy-900)] max-w-4xl"
+            style={{ textWrap: "balance" } as React.CSSProperties}
+          >
             {phrases.map((phrase, i) => (
-              <span key={i} className="inline-block overflow-hidden mr-[0.28em] align-bottom relative">
-                <motion.span
-                  className={`inline-block relative ${phrase.shine ? "shine" : ""}`}
-                  style={phrase.dim ? { color: isDark ? "rgba(255,255,255,0.30)" : "rgba(11,27,58,0.30)" } : undefined}
-                  initial={{ clipPath: "inset(0 0 100% 0)", y: 12, filter: "blur(6px)" }}
-                  animate={isInView ? { clipPath: "inset(0 0 0% 0)", y: 0, filter: "blur(0px)" } : { clipPath: "inset(0 0 100% 0)", y: 12, filter: "blur(6px)" }}
-                  transition={{ duration: 0.7, delay: 0.08 + i * 0.08, ease: EASE_FLUID }}
-                >
-                  {phrase.text}
-                  {phrase.strike && (
-                    <motion.span
-                      aria-hidden
-                      className={`absolute left-0 right-0 top-[52%] h-[2px] origin-left ${isDark ? "bg-white/25" : "bg-[var(--ink)]/25"}`}
-                      initial={{ scaleX: 0 }}
-                      animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
-                      transition={{ duration: 0.5, delay: 0.6, ease: EASE_SMOOTH }}
-                    />
-                  )}
-                </motion.span>
+              <span
+                key={i}
+                className={`relative inline mr-[0.28em] ${phrase.shine ? "shine" : ""}`}
+                style={phrase.dim ? { color: "var(--muted)", opacity: 0.6 } : undefined}
+                data-edit-path={['statementLead', 'statementOldWay', 'statementBridge', 'statementAccent', 'statementTail'][i]}
+              >
+                {phrase.text}
+                {phrase.strike && (
+                  <motion.span
+                    aria-hidden
+                    className="absolute left-0 right-0 top-[54%] h-[2px] origin-left bg-[var(--muted)]"
+                    initial={{ scaleX: 0 }}
+                    animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4, ease: EASE_SMOOTH }}
+                  />
+                )}
               </span>
             ))}
           </h2>
         </motion.div>
 
-        {/* Asymmetrical Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5" style={{ perspective: "1200px" }}>
+        {/* Bento grid */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
           {differentiators.map((d, i) => (
             <DifferentiatorCard
               key={d.id}
               diff={d}
               index={i}
               isParentInView={isInView}
-              isDark={isDark}
               wideStatValue={wideStatValue}
               wideStatLabel={wideStatLabel}
             />

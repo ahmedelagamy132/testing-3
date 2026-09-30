@@ -5,36 +5,17 @@ import { motion, AnimatePresence } from "motion/react"
 import {
   Mail,
   Building2,
-  MessageSquare,
-  User,
-  ChevronDown,
   ArrowRight,
   CheckCircle2,
-  Send,
+  Check,
 } from "lucide-react"
 import type { ContactData } from "@/lib/types"
+import { trackLead } from "@/lib/analytics"
 import { useFrameInView, useFrameIsDark } from "@/components/puck/frame-runtime"
+import { FormDots, GlobeWireframe } from "@/components/ui/globe-wireframe"
 
 const EASE_FLUID  = [0.32, 0.72, 0, 1] as const
 const EASE_SMOOTH = [0.22, 1, 0.36, 1] as const
-
-const DEFAULT_SERVICE_OPTIONS = [
-  { value: "",                  label: "Select a service..." },
-  { value: "growth-marketing",  label: "Growth & Marketing" },
-  { value: "conversion-funnels",label: "Conversion & Funnels" },
-  { value: "websites-dev",      label: "Websites & Development" },
-  { value: "ecommerce",         label: "E-Commerce" },
-  { value: "ai-automation",     label: "AI & Automation" },
-  { value: "data-analytics",    label: "Data & Analytics" },
-  { value: "full-system",       label: "Full Growth System" },
-]
-
-const DEFAULT_TRUST_ITEMS = [
-  { stat: "4.8×",    label: "Average ROAS" },
-  { stat: "+312%",   label: "Lead Volume" },
-  { stat: "14 days", label: "Time to Launch" },
-  { stat: "94%",     label: "Client Retention" },
-]
 
 const ICON_BY_NAME = { mail: Mail, building: Building2 } as const
 
@@ -42,6 +23,9 @@ const DEFAULT_CONTACT_INFO: { icon: keyof typeof ICON_BY_NAME; label: string }[]
   { icon: "mail",      label: "hello@miduva.com" },
   { icon: "building",  label: "Available Worldwide · Remote-First" },
 ]
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const MESSAGE_MIN_LENGTH = 20
 
 type FormState  = { name: string; email: string; company: string; service: string; message: string }
 type FormErrors = Partial<Record<keyof FormState, string>>
@@ -51,54 +35,59 @@ const INITIAL_STATE: FormState = { name: "", email: "", company: "", service: ""
 
 type ValidationMessages = {
   nameRequired: string; emailRequired: string; emailInvalid: string
-  serviceRequired: string; messageRequired: string; messageTooShort: string
+  messageRequired: string; messageTooShort: string
 }
 
 function validate(v: FormState, messages: ValidationMessages): FormErrors {
   const e: FormErrors = {}
   if (!v.name.trim())    e.name    = messages.nameRequired
   if (!v.email.trim())   e.email   = messages.emailRequired
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) e.email = messages.emailInvalid
-  if (!v.service)        e.service = messages.serviceRequired
+  else if (!EMAIL_RE.test(v.email)) e.email = messages.emailInvalid
   if (!v.message.trim()) e.message = messages.messageRequired
-  else if (v.message.trim().length < 20) e.message = messages.messageTooShort
+  else if (v.message.trim().length < MESSAGE_MIN_LENGTH) e.message = messages.messageTooShort
   return e
 }
 
-function inputStyle(isFocused: boolean, isDark: boolean): React.CSSProperties {
+function controlStyle(isFocused: boolean, hasError: boolean, isDark: boolean): React.CSSProperties {
   return {
+    display: "block",
     width: "100%",
-    background: isDark ? "rgba(255,255,255,0.04)" : "rgba(15,35,73,0.03)",
-    border: isFocused
-      ? "1px solid rgba(43,200,183,0.55)"
-      : isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid var(--line)",
     borderRadius: 12,
-    padding: "13px 16px 13px 42px",
-    color: isDark ? "#F0F4FF" : "var(--ink)",
+    padding: "11px 16px",
     fontSize: 14,
     fontFamily: "var(--font-jakarta)",
+    color: isDark ? "#F0F4FF" : "var(--ink)",
     outline: "none",
+    background: isDark ? "rgba(255,255,255,0.035)" : "rgba(15,35,73,0.025)",
+    border: `1px solid ${hasError
+      ? "rgba(248,113,113,0.55)"
+      : isFocused
+        ? "rgba(43,200,183,0.6)"
+        : isDark ? "rgba(255,255,255,0.09)" : "rgba(15,35,73,0.10)"}`,
     boxShadow: isFocused
-      ? "0 0 0 3px rgba(43,200,183,0.12), 0 0 20px rgba(43,200,183,0.07)"
+      ? `0 0 0 3px ${hasError ? "rgba(248,113,113,0.10)" : "rgba(43,200,183,0.10)"}`
       : "none",
-    transition: "border-color 0.22s ease, box-shadow 0.22s ease",
+    transition: "border-color 0.2s ease, box-shadow 0.2s ease",
   }
 }
 
-function FieldLabel({ children }: { children: React.ReactNode }) {
+function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
   return (
-    <div
+    <label
+      htmlFor={htmlFor}
       className="mono"
       style={{
-        fontSize: 10,
-        letterSpacing: "0.18em",
+        display: "block",
+        fontSize: 10.5,
+        fontWeight: 600,
+        letterSpacing: "0.16em",
         textTransform: "uppercase",
-        color: "var(--teal-500)",
-        marginBottom: 7,
+        color: "var(--muted)",
+        marginBottom: 8,
       }}
     >
       {children}
-    </div>
+    </label>
   )
 }
 
@@ -107,11 +96,11 @@ function FieldError({ message }: { message?: string }) {
     <AnimatePresence>
       {message && (
         <motion.p
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -4 }}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.2 }}
-          style={{ fontSize: 11, color: "#f87171", margin: "6px 0 0", padding: 0 }}
+          style={{ fontSize: 12, color: "#f87171", margin: 0, padding: "7px 2px 0", overflow: "hidden" }}
         >
           {message}
         </motion.p>
@@ -121,140 +110,77 @@ function FieldError({ message }: { message?: string }) {
 }
 
 function ContactInput({
-  label, type = "text", value, onChange, onBlur, error, placeholder,
-  index, isDark, icon: Icon, isInView,
+  id, label, type = "text", value, onChange, onBlur, error, placeholder, isDark, autoComplete,
 }: {
-  label: string; type?: string; value: string; onChange: (v: string) => void
-  onBlur?: () => void; error?: string; placeholder?: string
-  index: number; isDark: boolean; icon: React.ElementType; isInView: boolean
+  id: string; label: string; type?: string; value: string; onChange: (v: string) => void
+  onBlur?: () => void; error?: string; placeholder?: string; isDark: boolean; autoComplete?: string
 }) {
   const [isFocused, setIsFocused] = useState(false)
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
-      animate={isInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 20, filter: "blur(6px)" }}
-      transition={{ duration: 0.55, delay: 0.30 + index * 0.08, ease: EASE_FLUID }}
-    >
-      <FieldLabel>{label}</FieldLabel>
-      <div style={{ position: "relative" }}>
-        <Icon
-          style={{
-            position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)",
-            width: 15, height: 15,
-            color: isFocused ? "var(--teal-500)" : "rgba(110,133,168,0.7)",
-            transition: "color 0.22s ease", pointerEvents: "none",
-          }}
-          strokeWidth={1.8}
-        />
-        <input
-          type={type}
-          value={value}
-          placeholder={placeholder}
-          onChange={e => onChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => { setIsFocused(false); onBlur?.() }}
-          style={inputStyle(isFocused, isDark)}
-        />
-      </div>
+    <div>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        aria-invalid={!!error}
+        onChange={e => onChange(e.target.value)}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => { setIsFocused(false); onBlur?.() }}
+        className="contact-field"
+        style={controlStyle(isFocused, !!error, isDark)}
+      />
       <FieldError message={error} />
-    </motion.div>
-  )
-}
-
-function ContactSelect({
-  label, value, onChange, error, options, index, isDark, isInView,
-}: {
-  label: string; value: string; onChange: (v: string) => void; error?: string
-  options: { value: string; label: string }[]; index: number; isDark: boolean; isInView: boolean
-}) {
-  const [isFocused, setIsFocused] = useState(false)
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
-      animate={isInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 20, filter: "blur(6px)" }}
-      transition={{ duration: 0.55, delay: 0.30 + index * 0.08, ease: EASE_FLUID }}
-    >
-      <FieldLabel>{label}</FieldLabel>
-      <div style={{ position: "relative" }}>
-        <select
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          style={{
-            ...inputStyle(isFocused, isDark),
-            appearance: "none",
-            WebkitAppearance: "none",
-            cursor: "pointer",
-          }}
-        >
-          {options.map(o => (
-            <option
-              key={o.value}
-              value={o.value}
-              style={{ background: isDark ? "#060E1E" : "white", color: isDark ? "#F0F4FF" : "var(--ink)" }}
-            >
-              {o.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDown
-          style={{
-            position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)",
-            width: 15, height: 15,
-            color: isFocused ? "var(--teal-500)" : "rgba(110,133,168,0.7)",
-            transition: "color 0.22s ease", pointerEvents: "none",
-          }}
-          strokeWidth={1.8}
-        />
-      </div>
-      <FieldError message={error} />
-    </motion.div>
+    </div>
   )
 }
 
 function ContactTextarea({
-  label, value, onChange, onBlur, error, placeholder, index, isDark, isInView,
+  id, label, value, onChange, onBlur, error, placeholder, isDark,
 }: {
-  label: string; value: string; onChange: (v: string) => void
-  onBlur?: () => void; error?: string; placeholder?: string
-  index: number; isDark: boolean; isInView: boolean
+  id: string; label: string; value: string; onChange: (v: string) => void
+  onBlur?: () => void; error?: string; placeholder?: string; isDark: boolean
 }) {
   const [isFocused, setIsFocused] = useState(false)
+  const length = value.trim().length
+  const isEnough = length >= MESSAGE_MIN_LENGTH
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
-      animate={isInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 20, filter: "blur(6px)" }}
-      transition={{ duration: 0.55, delay: 0.30 + index * 0.08, ease: EASE_FLUID }}
-    >
-      <FieldLabel>{label}</FieldLabel>
+    <div>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
       <div style={{ position: "relative" }}>
-        <MessageSquare
-          style={{
-            position: "absolute", left: 14, top: 14,
-            width: 15, height: 15,
-            color: isFocused ? "var(--teal-500)" : "rgba(110,133,168,0.7)",
-            transition: "color 0.22s ease", pointerEvents: "none",
-          }}
-          strokeWidth={1.8}
-        />
         <textarea
+          id={id}
           value={value}
           rows={5}
           placeholder={placeholder}
+          aria-invalid={!!error}
           onChange={e => onChange(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => { setIsFocused(false); onBlur?.() }}
-          style={{
-            ...inputStyle(isFocused, isDark),
-            padding: "13px 16px 13px 42px",
-            resize: "none",
-            lineHeight: 1.6,
-          }}
+          className="contact-field"
+          style={{ ...controlStyle(isFocused, !!error, isDark), resize: "none", lineHeight: 1.6, paddingBottom: 26 }}
         />
+        <span
+          aria-hidden
+          className="mono"
+          style={{
+            position: "absolute", right: 12, bottom: 9,
+            display: "inline-flex", alignItems: "center", gap: 4,
+            fontSize: 10, letterSpacing: "0.08em",
+            color: isEnough ? "var(--teal-500)" : "var(--muted)",
+            opacity: length === 0 ? 0 : 1,
+            transition: "opacity 0.2s ease, color 0.2s ease",
+          }}
+        >
+          {isEnough
+            ? <Check style={{ width: 12, height: 12 }} strokeWidth={2.6} />
+            : `${length}/${MESSAGE_MIN_LENGTH}`}
+        </span>
       </div>
       <FieldError message={error} />
-    </motion.div>
+    </div>
   )
 }
 
@@ -343,27 +269,21 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
   const eyebrow         = data?.eyebrow         ?? "/ get in touch"
   const headline        = data?.headline        ?? "Let's build something"
   const headlineAccent  = data?.headlineAccent  ?? "that actually works."
-  const body            = data?.body            ?? "Tell us about your business. We'll review your situation and respond with a tailored plan — not a sales pitch."
+  const infoHeadline    = data?.infoHeadline    ?? "Talk to a human"
+  const infoBody        = data?.infoBody        ?? "Prefer email? Reach us directly — a strategist, not a sales rep, replies within one business day."
   const contactInfo     = data?.contactInfo?.length ? data.contactInfo : DEFAULT_CONTACT_INFO
-  const trustStats      = data?.trustStats?.length  ? data.trustStats  : DEFAULT_TRUST_ITEMS
   const formHeadline    = data?.formHeadline    ?? "Start the conversation"
   const formSubheadline = data?.formSubheadline ?? "We respond within 24 hours · No spam, ever"
-  const servicePlaceholder = data?.servicePlaceholder ?? "Select a service..."
-  const serviceOptions  = data?.serviceOptions?.length
-    ? (data.serviceOptions.some((option) => option.value === "") ? data.serviceOptions : [{ value: "", label: servicePlaceholder }, ...data.serviceOptions])
-    : DEFAULT_SERVICE_OPTIONS
   const nameLabel       = data?.nameLabel       ?? "Full Name"
   const namePlaceholder = data?.namePlaceholder ?? "Your name"
   const emailLabel      = data?.emailLabel      ?? "Email Address"
   const emailPlaceholder = data?.emailPlaceholder ?? "you@company.com"
   const companyLabel    = data?.companyLabel    ?? "Company (Optional)"
   const companyPlaceholder = data?.companyPlaceholder ?? "Company name"
-  const serviceLabel    = data?.serviceLabel    ?? "Service Interest"
   const messageLabel    = data?.messageLabel    ?? "Your Message"
   const messagePlaceholder = data?.messagePlaceholder ?? "Tell us what you need help with..."
   const submitLabel     = data?.submitLabel     ?? "Send Message"
   const submittingLabel = data?.submittingLabel ?? "Sending..."
-  const finePrint       = data?.finePrint       ?? "No commitment · No credit card · 100% Confidential"
   const successHeadline = data?.successHeadline ?? "Message Sent."
   const successBody     = data?.successBody ?? "We'll be in touch within 24 hours with a tailored plan — not a sales pitch."
   const resetLabel      = data?.resetLabel ?? "Send another message"
@@ -372,7 +292,6 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
     nameRequired: data?.nameRequiredMessage ?? "Name is required",
     emailRequired: data?.emailRequiredMessage ?? "Email is required",
     emailInvalid: data?.emailInvalidMessage ?? "Enter a valid email",
-    serviceRequired: data?.serviceRequiredMessage ?? "Please select a service",
     messageRequired: data?.messageRequiredMessage ?? "Message is required",
     messageTooShort: data?.messageTooShortMessage ?? "Please write at least 20 characters",
   }
@@ -385,8 +304,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>("idle")
 
   const touch = (field: keyof FormState) => {
-    const next = { ...touched, [field]: true }
-    setTouched(next)
+    setTouched(p => ({ ...p, [field]: true }))
     setErrors(validate(values, validationMessages))
   }
 
@@ -410,6 +328,7 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
         return
       }
       setSubmitted(true)
+      trackLead("contact-section")
     } catch {
       setSubmitStatus("error")
     } finally {
@@ -419,15 +338,19 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
 
   const reset = () => { setSubmitted(false); setValues(INITIAL_STATE); setTouched({}); setErrors({}); setSubmitStatus("idle") }
 
+  const reveal = (delay: number, y = 20) => ({
+    initial: { opacity: 0, y },
+    animate: isInView ? { opacity: 1, y: 0 } : { opacity: 0, y },
+    transition: { duration: 0.8, delay, ease: EASE_FLUID },
+  })
+
+  const sectionBg = isDark ? "#02060F" : "var(--paper)"
+
   return (
     <section
       id="contact"
       className="grain"
-      style={{
-        background: isDark ? "#02060F" : "var(--paper)",
-        position: "relative",
-        overflow: "hidden",
-      }}
+      style={{ background: sectionBg, position: "relative", overflow: "hidden" }}
     >
       {/* Teal top seam */}
       <div
@@ -440,358 +363,252 @@ export default function ContactSection({ data }: { data?: ContactData } = {}) {
         }}
       />
 
-      {/* Grid overlay */}
+      {/* Top glow */}
       <div
         aria-hidden
         style={{
-          position: "absolute", inset: 0,
-          backgroundImage: `linear-gradient(rgba(43,200,183,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(43,200,183,0.04) 1px, transparent 1px)`,
-          backgroundSize: "80px 80px",
-          pointerEvents: "none",
+          position: "absolute", top: -260, left: "50%", transform: "translateX(-50%)",
+          width: 900, height: 520, borderRadius: "50%",
+          background: "radial-gradient(ellipse, rgba(43,200,183,0.09) 0%, transparent 65%)",
+          filter: "blur(40px)", pointerEvents: "none",
         }}
       />
 
-      {/* Left radial orb */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute", top: "15%", left: "-8%",
-          width: 600, height: 600, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(43,200,183,0.08) 0%, transparent 60%)",
-          filter: "blur(80px)", pointerEvents: "none",
-        }}
-      />
-
-      {/* Right radial orb */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute", bottom: "8%", right: "-6%",
-          width: 500, height: 500, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(43,200,183,0.05) 0%, transparent 60%)",
-          filter: "blur(70px)", pointerEvents: "none",
-        }}
-      />
-
-      {/* Content */}
       <div
         ref={sectionRef}
-        style={{
-          position: "relative", zIndex: 10,
-          maxWidth: 1200, margin: "0 auto",
-          padding: "clamp(56px, 10vw, 140px) clamp(24px, 5vw, 48px)",
-        }}
+        className="relative z-10 mx-auto max-w-6xl px-6"
+        style={{ paddingTop: "clamp(48px, 6vw, 80px)", paddingBottom: "clamp(72px, 10vw, 128px)" }}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: "clamp(40px, 6vw, 96px)", alignItems: "center" }}>
+        {/* ── Centered header ── */}
+        <div className="mx-auto mb-14 flex max-w-2xl flex-col items-center gap-5 text-center md:mb-16">
+          <motion.div
+            {...reveal(0, -12)}
+            className="mono"
+            style={{
+              fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--teal-500)",
+            }}
+            data-edit-path="eyebrow"
+          >
+            {eyebrow}
+          </motion.div>
 
-          {/* ── LEFT COLUMN ── */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 40 }}>
+          <motion.h2
+            {...reveal(0.1)}
+            data-edit-path="headline"
+            style={{
+              fontSize: "clamp(36px, 5.4vw, 64px)", fontWeight: 800,
+              letterSpacing: "-0.045em", lineHeight: 1.04,
+              color: isDark ? "white" : "var(--ink)", margin: 0,
+            }}
+          >
+            {headline}{" "}
+            <span className="shine" data-edit-path="headlineAccent">{headlineAccent}</span>
+          </motion.h2>
 
-            {/* Eyebrow */}
-            <motion.div
-              className="mono"
-              style={{ fontSize: 13, letterSpacing: "0.22em", textTransform: "uppercase", color: "var(--teal-500)" }}
-              initial={{ opacity: 0, y: 16 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-              transition={{ duration: 0.5, ease: EASE_SMOOTH }}
-            >
-              {eyebrow}
-            </motion.div>
+        </div>
 
-            {/* Headline */}
-            <motion.h2
-              style={{
-                fontSize: "clamp(36px, 5vw, 60px)", fontWeight: 800,
-                letterSpacing: "-0.04em", lineHeight: 1.08,
-                color: isDark ? "white" : "var(--ink)", margin: 0,
-              }}
-              initial={{ opacity: 0, y: 40, filter: "blur(8px)" }}
-              animate={isInView ? { opacity: 1, y: 0, filter: "blur(0px)" } : { opacity: 0, y: 40, filter: "blur(8px)" }}
-              transition={{ duration: 0.7, delay: 0.1, ease: EASE_FLUID }}
-            >
-              {headline}<br />
-              <span className="shine">{headlineAccent}</span>
-            </motion.h2>
+        <div className="mx-auto grid max-w-5xl grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-14">
+          {/* ── LEFT: direct contact + globe ── */}
+          <motion.div {...reveal(0.25, 28)} className="flex flex-col gap-7 lg:pt-6">
+            <div className="flex flex-col gap-2">
+              <h3
+                data-edit-path="infoHeadline"
+                style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em", color: isDark ? "white" : "var(--ink)", margin: 0 }}
+              >
+                {infoHeadline}
+              </h3>
+              <p
+                data-edit-path="infoBody"
+                style={{ fontSize: 14.5, lineHeight: 1.6, color: "var(--muted)", maxWidth: 360, margin: 0 }}
+              >
+                {infoBody}
+              </p>
+            </div>
 
-            {/* Body */}
-            <motion.p
-              style={{
-                fontSize: "clamp(15px, 1.4vw, 17px)", lineHeight: 1.65,
-                color: "var(--muted)", maxWidth: 440, margin: 0,
-              }}
-              initial={{ opacity: 0, y: 24 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-              transition={{ duration: 0.55, delay: 0.22, ease: EASE_SMOOTH }}
-            >
-              {body}
-            </motion.p>
-
-            {/* Contact info */}
-            <motion.div
-              style={{ display: "flex", flexDirection: "column", gap: 14 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.5, delay: 0.32, ease: EASE_SMOOTH }}
-            >
-              {contactInfo.map(({ icon, label }) => {
+            <div className="flex flex-col gap-3">
+              {contactInfo.map(({ icon, label }, index) => {
                 const Icon = ICON_BY_NAME[icon] ?? Mail
+                const href = EMAIL_RE.test(label) ? `mailto:${label}` : undefined
+                const Row = href ? motion.a : motion.div
                 return (
-                  <div key={label} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                      background: isDark ? "rgba(43,200,183,0.10)" : "rgba(43,200,183,0.07)",
-                      border: `1px solid rgba(43,200,183,${isDark ? "0.20" : "0.15"})`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                    }}>
-                      <Icon style={{ width: 16, height: 16, color: "var(--teal-500)" }} strokeWidth={1.5} />
-                    </div>
-                    <span style={{ fontSize: 14, color: isDark ? "rgba(255,255,255,0.60)" : "var(--muted)" }}>
-                      {label}
+                  <Row
+                    key={label}
+                    href={href}
+                    data-edit-path={`contactInfo.${index}`}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -12 }}
+                    transition={{ duration: 0.5, delay: 0.35 + index * 0.1, ease: EASE_SMOOTH }}
+                    className="contact-link group flex w-fit items-center gap-3"
+                    style={{ fontSize: 14.5, color: isDark ? "rgba(240,244,255,0.72)" : "var(--muted)" }}
+                  >
+                    <span
+                      className="contact-link-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+                      style={{
+                        background: isDark ? "rgba(255,255,255,0.04)" : "rgba(15,35,73,0.04)",
+                        border: `1px solid ${isDark ? "rgba(255,255,255,0.09)" : "rgba(15,35,73,0.10)"}`,
+                      }}
+                    >
+                      <Icon style={{ width: 15, height: 15 }} strokeWidth={1.7} />
                     </span>
-                  </div>
+                    {label}
+                  </Row>
                 )
               })}
-            </motion.div>
+            </div>
 
-            {/* KPI mini-grid */}
-            <motion.div
-              className="grid grid-cols-2"
-              style={{ gap: 12 }}
-              initial={{ opacity: 0, y: 24 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-              transition={{ duration: 0.55, delay: 0.44, ease: EASE_SMOOTH }}
-            >
-              {trustStats.map(({ stat, label }) => (
-                <div
-                  key={label}
-                  style={{
-                    padding: "16px 20px", borderRadius: 16,
-                    background: isDark ? "rgba(255,255,255,0.03)" : "var(--chip)",
-                    border: isDark ? "1px solid rgba(255,255,255,0.07)" : "1px solid var(--line)",
-                  }}
-                >
-                  <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.04em", color: isDark ? "white" : "var(--ink)" }}>
-                    {stat}
-                  </div>
-                  <div className="mono" style={{ fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: "var(--muted)", marginTop: 4 }}>
-                    {label}
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-
-          </div>
-
-          {/* ── RIGHT COLUMN — Form Card ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 60, scale: 0.96, filter: "blur(8px)" }}
-            animate={isInView ? { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" } : { opacity: 0, y: 60, scale: 0.96, filter: "blur(8px)" }}
-            transition={{ duration: 0.8, delay: 0.2, ease: EASE_FLUID }}
-            style={{}}
-          >
-            {/* Double-bezel outer */}
-            <div style={{
-              padding: 5, borderRadius: "2rem",
-              background: isDark ? "rgba(255,255,255,0.03)" : "rgba(15,35,73,0.04)",
-              boxShadow: isDark ? "0 0 0 1px rgba(255,255,255,0.08)" : "0 0 0 1px var(--line)",
-            }}>
-              {/* Inner core */}
-              <div style={{
-                borderRadius: "calc(2rem - 5px)", overflow: "hidden",
-                background: isDark ? "#060E1E" : "white",
-                boxShadow: isDark
-                  ? "inset 0 1px 1px rgba(255,255,255,0.06)"
-                  : "inset 0 1px 1px rgba(15,35,73,0.04)",
-                padding: "clamp(28px, 4vw, 44px)",
-                position: "relative",
-                minHeight: "clamp(500px, 60vh, 700px)",
-                display: "flex", flexDirection: "column", justifyContent: "center",
-              }}>
-                {/* Inner teal orb */}
-                <div aria-hidden style={{
-                  position: "absolute", top: -40, right: -40,
-                  width: 200, height: 200, borderRadius: "50%",
-                  background: "radial-gradient(circle, rgba(43,200,183,0.10) 0%, transparent 70%)",
-                  filter: "blur(40px)", pointerEvents: "none",
-                }} />
-
-                <AnimatePresence mode="wait">
-                  {submitted ? (
-                    <SuccessState key="success" isDark={isDark} onReset={reset} headline={successHeadline} body={successBody} resetLabel={resetLabel} />
-                  ) : (
-                    <motion.form
-                      key="form"
-                      onSubmit={handleSubmit}
-                      noValidate
-                      initial={{ opacity: 1 }}
-                      exit={{ opacity: 0, filter: "blur(4px)" }}
-                      transition={{ duration: 0.3 }}
-                      style={{ display: "flex", flexDirection: "column", gap: 0 }}
-                    >
-                      {/* Card header */}
-                      <motion.div
-                        style={{ marginBottom: 28 }}
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-                        transition={{ duration: 0.5, delay: 0.35, ease: EASE_SMOOTH }}
-                      >
-                        <h3 style={{
-                          fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em",
-                          color: isDark ? "white" : "var(--ink)", margin: "0 0 6px",
-                        }}>
-                          {formHeadline}
-                        </h3>
-                        <p style={{ fontSize: 13, color: "var(--muted)", margin: 0 }}>
-                          {formSubheadline}
-                        </p>
-                      </motion.div>
-
-                      {/* Name + Email row */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: 14, marginBottom: 14 }}>
-                        <ContactInput
-                          label={nameLabel} value={values.name} icon={User} index={0}
-                          isDark={isDark} isInView={isInView} placeholder={namePlaceholder}
-                          onChange={v => setValues(p => ({ ...p, name: v }))}
-                          onBlur={() => touch("name")}
-                          error={touched.name ? errors.name : undefined}
-                        />
-                        <ContactInput
-                          label={emailLabel} type="email" value={values.email} icon={Mail} index={1}
-                          isDark={isDark} isInView={isInView} placeholder={emailPlaceholder}
-                          onChange={v => setValues(p => ({ ...p, email: v }))}
-                          onBlur={() => touch("email")}
-                          error={touched.email ? errors.email : undefined}
-                        />
-                      </div>
-
-                      {/* Company */}
-                      <div style={{ marginBottom: 14 }}>
-                        <ContactInput
-                          label={companyLabel} value={values.company} icon={Building2} index={2}
-                          isDark={isDark} isInView={isInView} placeholder={companyPlaceholder}
-                          onChange={v => setValues(p => ({ ...p, company: v }))}
-                        />
-                      </div>
-
-                      {/* Service select */}
-                      <div style={{ marginBottom: 14 }}>
-                        <ContactSelect
-                          label={serviceLabel} value={values.service}
-                          options={serviceOptions} index={3}
-                          isDark={isDark} isInView={isInView}
-                          onChange={v => {
-                            setValues(p => ({ ...p, service: v }))
-                            setTouched(p => ({ ...p, service: true }))
-                            setErrors(validate({ ...values, service: v }, validationMessages))
-                          }}
-                          error={touched.service ? errors.service : undefined}
-                        />
-                      </div>
-
-                      {/* Message */}
-                      <div style={{ marginBottom: 26 }}>
-                        <ContactTextarea
-                          label={messageLabel} value={values.message} index={4}
-                          isDark={isDark} isInView={isInView}
-                          placeholder={messagePlaceholder}
-                          onChange={v => setValues(p => ({ ...p, message: v }))}
-                          onBlur={() => touch("message")}
-                          error={touched.message ? errors.message : undefined}
-                        />
-                      </div>
-
-                      <AnimatePresence>
-                        {submitStatus === "error" && (
-                          <motion.p
-                            initial={{ opacity: 0, y: -6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -6 }}
-                            style={{
-                              color: "#f87171",
-                              fontSize: 12,
-                              lineHeight: 1.5,
-                              margin: "-12px 0 16px",
-                              textAlign: "center",
-                            }}
-                          >
-                            {errorMessage}
-                          </motion.p>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Submit */}
-                      <motion.button
-                        type="submit"
-                        disabled={submitting}
-                        className="btn-primary"
-                        style={{
-                          width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
-                          gap: 10, padding: "15px 28px", borderRadius: 14, fontSize: 15, fontWeight: 700,
-                          letterSpacing: "-0.02em", border: "none",
-                          cursor: submitting ? "wait" : "pointer",
-                          opacity: submitting ? 0.75 : 1,
-                          position: "relative", overflow: "hidden",
-                        }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.97 }}
-                        transition={{ type: "spring", stiffness: 280, damping: 20 }}
-                      >
-                        {/* Shimmer sweep */}
-                        <motion.div
-                          aria-hidden
-                          style={{
-                            position: "absolute", inset: 0,
-                            background: "linear-gradient(90deg, transparent 20%, rgba(255,255,255,0.10) 50%, transparent 80%)",
-                            backgroundSize: "200% 100%",
-                            pointerEvents: "none",
-                          }}
-                          animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
-                          transition={{ duration: 2.4, repeat: Infinity, ease: "linear" }}
-                        />
-
-                        {submitting ? (
-                          <>
-                            <motion.div
-                              style={{ width: 18, height: 18 }}
-                              animate={{ rotate: 360 }}
-                              transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
-                            >
-                              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: 18, height: 18 }}>
-                                <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
-                              </svg>
-                            </motion.div>
-                            {submittingLabel}
-                          </>
-                        ) : (
-                          <>
-                            <Send style={{ width: 16, height: 16 }} strokeWidth={2} />
-                            {submitLabel}
-                            <ArrowRight style={{ width: 15, height: 15 }} strokeWidth={2.5} />
-                          </>
-                        )}
-                      </motion.button>
-
-                      {/* Fine print */}
-                      <motion.p
-                        className="mono"
-                        style={{
-                          fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase",
-                          color: isDark ? "rgba(255,255,255,0.18)" : "rgba(15,35,73,0.25)",
-                          textAlign: "center", marginTop: 14, marginBottom: 0,
-                        }}
-                        initial={{ opacity: 0 }}
-                        animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                        transition={{ duration: 0.5, delay: 0.7 }}
-                      >
-                        {finePrint}
-                      </motion.p>
-                    </motion.form>
-                  )}
-                </AnimatePresence>
-              </div>
+            {/* Globe — top half, fading into the section */}
+            <div className="relative h-60 overflow-hidden sm:h-72" style={{ color: "var(--teal-500)" }}>
+              <div
+                aria-hidden
+                className="pointer-events-none absolute left-1/2 top-[18%] h-2/3 w-2/3 -translate-x-1/2 rounded-full"
+                style={{ background: "radial-gradient(circle, rgba(43,200,183,0.16), transparent 70%)", filter: "blur(30px)" }}
+              />
+              <GlobeWireframe className="absolute left-0 top-0" />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
+                style={{ background: `linear-gradient(to top, ${sectionBg}, transparent)` }}
+              />
             </div>
           </motion.div>
 
+          {/* ── RIGHT: form card ── */}
+          <motion.div
+            {...reveal(0.35, 28)}
+            className="relative overflow-hidden rounded-[22px]"
+            style={{
+              background: isDark ? "#060E1E" : "white",
+              border: `1px solid ${isDark ? "rgba(255,255,255,0.08)" : "var(--line)"}`,
+              boxShadow: isDark
+                ? "0 40px 80px -30px rgba(0,0,0,0.7), 0 0 60px -20px rgba(43,200,183,0.16), inset 0 1px 0 rgba(255,255,255,0.05)"
+                : "0 40px 80px -40px rgba(15,35,73,0.28)",
+            }}
+          >
+            {/* Top hairline highlight */}
+            <div aria-hidden style={{
+              position: "absolute", top: 0, left: "12%", right: "12%", height: 1,
+              background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.6), transparent)",
+              pointerEvents: "none",
+            }} />
+
+            <div style={{ padding: "clamp(24px, 3.4vw, 36px)" }}>
+              <AnimatePresence mode="wait">
+                {submitted ? (
+                  <SuccessState key="success" isDark={isDark} onReset={reset} headline={successHeadline} body={successBody} resetLabel={resetLabel} />
+                ) : (
+                  <motion.form
+                    key="form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                    initial={{ opacity: 1 }}
+                    exit={{ opacity: 0, filter: "blur(4px)" }}
+                    transition={{ duration: 0.3 }}
+                    className="flex flex-col gap-5"
+                  >
+                    <div>
+                      <h3 data-edit-path="formHeadline" style={{
+                        fontSize: 20, fontWeight: 800, letterSpacing: "-0.03em",
+                        color: isDark ? "white" : "var(--ink)", margin: "0 0 4px",
+                      }}>
+                        {formHeadline}
+                      </h3>
+                      <p style={{ fontSize: 13.5, color: "var(--muted)", margin: 0 }} data-edit-path="formSubheadline">
+                        {formSubheadline}
+                      </p>
+                    </div>
+
+                    <FormDots className={isDark ? "text-white/20" : "text-[rgba(15,35,73,0.25)]"} />
+
+                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                      <ContactInput
+                        id="contact-name" label={nameLabel} value={values.name}
+                        isDark={isDark} placeholder={namePlaceholder} autoComplete="name"
+                        onChange={v => setValues(p => ({ ...p, name: v }))}
+                        onBlur={() => touch("name")}
+                        error={touched.name ? errors.name : undefined}
+                      />
+                      <ContactInput
+                        id="contact-company" label={companyLabel} value={values.company}
+                        isDark={isDark} placeholder={companyPlaceholder} autoComplete="organization"
+                        onChange={v => setValues(p => ({ ...p, company: v }))}
+                      />
+                    </div>
+
+                    <ContactInput
+                      id="contact-email" label={emailLabel} type="email" value={values.email}
+                      isDark={isDark} placeholder={emailPlaceholder} autoComplete="email"
+                      onChange={v => setValues(p => ({ ...p, email: v }))}
+                      onBlur={() => touch("email")}
+                      error={touched.email ? errors.email : undefined}
+                    />
+
+                    <ContactTextarea
+                      id="contact-message" label={messageLabel} value={values.message}
+                      isDark={isDark} placeholder={messagePlaceholder}
+                      onChange={v => setValues(p => ({ ...p, message: v }))}
+                      onBlur={() => touch("message")}
+                      error={touched.message ? errors.message : undefined}
+                    />
+
+                    <AnimatePresence>
+                      {submitStatus === "error" && (
+                        <motion.p
+                          role="alert"
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          style={{
+                            color: "#f87171", fontSize: 13, lineHeight: 1.5, margin: 0,
+                            padding: "10px 14px", borderRadius: 12,
+                            background: "rgba(248,113,113,0.08)", border: "1px solid rgba(248,113,113,0.22)",
+                          }}
+                        >
+                          {errorMessage}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+
+                    <div className="flex justify-end pt-1">
+                      <motion.button
+                        type="submit"
+                        data-edit-path="submitLabel"
+                        disabled={submitting}
+                        className="btn-primary group inline-flex h-11 shrink-0 items-center gap-2 rounded-xl px-6"
+                        style={{
+                          fontSize: 14, fontWeight: 700, letterSpacing: "-0.01em", border: "none",
+                          fontFamily: "var(--font-jakarta)",
+                          cursor: submitting ? "wait" : "pointer",
+                          opacity: submitting ? 0.8 : 1,
+                          boxShadow: isDark
+                            ? "0 10px 26px -10px rgba(43,200,183,0.6), inset 0 1px 0 rgba(255,255,255,0.35)"
+                            : "0 10px 26px -12px rgba(15,35,73,0.55), inset 0 1px 0 rgba(255,255,255,0.15)",
+                        }}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        {submitting ? submittingLabel : submitLabel}
+                        {submitting ? (
+                          <motion.svg
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+                            style={{ width: 16, height: 16 }}
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
+                          >
+                            <path d="M12 2a10 10 0 0 1 10 10" strokeLinecap="round" />
+                          </motion.svg>
+                        ) : (
+                          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" strokeWidth={2.4} />
+                        )}
+                      </motion.button>
+                    </div>
+                    <p style={{ fontSize: 11.5, color: "var(--muted)", margin: 0, lineHeight: 1.5 }}>
+                      By sending this form you agree to our{" "}
+                      <a href="/privacy" className="underline underline-offset-2 hover:text-[var(--ink)]">Privacy Policy</a>.
+                    </p>
+                  </motion.form>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>

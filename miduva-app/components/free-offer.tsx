@@ -4,7 +4,7 @@ import { useRef } from "react"
 import { motion } from "motion/react"
 import { CalendarCheck, ArrowRight } from "lucide-react"
 import type { FreeOfferData } from "@/lib/types"
-import { useFrameInView } from "@/components/puck/frame-runtime"
+import { useFrameInView, useFrameIsDark } from "@/components/puck/frame-runtime"
 
 const DEFAULT_INCLUDES = [
   "Full Business Audit",
@@ -12,10 +12,11 @@ const DEFAULT_INCLUDES = [
   "Expert Recommendations",
 ]
 
-export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | "light"; data?: FreeOfferData }) {
+export default function FreeOffer({ theme, data }: { theme?: "dark" | "light"; data?: FreeOfferData }) {
   const sectionRef = useRef<HTMLDivElement>(null)
   const isInView = useFrameInView(sectionRef, { once: true, margin: "-80px" })
-  const isDark = theme === "dark"
+  const frameIsDark = useFrameIsDark()
+  const isDark = theme ? theme === "dark" : frameIsDark
 
   const eyebrow        = data?.eyebrow        ?? "/ free offer"
   const headlineLine1  = data?.headlineLine1  ?? "Get a Free"
@@ -23,14 +24,14 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
   const headlineLine3  = data?.headlineLine3  ?? "for Your Business."
   const includes       = data?.includes?.length ? data.includes : DEFAULT_INCLUDES
   const ctaLabel       = data?.ctaLabel       ?? "Book Your Free Call"
-  const ctaHref        = data?.ctaHref        ?? "#"
+  const ctaHref        = data?.ctaHref        ?? "#contact"
   const trustNote      = data?.trustNote      ?? "No commitment · No credit card · Just real strategy"
 
   return (
     <section
       id="cta"
       style={{
-        background: isDark ? "#020204" : "#0F2349",
+        background: "var(--paper)",
         position: "relative",
         overflow: "hidden",
         display: "flex",
@@ -49,7 +50,7 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
           width: 1000,
           height: 600,
           borderRadius: "50%",
-          background: `radial-gradient(ellipse, rgba(43,200,183,${isDark ? "0.20" : "0.16"}) 0%, transparent 60%)`,
+          background: `radial-gradient(ellipse, rgba(43,200,183,${isDark ? "0.16" : "0.10"}) 0%, transparent 60%)`,
           filter: "blur(72px)",
           pointerEvents: "none",
         }}
@@ -62,7 +63,7 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
           position: "absolute",
           inset: 0,
           backgroundImage:
-            `linear-gradient(rgba(43,200,183,${isDark ? "0.04" : "0.03"}) 1px, transparent 1px), linear-gradient(90deg, rgba(43,200,183,${isDark ? "0.04" : "0.03"}) 1px, transparent 1px)`,
+            `linear-gradient(rgba(43,200,183,${isDark ? "0.04" : "0.06"}) 1px, transparent 1px), linear-gradient(90deg, rgba(43,200,183,${isDark ? "0.04" : "0.06"}) 1px, transparent 1px)`,
           backgroundSize: "80px 80px",
           pointerEvents: "none",
         }}
@@ -91,13 +92,14 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
           width: "100%",
           maxWidth: 860,
           margin: "0 auto",
-          padding: "clamp(60px, 8vw, 120px) 24px",
+          padding: "clamp(48px, 5vw, 72px) 24px clamp(36px, 4vw, 56px)",
           textAlign: "center",
         }}
       >
         {/* Eyebrow */}
         <motion.div
           className="mono"
+          data-edit-path="eyebrow"
           style={{
             fontSize: 13,
             letterSpacing: "0.22em",
@@ -115,10 +117,10 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
         {/* Headline */}
         <motion.h2
           style={{
-            fontSize: "clamp(46px, 8vw, 96px)",
+            fontSize: "clamp(40px, 6.4vw, 80px)",
             fontWeight: 800,
             letterSpacing: "-0.04em",
-            color: "white",
+            color: "var(--ink)",
             lineHeight: 1.02,
             margin: "0 0 32px",
           }}
@@ -127,7 +129,7 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
           transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
         >
           {headlineLine1}<br />
-          <span className="shine">{headlineAccent}</span><br />
+          <span className="shine" data-edit-path="headlineAccent">{headlineAccent}</span><br />
           {headlineLine3}
         </motion.h2>
 
@@ -144,20 +146,21 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.55, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
         >
-          {includes.map((label) => (
+          {includes.map((label, index) => (
             <div
               key={label}
+              data-edit-path={`includes.${index}`}
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
                 padding: "9px 18px",
                 borderRadius: 100,
-                background: isDark ? "rgba(43,200,183,0.10)" : "rgba(43,200,183,0.07)",
-                border: isDark ? "1px solid rgba(43,200,183,0.25)" : "1px solid rgba(43,200,183,0.20)",
+                background: isDark ? "rgba(43,200,183,0.08)" : "var(--card)",
+                border: isDark ? "1px solid rgba(43,200,183,0.25)" : "1px solid var(--line)",
                 fontSize: 13,
                 fontWeight: 500,
-                color: "rgba(255,255,255,0.72)",
+                color: isDark ? "rgba(240,244,255,0.78)" : "var(--ink)",
               }}
             >
               <span
@@ -195,7 +198,7 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
                 position: "absolute",
                 inset: -12,
                 borderRadius: 100,
-                background: isDark ? "rgba(43,200,183,0.30)" : "rgba(43,200,183,0.25)",
+                background: isDark ? "rgba(43,200,183,0.30)" : "rgba(43,200,183,0.22)",
                 filter: "blur(20px)",
                 pointerEvents: "none",
               }}
@@ -205,6 +208,7 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
 
             <motion.a
               href={ctaHref}
+              data-edit-path="ctaLabel"
               style={{
                 position: "relative",
                 display: "inline-flex",
@@ -237,7 +241,7 @@ export default function FreeOffer({ theme = "light", data }: { theme?: "dark" | 
               fontSize: 11,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
-              color: "rgba(255,255,255,0.22)",
+              color: "var(--muted)",
               margin: 0,
             }}
           >

@@ -26,12 +26,13 @@ interface AppWrapperProps {
 
 const DEFAULT_ORDER: SectionId[] = [
   "hero", "systems", "problem-solution", "how-it-works", "results",
-  "our-work", "why-miduva", "parallax", "dashboard", "services", "growth-os",
+  "our-work", "parallax", "dashboard", "services", "growth-os",
   "faq", "free-offer", "contact", "footer",
 ]
 
 export function AppWrapper({ data = {} }: AppWrapperProps) {
-  const [theme, setTheme] = useState<"dark" | "light">("dark")
+  // Light mode is disabled for now; the site always renders dark.
+  const theme = "dark" as "dark" | "light"
   const [heroRevealed, setHeroRevealed] = useState(true)
   const navRef = useRef<HTMLElement>(null)
 
@@ -121,21 +122,11 @@ export function AppWrapper({ data = {} }: AppWrapperProps) {
   return (
     <div className="relative min-h-screen overflow-x-clip">
       <div id="anchor-nav" className="preview-anchor preview-nav-backdrop">
-        <Nav ref={navRef} theme={theme} setTheme={setTheme} heroRevealed={heroRevealed} data={data.nav} branding={data.branding} />
+        <Nav ref={navRef} theme={theme} heroRevealed={heroRevealed} data={data.nav} branding={data.branding} />
       </div>
       <main>
         {mainIds.map((id, idx) => {
           const node = renderSection(id, idx)
-          // Insert the original spacer just before a Free Offer that sits
-          // immediately after FAQ — only when both are in the rendered order.
-          if (id === "free-offer" && mainIds[idx - 1] === "faq") {
-            return (
-              <div key={`spacer-${idx}`}>
-                <div className="h-4 md:h-20" />
-                {node}
-              </div>
-            )
-          }
           return node
         })}
       </main>

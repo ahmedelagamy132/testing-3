@@ -30,7 +30,7 @@ const DEFAULT_STEPS: Step[] = [
     description:
       "We audit your channels, funnels, and conversion gaps to build a complete picture of where you stand and where the biggest opportunities hide.",
     imageUrl:
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop",
+      "/assets/visuals/analyze.webp",
   },
   {
     id: "strategy",
@@ -39,7 +39,7 @@ const DEFAULT_STEPS: Step[] = [
     description:
       "A system blueprint tailored to your market, audience, and goals — no templates, no guesswork, just a clear plan for growth.",
     imageUrl:
-      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2670&auto=format&fit=crop",
+      "/assets/visuals/strategy.webp",
   },
   {
     id: "launch",
@@ -48,7 +48,7 @@ const DEFAULT_STEPS: Step[] = [
     description:
       "Everything goes live and gets tuned until it performs. We test, iterate, and refine until every metric is moving in the right direction.",
     imageUrl:
-      "https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?q=80&w=2670&auto=format&fit=crop",
+      "/assets/visuals/launch.webp",
   },
   {
     id: "scale",
@@ -57,7 +57,7 @@ const DEFAULT_STEPS: Step[] = [
     description:
       "More traffic, better conversions, automated follow-up — compounding returns that grow your business while you focus on what you do best.",
     imageUrl:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop",
+      "/assets/visuals/scale.webp",
   },
 ]
 
@@ -82,18 +82,26 @@ function StepSlide({
 
   const local = useTransform(progress, [slideStart, slideEnd], [0, 1])
 
-  const textY = useTransform(local, [0, 0.3, 0.7, 1], [120, 0, 0, -120])
-  const textOpacity = useTransform(local, [0, 0.15, 0.85, 1], [0, 1, 1, 0])
+  // The first step is already on screen when the section pins and the last
+  // stays on screen as it unpins — otherwise both ends scroll by empty.
+  const isFirst = index === 0
+  const isLast = index === totalSteps - 1
+  const inOut = (enter: number, rest: number, exit: number) =>
+    [isFirst ? rest : enter, rest, rest, isLast ? rest : exit]
 
-  const imageX = useTransform(local, [0, 0.3, 0.7, 1], [200, 0, 0, -200])
-  const imageScale = useTransform(local, [0, 0.3, 0.7, 1], [1.15, 1, 1, 1.15])
-  const imageOpacity = useTransform(local, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
+  const textY = useTransform(local, [0, 0.3, 0.7, 1], inOut(120, 0, -120))
+  const textOpacity = useTransform(local, [0, 0.15, 0.85, 1], inOut(0, 1, 0))
 
-  const numScale = useTransform(local, [0, 0.25, 0.75, 1], [0.6, 1, 1, 0.6])
-  const numOpacity = useTransform(local, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
+  const imageX = useTransform(local, [0, 0.3, 0.7, 1], inOut(200, 0, -200))
+  const imageScale = useTransform(local, [0, 0.3, 0.7, 1], inOut(1.15, 1, 1.15))
+  const imageOpacity = useTransform(local, [0, 0.2, 0.8, 1], inOut(0, 1, 0))
+
+  const numScale = useTransform(local, [0, 0.25, 0.75, 1], inOut(0.6, 1, 0.6))
+  const numOpacity = useTransform(local, [0, 0.2, 0.8, 1], inOut(0, 1, 0))
 
   return (
     <div
+      data-edit-path={`steps.${index}`}
       style={{
         position: "absolute",
         inset: 0,
@@ -105,6 +113,7 @@ function StepSlide({
     >
       {/* ── Background Image ── */}
       <motion.div
+        data-miduva-native-id={`step:${step.id}`}
         style={{
           position: "absolute",
           right: isMobile ? undefined : 0,
@@ -144,7 +153,7 @@ function StepSlide({
                   position: "absolute",
                   inset: 0,
                   background: isDark
-                    ? "linear-gradient(to right, #020204 0%, rgba(2,2,4,0.92) 25%, transparent 60%)"
+                    ? "linear-gradient(to right, #02060F 0%, rgba(2,6,15,0.92) 25%, transparent 60%)"
                     : "linear-gradient(to right, #F6F8FC 0%, rgba(246,248,252,0.92) 25%, transparent 60%)",
                 }}
               />
@@ -153,7 +162,7 @@ function StepSlide({
                   position: "absolute",
                   inset: 0,
                   background: isDark
-                    ? "linear-gradient(to top, #020204 0%, transparent 25%), linear-gradient(to bottom, #020204 0%, transparent 25%)"
+                    ? "linear-gradient(to top, #02060F 0%, transparent 25%), linear-gradient(to bottom, #02060F 0%, transparent 25%)"
                     : "linear-gradient(to top, #F6F8FC 0%, transparent 25%), linear-gradient(to bottom, #F6F8FC 0%, transparent 25%)",
                 }}
               />
@@ -166,7 +175,7 @@ function StepSlide({
                 position: "absolute",
                 inset: 0,
                 background: isDark
-                  ? "linear-gradient(to top, rgba(2,2,4,0.98) 0%, rgba(2,2,4,0.85) 35%, rgba(2,2,4,0.4) 65%, rgba(2,2,4,0.15) 100%)"
+                  ? "linear-gradient(to top, rgba(2,6,15,0.98) 0%, rgba(2,6,15,0.85) 35%, rgba(2,6,15,0.4) 65%, rgba(2,6,15,0.15) 100%)"
                   : "linear-gradient(to top, rgba(246,248,252,0.98) 0%, rgba(246,248,252,0.85) 35%, rgba(246,248,252,0.4) 65%, rgba(246,248,252,0.15) 100%)",
               }}
             />
@@ -348,7 +357,7 @@ export default function HowItWorks({ data }: { data?: HowItWorksData }) {
   const scrollYProgress = useFrameScrollProgress(sectionRef, STICKY_SCROLL_RANGE)
   const isDark = useFrameIsDark()
   const isMobile = useFrameMediaQuery("(max-width: 767px)")
-  const bg = isDark ? "#020204" : "var(--paper)"
+  const bg = "var(--paper)"
 
   return (
     <>
@@ -420,13 +429,14 @@ export default function HowItWorks({ data }: { data?: HowItWorksData }) {
               pointerEvents: "none",
               background: isMobile
                 ? isDark
-                  ? "linear-gradient(to bottom, #020204 0%, rgba(2,2,4,0.9) 60%, transparent 100%)"
+                  ? "linear-gradient(to bottom, #02060F 0%, rgba(2,6,15,0.9) 60%, transparent 100%)"
                   : "linear-gradient(to bottom, #F6F8FC 0%, rgba(246,248,252,0.9) 60%, transparent 100%)"
                 : undefined,
             }}
           >
             <div
               className="mono"
+              data-edit-path="eyebrow"
               style={{
                 fontSize: 13,
                 letterSpacing: "0.22em",
@@ -438,6 +448,7 @@ export default function HowItWorks({ data }: { data?: HowItWorksData }) {
               {eyebrow}
             </div>
             <h2
+              data-edit-path="headline"
               style={{
                 fontSize: isMobile
                   ? "clamp(20px, 5.5vw, 28px)"
@@ -450,7 +461,7 @@ export default function HowItWorks({ data }: { data?: HowItWorksData }) {
               }}
             >
               {headline}{" "}
-              <span className="shine">{headlineAccent}</span>
+              <span className="shine" data-edit-path="headlineAccent">{headlineAccent}</span>
             </h2>
           </div>
 

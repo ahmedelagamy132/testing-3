@@ -4,6 +4,9 @@ import { createClient, type Client } from '@libsql/client'
 import { mkdir, readdir, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { getDefaultLandingPageData } from './defaults'
+import { migrateNativeItemSlots } from './native-slots'
+import { migrateLegacyVisuals } from './visual-migration'
+import { migrateLegacyPageLinks } from '@/lib/page-navigation'
 import type { LandingPagePuckData, PuckMedia, PuckPageDocument, PuckRevision } from './types'
 
 const PAGE_SLUG = 'landing-page'
@@ -67,7 +70,7 @@ async function getDatabase() {
 }
 
 function parseData(value: unknown): LandingPagePuckData {
-  return JSON.parse(String(value)) as LandingPagePuckData
+  return migrateLegacyVisuals(migrateLegacyPageLinks(migrateNativeItemSlots(JSON.parse(String(value)) as LandingPagePuckData)))
 }
 
 export async function getPageDocument(): Promise<PuckPageDocument> {

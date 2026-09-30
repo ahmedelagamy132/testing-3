@@ -1,18 +1,3 @@
-.puck-admin-shell { min-height: 100vh; background: #f5f7fb; color: #0f2349; }
-.puck-admin-bar { height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 16px; background: #071226; color: #eef5ff; font-size: 12px; position: relative; z-index: 100; }
-.puck-admin-bar > div, .puck-admin-bar nav { display: flex; align-items: center; gap: 10px; }
-.puck-admin-bar nav { gap: 6px; }
-.puck-admin-bar a, .puck-admin-bar button { border: 1px solid rgba(255,255,255,.18); border-radius: 6px; padding: 6px 10px; color: inherit; background: rgba(255,255,255,.06); cursor: pointer; }
-.puck-admin-bar a:hover, .puck-admin-bar button:hover { background: rgba(255,255,255,.12); }
-.puck-save-dot { width: 7px; height: 7px; border-radius: 50%; background: #56d6c8; box-shadow: 0 0 8px rgba(86,214,200,.5); }
-.puck-save-dot.is-saving, .puck-save-dot.is-publishing { background: #f0bd58; }
-.puck-save-dot.is-error { background: #fb7185; }
-.puck-revisions { position: fixed; top: 48px; right: 0; z-index: 99; width: min(390px, 100vw); max-height: calc(100vh - 48px); overflow: auto; padding: 20px; background: #fff; border-left: 1px solid #dce3ef; box-shadow: -16px 0 40px rgba(15,35,73,.12); color: #0f2349; }
-.puck-revisions > div > p { font-size: 15px; font-weight: 750; }
-.puck-revisions > div > span { display: block; color: #65728a; font-size: 12px; margin-top: 3px; }
-.puck-revisions ul { display: grid; gap: 8px; margin-top: 16px; }
-.puck-revisions li { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #e8edf5; padding-top: 10px; font-size: 12px; }
-.puck-revisions button { color: #087f73; font-weight: 700; cursor: pointer; }
 .puck-login-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; background-color: #030a14; background-image: linear-gradient(115deg, rgba(3,10,20,.46), rgba(3,10,20,.7)), url('/assets/miduva-editor-bg.webp'); background-position: center; background-size: cover; }
 .puck-login-card { width: min(100%, 420px); border: 1px solid rgba(143,221,214,.2); border-radius: 18px; padding: 34px; background: rgba(5,16,33,.94); box-shadow: 0 28px 80px rgba(0,4,12,.58); color: #edf5ff; }
 .puck-login-logo { display: block; width: 182px; height: auto; object-fit: contain; }
@@ -35,15 +20,6 @@
   .puck-login-page { align-items: end; padding: 16px; background-position: 58% center; }
   .puck-login-card { padding: 28px 24px; }
 }
-.miduva-media-field { display: grid; gap: 8px; }
-.miduva-media-field__url, .miduva-string-list-field { width: 100%; border: 1px solid #d8dee9; border-radius: 6px; padding: 8px; background: #fff; color: #172033; }
-.miduva-media-field__preview { width: 100%; height: 110px; object-fit: contain; border-radius: 7px; background: #edf1f7; }
-.miduva-media-field__actions { display: flex; gap: 6px; }
-.miduva-media-field__actions button, .miduva-media-field__actions label { flex: 1; border: 1px solid #cbd4e2; border-radius: 6px; padding: 7px 9px; background: #fff; color: #263650; text-align: center; font-size: 12px; cursor: pointer; }
-.miduva-media-field__actions input { display: none; }
-.miduva-media-field__error { color: #b4233b; font-size: 12px; }
-.miduva-media-field__library { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; max-height: 280px; overflow: auto; padding: 3px; }
-.miduva-media-field__library button { min-width: 0; overflow: hidden; border: 2px solid transparent; border-radius: 7px; background: #eef2f7; cursor: pointer; }
-.miduva-media-field__library button.is-selected { border-color: #2bc8b7; }
-.miduva-media-field__library img { width: 100%; height: 76px; object-fit: contain; }
-.miduva-media-field__library span { display: block; overflow: hidden; padding: 4px 6px; color: #43516a; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Miduva brand for the visual editor (lib/visual-editor). */
+.ve-shell, .ve-modal { --ve-font: var(--font-jakarta), system-ui, sans-serif; --ve-mono: var(--font-jetbrains-mono), monospace; }

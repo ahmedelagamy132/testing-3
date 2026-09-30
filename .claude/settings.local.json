@@ -12,7 +12,8 @@
       "Bash(npx shadcn@latest init --defaults)",
       "Bash(npm install *)",
       "mcp__Claude_Preview__preview_start",
-      "Bash(node \"C:\\\\Users\\\\ahmed\\\\.claude\\\\skills\\\\impeccable\\\\scripts\\\\load-context.mjs\")"
+      "Bash(node \"C:\\\\Users\\\\ahmed\\\\.claude\\\\skills\\\\impeccable\\\\scripts\\\\load-context.mjs\")",
+      "Bash(docker compose *)"
     ]
   }
 }

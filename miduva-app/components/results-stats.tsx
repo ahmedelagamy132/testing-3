@@ -180,13 +180,13 @@ export default function ResultsStats({ data }: { data?: ResultsData }) {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-3">
+          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-3" data-edit-path="eyebrow">
             {eyebrow}
           </div>
-          <h2 className="text-[36px] md:text-[52px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.05]">
+          <h2 className="text-[36px] md:text-[52px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.05]" data-edit-path="headline">
             {headline}
           </h2>
-          <p className="mt-4 text-[15px] md:text-[17px] text-[var(--muted)] max-w-lg leading-[1.65]" style={{ whiteSpace: "pre-line" }}>
+          <p className="mt-4 text-[15px] md:text-[17px] text-[var(--muted)] max-w-lg leading-[1.65]" style={{ whiteSpace: "pre-line" }} data-edit-path="subheadline">
             {subheadline}
           </p>
         </motion.div>
@@ -196,6 +196,8 @@ export default function ResultsStats({ data }: { data?: ResultsData }) {
           {stats.map((stat, i) => (
             <div
               key={stat.id}
+              data-edit-path={`stats.${i}`}
+              data-miduva-native-id={`stat:${stat.id}`}
               style={isMobile ? {
                 padding: "32px 0",
                 borderBottom: i < stats.length - 1 ? "1px solid var(--line)" : "none",
@@ -218,11 +220,12 @@ export default function ResultsStats({ data }: { data?: ResultsData }) {
           animate={isInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
         >
-          <p className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]">
+          <p className="mono text-[11px] uppercase tracking-[0.18em] text-[var(--muted)]" data-edit-path="trustNote">
             {trustNote}
           </p>
           <a
             href={ctaHref}
+            data-edit-path="ctaLabel"
             className="btn-primary inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-semibold transition-opacity hover:opacity-80 flex-shrink-0"
           >
             {ctaLabel}

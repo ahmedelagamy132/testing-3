@@ -10,7 +10,7 @@ const SYSTEMS = [
     label: "Lead Generation System",
     title: "Consistent leads.\nOn autopilot.",
     description: "Generate predictable lead flow using ads, funnels & precision conversion systems built for your market.",
-    imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop",
+    imageUrl: "/assets/visuals/growth-marketing.webp",
     span: "col",
   },
   {
@@ -19,7 +19,7 @@ const SYSTEMS = [
     label: "Website & Conversion System",
     title: "Your website,\nactually converting.",
     description: "Turn traffic into revenue with a high-performance site engineered around your buyer's journey.",
-    imageUrl: "https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=1200&auto=format&fit=crop",
+    imageUrl: "/assets/visuals/websites-development.webp",
     span: "col",
   },
   {
@@ -28,7 +28,7 @@ const SYSTEMS = [
     label: "Smart Automation System",
     title: "Sales & follow-ups running 24/7 — without hiring.",
     description: "CRM workflows, AI agents, and email sequences that close deals while you sleep.",
-    imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600&auto=format&fit=crop",
+    imageUrl: "/assets/visuals/ai-automation.webp",
     span: "full",
   },
 ]

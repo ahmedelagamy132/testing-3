@@ -57,15 +57,6 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
   const headline        = data?.headline        ?? "Built as a"
   const headlineAccent  = data?.headlineAccent  ?? "system."
   const description     = data?.description     ?? "Not a one-off campaign, not a template. A connected machine — ads → funnels → automation → data — tuned for your business."
-  const pipelineLabel   = data?.pipelineLabel   ?? "Pipeline · live"
-  const pipelineValue   = data?.pipelineValue   ?? "$482,120"
-  const pipelineDelta   = data?.pipelineDelta   ?? "▲ 21.4%"
-  const pipelineComparison = data?.pipelineComparison ?? "vs last Q"
-  const bottomLabel     = data?.bottomLabel     ?? "Eight modules · one OS"
-  const bottomDesc      = data?.bottomDescription ?? "Every lever connected, every number visible, every dollar accounted for."
-
-  const bars = data?.chartValues?.length ? data.chartValues : [42, 58, 51, 64, 72, 69, 81, 88, 83, 92, 97, 104]
-
   return (
     <div className="parallax" ref={ref}>
       <section className="parallax__header">
@@ -105,79 +96,24 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
             {/* Layer 3 — title */}
             <div data-parallax-layer="3" className="parallax__layer">
               <div style={{ textAlign: "center" }}>
-                <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">
+                <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4" data-edit-path="eyebrow">
                   {eyebrow}
                 </div>
-                <h2 className="parallax__title">
+                <h2 className="parallax__title" data-edit-path="headline">
                   {headline}<br />
-                  <em>{headlineAccent}</em>
+                  <em data-edit-path="headlineAccent">{headlineAccent}</em>
                 </h2>
-                <div className="parallax__description">
+                <div className="parallax__description" data-edit-path="description">
                   {description}
                 </div>
               </div>
             </div>
 
-            {/* Layer 4 — pipeline card, anchored bottom-right */}
-            <div data-parallax-layer="4" className="parallax__layer">
-              <div
-                className="parallax__pipeline-card"
-                style={{
-                  background: "var(--card)",
-                  border: "1px solid var(--line)",
-                  boxShadow: "0 32px 64px -24px rgba(15,35,73,.4), 0 0 0 1px rgba(255,255,255,0.04)",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                  <div className="mono" style={{ fontSize: 10, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--muted)" }}>
-                    {pipelineLabel}
-                  </div>
-                  <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <span style={{
-                      width: 7, height: 7, borderRadius: "50%",
-                      background: "var(--teal-500)",
-                      boxShadow: "0 0 0 3px rgba(0,198,160,0.25)",
-                      display: "inline-block",
-                    }} />
-                  </span>
-                </div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: "var(--navy-900)", letterSpacing: "-.02em", marginTop: 2 }}>
-                  {pipelineValue}
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4, fontSize: 12, color: "var(--teal-500)", fontWeight: 600 }}>
-                  <span>{pipelineDelta}</span>
-                  <span style={{ color: "var(--muted)", fontWeight: 400 }}>{pipelineComparison}</span>
-                </div>
-                <div style={{ height: 1, background: "var(--line)", margin: "12px 0" }} />
-                <div className="parallax__pipeline-bars">
-                  {bars.map((h, i) => (
-                    <div
-                      key={i}
-                      style={{ height: `${h * 0.85}%`, opacity: 0.7 + i * 0.025 }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
           <div className="parallax__fade" />
         </div>
       </section>
 
-      <section className="parallax__content">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" className="mark">
-          <path
-            d="M94.8284 53.8578C92.3086 56.3776 88 54.593 88 51.0294V0H72V59.9999C72 66.6273 66.6274 71.9999 60 71.9999H0V87.9999H51.0294C54.5931 87.9999 56.3777 92.3085 53.8579 94.8283L18.3431 130.343L29.6569 141.657L65.1717 106.142C67.684 103.63 71.9745 105.396 72 108.939V160L88.0001 160L88 99.9999C88 93.3725 93.3726 87.9999 100 87.9999H160V71.9999H108.939C105.407 71.9745 103.64 67.7091 106.12 65.1938L106.142 65.1716L141.657 29.6568L130.343 18.3432L94.8284 53.8578Z"
-            fill="currentColor"
-          />
-        </svg>
-        <div className="mono" style={{ fontSize: 11, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--muted)" }}>
-          {bottomLabel}
-        </div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "var(--navy-900)", maxWidth: 560, letterSpacing: "-.02em" }}>
-          {bottomDesc}
-        </div>
-      </section>
     </div>
   )
 }

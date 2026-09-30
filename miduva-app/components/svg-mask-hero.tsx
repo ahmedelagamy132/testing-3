@@ -94,7 +94,7 @@ export default function SvgMaskHero({
       </div>
 
       {/* Background illustration — desktop (landscape) */}
-      <div className="hero-illustration" aria-hidden={!illustrationAlt}>
+      <div className="hero-illustration" aria-hidden={!illustrationAlt} data-edit-path={theme === "dark" ? "illustrationDarkUrl" : "illustrationLightUrl"}>
         <Image
           src={illustrationSrc}
           alt={illustrationAlt}

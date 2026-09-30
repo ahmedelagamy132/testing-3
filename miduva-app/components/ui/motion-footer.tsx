@@ -7,6 +7,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { cn } from "@/lib/utils";
 import { Phone, ArrowRight } from "lucide-react";
 import type { FooterData } from "@/lib/types";
+import { CookieSettingsButton } from "@/components/cookie-settings-button";
+import { scrollToPageAnchor } from "@/lib/page-navigation";
 import {
   bindFrameScrollProgress,
   useFrameRuntime,
@@ -26,7 +28,7 @@ const STYLES = `
 
   /*
    * Bridge project tokens → generic names used throughout this component.
-   * Tailwind v4 exposes colors as utility classes (text-foreground → var(--color-foreground))
+   * Tailwind v4 exposes colors as utility classes (text-[var(--ink)] → var(--color-foreground))
    * but does NOT define bare --foreground / --background as CSS custom properties.
    * This project uses --ink / --paper instead (defined in globals.css :root and html.dark).
    */
@@ -70,8 +72,8 @@ const STYLES = `
 .footer-bg-grid {
   background-size: 60px 60px;
   background-image:
-    linear-gradient(to right,  color-mix(in oklch, var(--foreground) 3%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in oklch, var(--foreground) 3%, transparent) 1px, transparent 1px);
+    linear-gradient(to right,  rgba(43, 200, 183, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(43, 200, 183, 0.05) 1px, transparent 1px);
   mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
   -webkit-mask-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
 }
@@ -99,9 +101,10 @@ const STYLES = `
 
 .footer-glass-pill:hover {
   background: linear-gradient(145deg, var(--pill-bg-1-hover) 0%, var(--pill-bg-2-hover) 100%);
-  border-color: var(--pill-border-hover);
+  border-color: rgba(43, 200, 183, 0.45);
   box-shadow:
     0 20px 40px -10px var(--pill-shadow-hover),
+    0 0 24px -6px rgba(43, 200, 183, 0.35),
     inset 0 1px 1px var(--pill-highlight-hover);
   color: var(--foreground);
 }
@@ -112,8 +115,8 @@ const STYLES = `
   font-weight: 900;
   letter-spacing: -0.05em;
   color: transparent;
-  -webkit-text-stroke: 1px color-mix(in oklch, var(--foreground) 10%, transparent);
-  background: linear-gradient(180deg, color-mix(in oklch, var(--foreground) 15%, transparent) 0%, transparent 60%);
+  -webkit-text-stroke: 1px color-mix(in oklch, var(--teal-500) 22%, transparent);
+  background: linear-gradient(180deg, color-mix(in oklch, var(--teal-500) 14%, transparent) 0%, transparent 60%);
   -webkit-background-clip: text;
   background-clip: text;
 }
@@ -123,7 +126,7 @@ const STYLES = `
    an isolated compositor layer where the clipped gradient does not paint,
    making the text invisible (visually empty but selectable). */
 .footer-text-glow {
-  background: linear-gradient(180deg, var(--foreground) 0%, color-mix(in oklch, var(--foreground) 50%, transparent) 100%);
+  background: linear-gradient(180deg, var(--ink) 20%, var(--teal-400) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -199,14 +202,14 @@ const DEFAULT_MARQUEE = [
 ];
 
 const DEFAULT_PRIMARY_CTAS = [
-  { label: "Book a Free Call", href: "#" },
-  { label: "Get Started", href: "#" },
+  { label: "Book a Free Call", href: "#contact" },
+  { label: "Get Started", href: "#contact" },
 ];
 
 const DEFAULT_SECONDARY_LINKS = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Service", href: "#" },
-  { label: "Support", href: "#" },
+  { label: "Services", href: "#services" },
+  { label: "Our Work", href: "#our-work" },
+  { label: "FAQ", href: "#faq" },
 ];
 
 const FOOTER_GIANT_RANGE: FrameScrollRange = { start: [0, 0.8], end: [1, 1] };
@@ -216,8 +219,8 @@ const MarqueeItem = ({ items }: { items: string[] }) => (
   <div className="flex items-center space-x-12 px-6">
     {items.map((label, i) => (
       <React.Fragment key={`${label}-${i}`}>
-        <span>{label}</span>
-        <span className={i % 2 === 0 ? "text-primary/60" : "text-secondary/60"}>✦</span>
+        <span data-edit-path={`marqueeItems.${i}`}>{label}</span>
+        <span className={i % 2 === 0 ? "text-[var(--teal-500)]" : "text-[var(--teal-500)]/50"}>✦</span>
       </React.Fragment>
     ))}
   </div>
@@ -281,7 +284,13 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
     };
   }, [runtime]);
 
-  const scrollToTop = () => runtime?.window.scrollTo({ top: 0, behavior: "smooth" });
+  const scrollToTop = () => {
+    if (runtime) scrollToPageAnchor(runtime, "#hero");
+  };
+  const handleFooterLink = (event: React.MouseEvent<HTMLElement>, href: string) => {
+    if (!runtime || !scrollToPageAnchor(runtime, href)) return;
+    event.preventDefault();
+  };
 
   const giantBgText     = data?.giantBgText     ?? "MIDUVA";
   const heading         = data?.heading         ?? "Ready to grow?";
@@ -302,7 +311,7 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
         className="relative h-screen w-full"
         style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
       >
-        <footer className="fixed bottom-0 left-0 flex h-screen w-full flex-col justify-between overflow-hidden bg-background text-foreground cinematic-footer-wrapper">
+        <footer className="fixed bottom-0 left-0 flex h-screen w-full flex-col justify-between overflow-hidden bg-[var(--paper)] text-[var(--ink)] cinematic-footer-wrapper">
 
           {/* Ambient glow */}
           <div className="footer-aurora absolute left-1/2 top-1/2 h-[60vh] w-[80vw] -translate-x-1/2 -translate-y-1/2 animate-footer-breathe rounded-[50%] blur-[80px] pointer-events-none z-0" />
@@ -311,14 +320,15 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
           {/* Giant background text */}
           <div
             ref={giantTextRef}
+            data-edit-path="giantBgText"
             className="footer-giant-bg-text absolute bottom-16 md:-bottom-[5vh] left-1/2 -translate-x-1/2 whitespace-nowrap z-0 pointer-events-none select-none"
           >
             {giantBgText}
           </div>
 
           {/* Marquee */}
-          <div className="absolute top-12 left-0 w-full overflow-hidden border-y border-border/50 bg-background/60 backdrop-blur-md py-4 z-10 -rotate-2 scale-110 shadow-2xl">
-            <div className="flex w-max animate-footer-scroll-marquee text-xs md:text-sm font-bold tracking-[0.3em] text-muted-foreground uppercase">
+          <div className="absolute top-12 left-0 w-full overflow-hidden border-y border-[rgba(43,200,183,0.18)] bg-[var(--paper-2)]/70 backdrop-blur-md py-4 z-10 -rotate-2 scale-110 shadow-2xl">
+            <div className="flex w-max animate-footer-scroll-marquee text-xs md:text-sm font-bold tracking-[0.3em] text-[var(--muted)] uppercase">
               <MarqueeItem items={marqueeItems} />
               <MarqueeItem items={marqueeItems} />
             </div>
@@ -328,6 +338,7 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
           <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pt-24 pb-4 md:pt-0 md:pb-0 md:mt-20 w-full max-w-5xl mx-auto">
             <h2
               ref={headingRef}
+              data-edit-path="heading"
               className="text-5xl md:text-8xl font-black footer-text-glow tracking-tighter mb-8 md:mb-12 text-center"
             >
               {heading}
@@ -339,16 +350,23 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
                 {primaryCtas.map((cta, i) => (
                   <MagneticButton
                     key={`${cta.label}-${i}`}
+                    data-edit-path={`primaryCtas.${i}`}
                     as="a"
                     href={cta.href}
-                    className="footer-glass-pill w-full md:w-auto justify-center md:justify-start px-8 md:px-10 py-4 md:py-5 rounded-full text-foreground font-bold text-sm md:text-base flex items-center gap-3 group"
+                    onClick={(event: React.MouseEvent<HTMLElement>) => handleFooterLink(event, cta.href)}
+                    className={cn(
+                      "w-full md:w-auto justify-center md:justify-start px-8 md:px-10 py-4 md:py-5 rounded-full font-bold text-sm md:text-base flex items-center gap-3 group",
+                      i === 0
+                        ? "btn-primary shadow-[0_14px_34px_-12px_rgba(43,200,183,0.6)]"
+                        : "footer-glass-pill text-[var(--ink)]",
+                    )}
                   >
                     {i === 0 ? (
-                      <Phone className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+                      <Phone className="w-5 h-5 transition-transform group-hover:-rotate-12" />
                     ) : null}
                     {cta.label}
                     {i !== 0 ? (
-                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground group-hover:translate-x-1 transition-all" />
+                      <ArrowRight className="w-5 h-5 text-[var(--muted)] group-hover:text-[var(--ink)] group-hover:translate-x-1 transition-all" />
                     ) : null}
                   </MagneticButton>
                 ))}
@@ -359,9 +377,11 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
                 {secondaryLinks.map((link, i) => (
                   <MagneticButton
                     key={`${link.label}-${i}`}
+                    data-edit-path={`secondaryLinks.${i}`}
                     as="a"
                     href={link.href}
-                    className="footer-glass-pill px-6 py-3 rounded-full text-muted-foreground font-medium text-xs md:text-sm hover:text-foreground"
+                    onClick={(event: React.MouseEvent<HTMLElement>) => handleFooterLink(event, link.href)}
+                    className="footer-glass-pill px-6 py-3 rounded-full text-[var(--muted)] font-medium text-xs md:text-sm hover:text-[var(--ink)]"
                   >
                     {link.label}
                   </MagneticButton>
@@ -374,20 +394,27 @@ export function CinematicFooter({ data }: { data?: FooterData } = {}) {
               wordmark credit, and back-to-top across. Mobile drops the credit pill
               and pairs copyright (left) with back-to-top (right). */}
           <div className="relative z-20 w-full pb-8 px-6 md:px-12 flex flex-row items-center justify-between gap-4 md:gap-6">
-            <div className="text-muted-foreground text-[10px] md:text-xs font-semibold tracking-widest uppercase order-1">
-              {copyright}
+            <div className="order-1 flex flex-col gap-2">
+              <div className="text-[var(--muted)] text-[10px] md:text-xs font-semibold tracking-widest uppercase" data-edit-path="copyright">
+                {copyright}
+              </div>
+              <nav aria-label="Legal" className="flex flex-wrap gap-x-4 gap-y-1 text-[var(--muted)] text-[10px] md:text-xs font-medium">
+                <a href="/privacy" className="hover:text-[var(--ink)] transition-colors">Privacy</a>
+                <a href="/terms" className="hover:text-[var(--ink)] transition-colors">Terms</a>
+                <CookieSettingsButton label="Cookies" className="hover:text-[var(--ink)] transition-colors" />
+              </nav>
             </div>
 
-            <div className="hidden md:flex footer-glass-pill px-6 py-3 rounded-full items-center gap-2 order-2 cursor-default border-border/50">
-              <span className="text-muted-foreground text-[10px] md:text-xs font-bold uppercase tracking-widest">{createdByLabel}</span>
-              <span className="text-foreground font-black text-xs md:text-sm tracking-normal ml-1">{createdByName}</span>
+            <div className="hidden md:flex footer-glass-pill px-6 py-3 rounded-full items-center gap-2 order-2 cursor-default border-[var(--line)]">
+              <span className="text-[var(--muted)] text-[10px] md:text-xs font-bold uppercase tracking-widest">{createdByLabel}</span>
+              <span className="text-[var(--ink)] font-black text-xs md:text-sm tracking-normal ml-1">{createdByName}</span>
             </div>
 
             <MagneticButton
               as="button"
               onClick={scrollToTop}
               aria-label={backToTopLabel}
-              className="w-12 h-12 rounded-full footer-glass-pill flex items-center justify-center text-muted-foreground hover:text-foreground group order-3 shrink-0"
+              className="w-12 h-12 rounded-full footer-glass-pill flex items-center justify-center text-[var(--muted)] hover:text-[var(--ink)] group order-3 shrink-0"
             >
               <svg className="w-5 h-5 transform group-hover:-translate-y-1.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />

@@ -91,19 +91,37 @@ function AccordionItem({
 }) {
   return (
     <motion.div
+      data-edit-path={`items.${index}`}
+      data-miduva-native-id={`faq:${item.id}`}
       initial={{ opacity: 0, y: 18 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
       transition={{ duration: 0.55, delay: 0.08 + index * 0.055, ease: EASE_FLUID }}
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: 20,
+        background: "var(--card)",
+        border: `1px solid ${isOpen ? "rgba(43,200,183,0.35)" : isDark ? "rgba(255,255,255,0.08)" : "var(--line)"}`,
+        boxShadow: isOpen
+          ? "0 0 40px rgba(43,200,183,0.06)"
+          : isDark
+          ? "inset 0 1px 1px rgba(255,255,255,0.04)"
+          : "0 1px 2px rgba(15,35,73,0.04)",
+        transition: "border-color 0.35s ease, box-shadow 0.35s ease",
+      }}
     >
-      {/* Separator: gradient teal on open, standard line on closed */}
+      {/* Teal top seam when open */}
       <div
         aria-hidden
         style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
           height: 1,
-          background: isOpen
-            ? "linear-gradient(90deg, var(--teal-500), rgba(43,200,183,0.25), transparent)"
-            : "var(--line)",
-          transition: "background 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
+          background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.6), transparent)",
+          opacity: isOpen ? 1 : 0,
+          transition: "opacity 0.35s ease",
         }}
       />
 
@@ -124,7 +142,7 @@ function AccordionItem({
           alignItems: "center",
           width: "100%",
           textAlign: "left",
-          padding: "20px 0",
+          padding: "20px 22px",
           cursor: "pointer",
           background: "none",
           border: "none",
@@ -139,8 +157,6 @@ function AccordionItem({
             lineHeight: 1,
             color: isOpen
               ? "var(--teal-500)"
-              : isDark
-              ? "rgba(255,255,255,0.18)"
               : "var(--muted)",
             transition: "color 0.3s ease",
             userSelect: "none",
@@ -157,13 +173,7 @@ function AccordionItem({
             fontWeight: isOpen ? 600 : 500,
             letterSpacing: "-0.01em",
             lineHeight: 1.45,
-            color: isOpen
-              ? isDark
-                ? "rgba(255,255,255,0.95)"
-                : "var(--ink)"
-              : isDark
-              ? "rgba(255,255,255,0.68)"
-              : "var(--muted)",
+            color: isOpen ? "var(--ink)" : isDark ? "rgba(240,244,255,0.78)" : "var(--ink)",
             transition: "color 0.25s ease",
           }}
         >
@@ -180,8 +190,6 @@ function AccordionItem({
             alignItems: "center",
             color: isOpen
               ? "var(--teal-500)"
-              : isDark
-              ? "rgba(255,255,255,0.28)"
               : "var(--muted)",
             transition: "color 0.3s ease",
             flexShrink: 0,
@@ -207,12 +215,13 @@ function AccordionItem({
           <p
             style={{
               margin: 0,
-              paddingLeft: 54,
+              paddingLeft: 76,
+              paddingRight: 22,
               paddingBottom: 22,
               paddingTop: 2,
               fontSize: 15,
               lineHeight: 1.75,
-              color: isDark ? "rgba(255,255,255,0.48)" : "var(--muted)",
+              color: "var(--muted)",
               maxWidth: "68ch",
             }}
           >
@@ -227,7 +236,7 @@ function AccordionItem({
 // ─── Main export ─────────────────────────────────────────────────────────────
 
 export default function FaqSection({ data }: { data?: FaqData }) {
-  const eyebrow = data?.eyebrow ?? "Common questions"
+  const eyebrow = data?.eyebrow ?? "/ common questions"
   const headline = data?.headline ?? "What founders ask before they book."
   const body = data?.body ?? "If your question isn't here, it will be in the call."
   const items = data?.items?.length ? data.items : DEFAULT_FAQ
@@ -266,7 +275,7 @@ export default function FaqSection({ data }: { data?: FaqData }) {
     <section
       id="faq"
       style={{
-        background: isDark ? "#020204" : "var(--paper)",
+        background: "var(--paper)",
         position: "relative",
         overflow: "hidden",
       }}
@@ -292,13 +301,13 @@ export default function FaqSection({ data }: { data?: FaqData }) {
         aria-hidden
         style={{
           position: "absolute",
-          top: -100,
-          right: -100,
-          width: 480,
-          height: 480,
+          top: -120,
+          left: -120,
+          width: 560,
+          height: 560,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(43,200,183,0.045) 0%, transparent 60%)",
+            "radial-gradient(circle, rgba(43,200,183,0.07) 0%, transparent 60%)",
           filter: "blur(80px)",
           pointerEvents: "none",
         }}
@@ -306,40 +315,36 @@ export default function FaqSection({ data }: { data?: FaqData }) {
 
       <div
         ref={sectionRef}
-        className="relative z-10 max-w-4xl mx-auto px-6 py-14 md:py-28"
+        className="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-12 md:pt-28 md:pb-16 grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-10 lg:gap-16 items-start"
       >
         {/* Header */}
         <motion.div
-          className="mb-8 md:mb-14"
+          className="lg:sticky lg:top-28"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.55, ease: EASE_FLUID }}
         >
-          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-3">
+          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-3" data-edit-path="eyebrow">
             {eyebrow}
           </div>
           <h2
-            className={`text-[clamp(26px,3.2vw,40px)] font-extrabold tracking-[-0.04em] leading-[1.1] ${
-              isDark ? "text-white" : "text-[var(--ink)]"
-            }`}
+            data-edit-path="headline"
+            className="text-[34px] md:text-[48px] font-extrabold tracking-[-0.04em] leading-[1.05] text-[var(--ink)]"
             style={{ textWrap: "balance" } as React.CSSProperties}
           >
             {headline}
           </h2>
           <p
-            className="mt-3 leading-[1.65]"
-            style={{
-              fontSize: 15,
-              color: isDark ? "rgba(255,255,255,0.40)" : "var(--muted)",
-              maxWidth: "44ch",
-            }}
+            className="mt-4 text-[15px] md:text-[17px] leading-[1.65] text-[var(--muted)]"
+            data-edit-path="body"
+            style={{ maxWidth: "40ch" }}
           >
             {body}
           </p>
         </motion.div>
 
         {/* Accordion */}
-        <div>
+        <div className="flex flex-col gap-3">
           {items.map((item, index) => (
             <AccordionItem
               key={item.id}
@@ -355,8 +360,6 @@ export default function FaqSection({ data }: { data?: FaqData }) {
               onKeyDown={(e) => handleKeyDown(e, index)}
             />
           ))}
-          {/* Final separator */}
-          <div aria-hidden style={{ height: 1, background: "var(--line)" }} />
         </div>
       </div>
     </section>

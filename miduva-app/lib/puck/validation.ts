@@ -1,5 +1,6 @@
 import type { LandingPagePuckData } from './types'
 import { SECTION_COMPONENT_NAMES } from './types'
+import { migrateNativeItemSlots, validateNativeItemSlots } from './native-slots'
 
 const MAX_DOCUMENT_BYTES = 1_000_000
 const allowedComponents = new Set<string>(SECTION_COMPONENT_NAMES)
@@ -84,8 +85,6 @@ function validateSectionProps(type: string, props: Record<string, unknown>) {
       break
     case 'ContactSection':
       if (!validRecordArray(props.contactInfo, { icon: 'string', label: 'string' })) return 'Contact information is malformed'
-      if (!validRecordArray(props.trustStats, { stat: 'string', label: 'string' })) return 'Contact statistics are malformed'
-      if (!validRecordArray(props.serviceOptions, { value: 'string', label: 'string' })) return 'Contact service options are malformed'
       break
     case 'FooterSection':
       if (!validStringArray(props.marqueeItems)) return 'Footer marquee items are malformed'
@@ -135,6 +134,8 @@ function validateSlots(rootProps: Record<string, unknown>) {
     if (seen.has(component.type)) return `Section ${component.type} can only appear once`
     seen.add(component.type)
     if (typeof component.props.id !== 'string' || !component.props.id) return `Section ${component.type} is missing its ID`
+    const nativeSlotError = validateNativeItemSlots(component.type, component.props)
+    if (nativeSlotError) return nativeSlotError
     const propsError = validateSectionProps(component.type, component.props)
     if (propsError) return propsError
   }
@@ -149,10 +150,12 @@ export function validateLandingPageData(input: unknown): { ok: true; data: Landi
     return { ok: false, error: 'Document is not valid JSON' }
   }
   if (Buffer.byteLength(serialized, 'utf8') > MAX_DOCUMENT_BYTES) return { ok: false, error: 'Document exceeds the 1 MB limit' }
-  if (!isRecord(input) || !Array.isArray(input.content) || !isRecord(input.root)) return { ok: false, error: 'Invalid Puck document' }
+  if (!isRecord(input) || !Array.isArray(input.content) || !isRecord(input.root)) return { ok: false, error: 'Invalid Miduva page document' }
   if (input.content.length > 0) return { ok: false, error: 'Sections must stay inside the protected landing-page slots' }
 
-  const rootProps = isRecord(input.root.props) ? input.root.props : input.root
+  const data = migrateNativeItemSlots(input as LandingPagePuckData)
+
+  const rootProps = (isRecord(data.root.props) ? data.root.props : data.root) as Record<string, unknown>
   if (!isRecord(rootProps.dashboard)) return { ok: false, error: 'Protected dashboard data is required' }
 
   const slotError = validateSlots(rootProps)
@@ -182,7 +185,7 @@ export function validateLandingPageData(input: unknown): { ok: true; data: Landi
     return { ok: false, error: 'Automation health must be between 0 and 100' }
   }
 
-  const valueError = inspectValue(input)
+  const valueError = inspectValue(data)
   if (valueError) return { ok: false, error: valueError }
-  return { ok: true, data: input as LandingPagePuckData }
+  return { ok: true, data }
 }

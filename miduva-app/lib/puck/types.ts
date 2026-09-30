@@ -1,4 +1,3 @@
-import type { Data, Slot } from '@puckeditor/core'
 import type {
   BrandingData,
   ContactData,
@@ -17,23 +16,63 @@ import type {
   ServicesData,
   SystemsSectionData,
   WhyMiduvaData,
+  SystemCard,
+  SystemBackgroundImage,
+  ProblemCard,
+  HowItWorksStep,
+  StatCard,
+  ClientLogoData,
+  DifferentiatorCard,
+  ServiceCategory,
+  GrowthOsModule,
+  FaqItem as FaqItemData,
 } from '@/lib/types'
+
+// Stored page documents keep the shape the previous (Puck) editor wrote, so
+// existing drafts, published pages and revisions stay readable.
+export type StoredComponent = { type: string; props: Record<string, unknown> & { id?: string } }
+type Slot = StoredComponent[]
+
+export type NativeItemProps<T> = Omit<T, 'id'> & { itemId: string }
+
+export type NativeSectionSlots = {
+  systemItems?: Slot
+  systemBackgroundItems?: Slot
+  problemItems?: Slot
+  stepItems?: Slot
+  statItems?: Slot
+  logoItems?: Slot
+  differentiatorItems?: Slot
+  serviceItems?: Slot
+  moduleItems?: Slot
+  faqItems?: Slot
+}
 
 export type LandingPageComponents = {
   HeroSection: HeroData
-  SystemsSection: SystemsSectionData
-  ProblemSolutionSection: ProblemSolutionData
-  HowItWorksSection: HowItWorksData
-  ResultsSection: ResultsData
-  OurWorkSection: OurWorkData
-  WhyMiduvaSection: WhyMiduvaData
+  SystemsSection: SystemsSectionData & Pick<NativeSectionSlots, 'systemItems' | 'systemBackgroundItems'>
+  ProblemSolutionSection: ProblemSolutionData & Pick<NativeSectionSlots, 'problemItems'>
+  HowItWorksSection: HowItWorksData & Pick<NativeSectionSlots, 'stepItems'>
+  ResultsSection: ResultsData & Pick<NativeSectionSlots, 'statItems'>
+  OurWorkSection: OurWorkData & Pick<NativeSectionSlots, 'logoItems'>
+  WhyMiduvaSection: WhyMiduvaData & Pick<NativeSectionSlots, 'differentiatorItems'>
   ParallaxSection: ParallaxData
-  ServicesSection: ServicesData
-  GrowthOsSection: GrowthOsData
-  FaqSection: FaqData
+  ServicesSection: ServicesData & Pick<NativeSectionSlots, 'serviceItems'>
+  GrowthOsSection: GrowthOsData & Pick<NativeSectionSlots, 'moduleItems'>
+  FaqSection: FaqData & Pick<NativeSectionSlots, 'faqItems'>
   FreeOfferSection: FreeOfferData
   ContactSection: ContactData
   FooterSection: FooterData
+  SystemCardItem: NativeItemProps<SystemCard>
+  SystemBackgroundItem: NativeItemProps<SystemBackgroundImage>
+  ProblemCardItem: NativeItemProps<ProblemCard>
+  HowStepItem: NativeItemProps<HowItWorksStep>
+  ResultStatItem: NativeItemProps<StatCard>
+  ClientLogoItem: NativeItemProps<ClientLogoData>
+  DifferentiatorItem: NativeItemProps<DifferentiatorCard>
+  ServiceCategoryItem: NativeItemProps<ServiceCategory>
+  GrowthModuleItem: NativeItemProps<GrowthOsModule>
+  FaqItem: NativeItemProps<FaqItemData>
 }
 
 export type SeoData = {
@@ -48,11 +87,14 @@ export type LandingPageRootProps = {
   branding?: BrandingData
   nav?: NavData
   dashboard?: DashboardData
-  beforeDashboard?: Slot<LandingPageComponents>
-  afterDashboard?: Slot<LandingPageComponents>
+  beforeDashboard?: Slot
+  afterDashboard?: Slot
 }
 
-export type LandingPagePuckData = Data<LandingPageComponents, LandingPageRootProps>
+export type LandingPagePuckData = {
+  content: StoredComponent[]
+  root: { props?: LandingPageRootProps }
+}
 
 export type PuckPageDocument = {
   draft: LandingPagePuckData
@@ -95,4 +137,17 @@ export const SECTION_COMPONENT_NAMES = [
   'FreeOfferSection',
   'ContactSection',
   'FooterSection',
+] as const satisfies readonly (keyof LandingPageComponents)[]
+
+export const NATIVE_ITEM_COMPONENT_NAMES = [
+  'SystemCardItem',
+  'SystemBackgroundItem',
+  'ProblemCardItem',
+  'HowStepItem',
+  'ResultStatItem',
+  'ClientLogoItem',
+  'DifferentiatorItem',
+  'ServiceCategoryItem',
+  'GrowthModuleItem',
+  'FaqItem',
 ] as const satisfies readonly (keyof LandingPageComponents)[]

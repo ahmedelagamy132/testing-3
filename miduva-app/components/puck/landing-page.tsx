@@ -2,18 +2,14 @@
 
 import { createContext, useCallback, useContext, useRef, useState } from "react"
 import type { RefObject } from "react"
-import type { SlotComponent } from "@puckeditor/core"
 import type {
-  BrandingData,
   ContactData,
-  DashboardData,
   FaqData,
   FooterData,
   FreeOfferData,
   GrowthOsData,
   HeroData,
   HowItWorksData,
-  NavData,
   OurWorkData,
   ParallaxData,
   ProblemSolutionData,
@@ -22,10 +18,11 @@ import type {
   SystemsSectionData,
   WhyMiduvaData,
 } from "@/lib/types"
+import type { LandingContent, SectionEntry } from "@/lib/site-editor/content"
+import type { SectionType } from "@/lib/site-editor/schema"
 import Nav from "@/components/nav"
 import SvgMaskHero from "@/components/svg-mask-hero"
 import HeroContent from "@/components/hero-content"
-import Dashboard from "@/components/dashboard"
 import SystemsZoomSection from "@/components/systems-zoom-section"
 import ProblemSolution from "@/components/problem-solution"
 import HowItWorks from "@/components/how-it-works"
@@ -52,26 +49,66 @@ const LandingContext = createContext<LandingContextValue | null>(null)
 
 function useLandingContext() {
   const value = useContext(LandingContext)
-  if (!value) throw new Error("Landing page sections must render inside LandingPageRoot")
+  if (!value) throw new Error("Landing page sections must render inside LandingPage")
   return value
 }
 
-export function LandingPageRoot({
-  beforeDashboard,
-  afterDashboard,
-  branding,
-  nav,
-  dashboard,
-  defaultTheme = "dark",
-}: {
-  beforeDashboard?: SlotComponent
-  afterDashboard?: SlotComponent
-  branding?: BrandingData
-  nav?: NavData
-  dashboard?: DashboardData
-  defaultTheme?: "dark" | "light"
-}) {
-  const [theme, setTheme] = useState<"dark" | "light">(defaultTheme)
+function HeroSection({ data }: { data: HeroData }) {
+  const { theme, navRef, onRevealComplete, onRevealReverse } = useLandingContext()
+  return (
+    <div className="relative">
+      <SvgMaskHero
+        theme={theme}
+        onRevealComplete={onRevealComplete}
+        onRevealReverse={onRevealReverse}
+        scanTarget={navRef}
+        illustrationDarkUrl={data.illustrationDarkUrl}
+        illustrationLightUrl={data.illustrationLightUrl}
+        illustrationAlt={data.illustrationAlt}
+      >
+        <HeroContent theme={theme} data={data} />
+      </SvgMaskHero>
+    </div>
+  )
+}
+
+function FreeOfferSection({ data }: { data: FreeOfferData }) {
+  const { theme } = useLandingContext()
+  return <FreeOffer theme={theme} data={data} />
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any -- section props are validated server-side against the schema */
+const SECTIONS: Record<SectionType, { anchor: string; render: (data: any) => React.ReactNode }> = {
+  HeroSection: { anchor: "hero", render: (data: HeroData) => <HeroSection data={data} /> },
+  SystemsSection: { anchor: "systems", render: (data: SystemsSectionData) => <SystemsZoomSection data={data} /> },
+  ProblemSolutionSection: { anchor: "problem-solution", render: (data: ProblemSolutionData) => <ProblemSolution data={data} /> },
+  HowItWorksSection: { anchor: "how-it-works", render: (data: HowItWorksData) => <HowItWorks data={data} /> },
+  ResultsSection: { anchor: "results", render: (data: ResultsData) => <ResultsStats data={data} /> },
+  OurWorkSection: { anchor: "our-work", render: (data: OurWorkData) => <OurWork data={data} /> },
+  WhyMiduvaSection: { anchor: "why-miduva", render: (data: WhyMiduvaData) => <WhyMiduva data={data} /> },
+  ParallaxSection: { anchor: "parallax", render: (data: ParallaxData) => <ParallaxSection data={data} /> },
+  ServicesSection: { anchor: "services", render: (data: ServicesData) => <Services data={data} /> },
+  GrowthOsSection: { anchor: "growth-os", render: (data: GrowthOsData) => <SystemRibbon data={data} /> },
+  FaqSection: { anchor: "faq", render: (data: FaqData) => <FaqSection data={data} /> },
+  FreeOfferSection: { anchor: "free-offer", render: (data: FreeOfferData) => <FreeOfferSection data={data} /> },
+  ContactSection: { anchor: "contact", render: (data: ContactData) => <ContactSection data={data} /> },
+  FooterSection: { anchor: "footer", render: (data: FooterData) => <CinematicFooter data={data} /> },
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+function Section({ section }: { section: SectionEntry }) {
+  const definition = SECTIONS[section.type]
+  return (
+    <div id={`anchor-${definition.anchor}`} className="preview-anchor" data-edit-section={section.id}>
+      {definition.render(section.props)}
+    </div>
+  )
+}
+
+export function LandingPage({ content }: { content: LandingContent }) {
+  const { settings, sections } = content
+  // Light mode is disabled for now; the site always renders dark.
+  const theme = "dark" as const
   const [heroRevealed, setHeroRevealed] = useState(true)
   const navRef = useRef<HTMLElement>(null)
 
@@ -82,72 +119,19 @@ export function LandingPageRoot({
     <FrameRuntimeProvider className="relative min-h-screen overflow-x-clip">
       <FrameThemeSync theme={theme} />
       <LandingContext.Provider value={{ theme, navRef, onRevealComplete, onRevealReverse }}>
-        <div id="anchor-nav" className="preview-anchor preview-nav-backdrop">
+        <div id="anchor-nav" className="preview-anchor preview-nav-backdrop" data-edit-scope="nav" data-edit-section="@settings">
           <Nav
             ref={navRef}
             theme={theme}
-            setTheme={setTheme}
             heroRevealed={heroRevealed}
-            data={nav}
-            branding={branding}
+            data={settings.nav}
+            branding={settings.branding}
           />
         </div>
         <main>
-          {beforeDashboard?.({ className: "puck-section-slot", minEmptyHeight: 72 })}
-          <div id="anchor-dashboard" className="preview-anchor">
-            <div className="hidden px-6 py-10 md:block md:py-14">
-              <div className="max-w-6xl mx-auto p-3 rounded-[32px] border-2 border-dashed border-[var(--line)]">
-                <Dashboard data={dashboard} />
-              </div>
-            </div>
-          </div>
-          {afterDashboard?.({ className: "puck-section-slot", minEmptyHeight: 72 })}
+          {sections.filter((section) => !section.hidden).map((section) => <Section key={section.id} section={section} />)}
         </main>
       </LandingContext.Provider>
     </FrameRuntimeProvider>
   )
 }
-
-function Anchor({ id, children }: { id: string; children: React.ReactNode }) {
-  return <div id={`anchor-${id}`} className="preview-anchor">{children}</div>
-}
-
-export function PuckHeroSection(props: HeroData) {
-  const { theme, navRef, onRevealComplete, onRevealReverse } = useLandingContext()
-  return (
-    <Anchor id="hero">
-      <div className="relative">
-        <SvgMaskHero
-          theme={theme}
-          onRevealComplete={onRevealComplete}
-          onRevealReverse={onRevealReverse}
-          scanTarget={navRef}
-          illustrationDarkUrl={props.illustrationDarkUrl}
-          illustrationLightUrl={props.illustrationLightUrl}
-          illustrationAlt={props.illustrationAlt}
-        >
-          <HeroContent theme={theme} data={props} />
-        </SvgMaskHero>
-      </div>
-    </Anchor>
-  )
-}
-
-export const PuckSystemsSection = (props: SystemsSectionData) => <Anchor id="systems"><SystemsZoomSection data={props} /></Anchor>
-export const PuckProblemSolutionSection = (props: ProblemSolutionData) => <Anchor id="problem-solution"><ProblemSolution data={props} /></Anchor>
-export const PuckHowItWorksSection = (props: HowItWorksData) => <Anchor id="how-it-works"><HowItWorks data={props} /></Anchor>
-export const PuckResultsSection = (props: ResultsData) => <Anchor id="results"><ResultsStats data={props} /></Anchor>
-export const PuckOurWorkSection = (props: OurWorkData) => <Anchor id="our-work"><OurWork data={props} /></Anchor>
-export const PuckWhyMiduvaSection = (props: WhyMiduvaData) => <Anchor id="why-miduva"><WhyMiduva data={props} /></Anchor>
-export const PuckParallaxSection = (props: ParallaxData) => <Anchor id="parallax"><ParallaxSection data={props} /></Anchor>
-export const PuckServicesSection = (props: ServicesData) => <Anchor id="services"><Services data={props} /></Anchor>
-export const PuckGrowthOsSection = (props: GrowthOsData) => <Anchor id="growth-os"><SystemRibbon data={props} /></Anchor>
-export const PuckFaqSection = (props: FaqData) => <Anchor id="faq"><FaqSection data={props} /></Anchor>
-
-export function PuckFreeOfferSection(props: FreeOfferData) {
-  const { theme } = useLandingContext()
-  return <Anchor id="free-offer"><div className="h-4 md:h-20" /><FreeOffer theme={theme} data={props} /></Anchor>
-}
-
-export const PuckContactSection = (props: ContactData) => <Anchor id="contact"><ContactSection data={props} /></Anchor>
-export const PuckFooterSection = (props: FooterData) => <Anchor id="footer"><CinematicFooter data={props} /></Anchor>

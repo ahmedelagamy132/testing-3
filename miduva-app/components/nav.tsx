@@ -3,6 +3,7 @@
 import { forwardRef, useState, useEffect } from "react"
 import type { BrandingData, NavData } from "@/lib/types"
 import { useFrameRuntime } from "@/components/puck/frame-runtime"
+import { scrollToPageAnchor } from "@/lib/page-navigation"
 
 const DEFAULT_LEFT = [
   { n: "Services",     h: "#services"    },
@@ -11,13 +12,14 @@ const DEFAULT_LEFT = [
 ]
 const DEFAULT_RIGHT = [
   { n: "Our Work",     h: "#our-work"    },
-  { n: "About",        h: "#why-miduva"  },
-  { n: "Get Started",  h: "#cta"         },
+  { n: "About",        h: "#parallax"    },
+  { n: "Get Started",  h: "#contact"     },
 ]
 
 interface NavProps {
   theme: "dark" | "light"
-  setTheme: (t: "dark" | "light") => void
+  /** Omit to hide the theme toggle (the site is dark-only for now). */
+  setTheme?: (t: "dark" | "light") => void
   heroRevealed?: boolean
   data?: NavData
   branding?: BrandingData
@@ -78,14 +80,9 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
   const logoAlt = branding?.logoAlt || "Miduva"
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (!href.startsWith("#")) return
+    if (!runtime || !scrollToPageAnchor(runtime, href)) return
     e.preventDefault()
-    const id = href.replace("#", "")
-    const el = runtime?.document.getElementById(id)
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" })
-      setOpen(false)
-    }
+    setOpen(false)
   }
 
   return (
@@ -104,26 +101,27 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
       >
         <div className="hidden lg:grid grid-cols-[1fr_auto_1fr] items-center px-8 py-3 gap-8">
           <ul className={`flex items-center justify-start gap-8 ${linkBase} ${linkColor}`}>
-            {leftItems.map((i) => (
-              <li key={i.n}>
+            {leftItems.map((i, index) => (
+              <li key={i.n} data-edit-path={`leftLinks.${index}`}>
                 <a href={i.h} onClick={(e) => handleNavClick(e, i.h)}>{i.n}</a>
               </li>
             ))}
           </ul>
 
-          <a href="#" className="flex items-center justify-center">
+          <a href="#hero" onClick={(e) => handleNavClick(e, "#hero")} className="flex items-center justify-center" aria-label={`${logoAlt} home`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoSrc} alt={logoAlt} className="h-7 w-auto" />
+            <img src={logoSrc} alt={logoAlt} className="h-7 w-auto" data-edit-scope="branding" data-edit-path={useWhite ? "logoLightUrl" : "logoDarkUrl"} />
           </a>
 
           <div className="flex items-center justify-end gap-8">
             <ul className={`flex items-center gap-8 ${linkBase} ${linkColor}`}>
-              {rightItems.map((i) => (
-                <li key={i.n}>
+              {rightItems.map((i, index) => (
+                <li key={i.n} data-edit-path={`rightLinks.${index}`}>
                   <a href={i.h} onClick={(e) => handleNavClick(e, i.h)}>{i.n}</a>
                 </li>
               ))}
             </ul>
+            {setTheme && (
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle theme"
@@ -144,16 +142,18 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
                 </svg>
               )}
             </button>
+            )}
           </div>
         </div>
 
         <div className="lg:hidden flex items-center justify-between px-5 py-3">
-          <a href="#" className="flex items-center">
+          <a href="#hero" onClick={(e) => handleNavClick(e, "#hero")} className="flex items-center" aria-label={`${logoAlt} home`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoSrc} alt={logoAlt} className="h-7 w-auto" />
+            <img src={logoSrc} alt={logoAlt} className="h-7 w-auto" data-edit-scope="branding" data-edit-path={useWhite ? "logoLightUrl" : "logoDarkUrl"} />
           </a>
 
           <div className="flex items-center gap-2">
+            {setTheme && (
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label="Toggle theme"
@@ -174,6 +174,7 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
                 </svg>
               )}
             </button>
+            )}
             <button
               onClick={() => setOpen(!open)}
               className={`p-2 rounded-lg border transition ${
@@ -199,9 +200,10 @@ const Nav = forwardRef<HTMLElement, NavProps>(function Nav(
 
         {open && (
           <div className="lg:hidden border-t border-[var(--line)] px-5 pb-5 pt-2">
-            {[...leftItems, ...rightItems].map((i) => (
+            {[...leftItems, ...rightItems].map((i, index) => (
               <a
                 key={i.n}
+                data-edit-path={index < leftItems.length ? `leftLinks.${index}` : `rightLinks.${index - leftItems.length}`}
                 href={i.h}
                 onClick={(e) => handleNavClick(e, i.h)}
                 className={`block rounded-lg px-2 py-3 text-sm font-medium transition ${

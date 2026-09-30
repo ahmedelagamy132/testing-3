@@ -24,37 +24,37 @@ const DEFAULT_SLIDES: Slide[] = [
     id: "growth-marketing",
     title: "Growth & Marketing",
     items: ["Paid Ads", "Social Media Ads", "Retargeting", "SEO", "Content Marketing", "AI Visibility (GEO)", "Advanced Growth Strategies"],
-    imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=900&auto=format&fit=crop",
+    imageUrl: "/assets/visuals/growth-marketing.webp",
   },
   {
     id: "conversion-funnels",
     title: "Conversion & Funnels",
     items: ["Landing Pages", "Sales Funnels", "CRO", "A/B Testing", "UX Optimization", "Personalization Systems"],
-    imageUrl: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=900&auto=format&fit=crop",
+    imageUrl: "/assets/visuals/conversion-funnels.webp",
   },
   {
     id: "websites-dev",
     title: "Websites & Development",
     items: ["Landing Pages", "E-Commerce", "Performance Optimization", "CMS", "Web Apps", "SaaS Development"],
-    imageUrl: "https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=900&auto=format&fit=crop",
+    imageUrl: "/assets/visuals/websites-development.webp",
   },
   {
     id: "ecommerce",
     title: "E-Commerce",
     items: ["Shopify", "WooCommerce", "Custom Platforms", "Marketing Integration", "Conversion Optimization"],
-    imageUrl: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=900&auto=format&fit=crop",
+    imageUrl: "/assets/visuals/ecommerce.webp",
   },
   {
     id: "ai-automation",
     title: "AI & Automation",
     items: ["WhatsApp & Website Chatbots", "CRM Automation", "Email Automation", "Lead Management", "AI Sales Agents", "n8n Workflows", "Custom AI"],
-    imageUrl: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?q=80&w=900&auto=format&fit=crop",
+    imageUrl: "/assets/visuals/ai-automation.webp",
   },
   {
     id: "data-analytics",
     title: "Data & Analytics",
     items: ["GA4 / Meta Setup", "Conversion Tracking", "Dashboards", "Reporting", "Attribution Modeling", "Revenue Forecasting"],
-    imageUrl: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=900&auto=format&fit=crop",
+    imageUrl: "/assets/visuals/data-analytics.webp",
   },
 ]
 
@@ -147,8 +147,9 @@ function ServiceTitles({ slides, activeLabel, servicesLabel }: { slides: Slide[]
   return (
     <>
       {slides.map((slide, index) => (
-        <div key={slide.id} className="border-b border-[var(--line)] last:border-none md:contents">
+        <div key={slide.id} className="border-b border-[var(--line)] last:border-none md:contents" data-edit-path={`categories.${index}`}>
           <TextStaggerHover
+            data-miduva-native-id={`service:${slide.id}`}
             index={index}
             tabIndex={0}
             role="button"
@@ -183,14 +184,14 @@ export default function Services({ data }: { data?: ServicesData }) {
     : DEFAULT_SLIDES
 
   return (
-    <section id="services" className="py-16 md:py-28">
+    <section id="services" className="pt-10 pb-16 md:pt-16 md:pb-28">
       <div className="max-w-6xl mx-auto px-5 md:px-6">
         {/* Header */}
         <div className="mb-9 md:mb-14">
-          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4">{eyebrow}</div>
-          <h2 className="text-[42px] md:text-[72px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.02]">
+          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-4" data-edit-path="eyebrow">{eyebrow}</div>
+          <h2 className="text-[42px] md:text-[72px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.02]" data-edit-path="headline">
             {headline}<br />
-            <span className="text-[var(--teal-500)]">{headlineAccent}</span>
+            <span className="text-[var(--teal-500)]" data-edit-path="headlineAccent">{headlineAccent}</span>
           </h2>
         </div>
 
@@ -202,6 +203,7 @@ export default function Services({ data }: { data?: ServicesData }) {
             <div className="pt-6 md:pt-8">
               <a
                 href={ctaHref}
+                data-edit-path="ctaLabel"
                 className="inline-flex items-center gap-2.5 text-[13px] font-semibold text-[var(--navy-900)] hover:text-[var(--teal-500)] transition-colors"
               >
                 {ctaLabel}

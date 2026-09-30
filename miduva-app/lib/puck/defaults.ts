@@ -1,4 +1,5 @@
 import type { LandingPagePuckData } from './types'
+import { migrateNativeItemSlots } from './native-slots'
 
 const ourWorkLogos = [
   { src: '/client-logos/19.png', name: 'DEZ', category: 'B2B systems' },
@@ -41,8 +42,8 @@ export const DEFAULT_ROOT_PROPS = {
     ],
     rightLinks: [
       { label: 'Our Work', href: '#our-work' },
-      { label: 'About', href: '#why-miduva' },
-      { label: 'Get Started', href: '#cta' },
+      { label: 'About', href: '#parallax' },
+      { label: 'Get Started', href: '#contact' },
     ],
   },
   dashboard: {
@@ -94,7 +95,7 @@ export const DEFAULT_SECTION_PROPS = {
     body: 'No generic services. We design tailored systems using ads, funnels, automation, and data — engineered end-to-end, owned by you.',
     phrasePrefix: 'Engineered to',
     phrases: ['generate leads.', 'drive sales.', 'scale your business.'],
-    primaryCta: { label: 'Get Started', href: '#get-started' },
+    primaryCta: { label: 'Get Started', href: '#contact' },
     secondaryCta: { label: 'See Our Work', href: '#our-work' },
     illustrationDarkUrl: '/assets/system-dark.png',
     illustrationLightUrl: '/assets/system-light.png',
@@ -107,17 +108,17 @@ export const DEFAULT_SECTION_PROPS = {
     ctaLabel: 'Explore Your System',
     ctaHref: '#cta',
     systems: [
-      { id: 'lead-gen', num: '01', label: 'Lead Generation System', title: 'Consistent leads.\nOn autopilot.', description: 'Generate predictable lead flow using ads, funnels & precision conversion systems built for your market.', imageUrl: '/assets/systems/lead-gen.jpg' },
-      { id: 'website-conversion', num: '02', label: 'Website & Conversion System', title: 'Your website,\nactually converting.', description: "Turn traffic into revenue with a high-performance site engineered around your buyer's journey.", imageUrl: '/assets/systems/website-conversion.jpg' },
-      { id: 'automation', num: '03', label: 'Smart Automation System', title: 'Sales & follow-ups\nrunning 24/7.', description: 'CRM workflows, AI agents, and email sequences that close deals while you sleep, no extra hires.', imageUrl: '/assets/systems/automation.jpg' },
+      { id: 'lead-gen', num: '01', label: 'Lead Generation System', title: 'Consistent leads.\nOn autopilot.', description: 'Generate predictable lead flow using ads, funnels & precision conversion systems built for your market.', imageUrl: '/assets/system-story/lead-generation-system.webp' },
+      { id: 'website-conversion', num: '02', label: 'Website & Conversion System', title: 'Your website,\nactually converting.', description: "Turn traffic into revenue with a high-performance site engineered around your buyer's journey.", imageUrl: '/assets/system-story/website-conversion-system.webp' },
+      { id: 'automation', num: '03', label: 'Smart Automation System', title: 'Sales & follow-ups\nrunning 24/7.', description: 'CRM workflows, AI agents, and email sequences that close deals while you sleep, no extra hires.', imageUrl: '/assets/system-story/smart-automation-system.webp' },
     ],
     backgroundImages: [
-      { url: '/assets/systems/bg-growth.jpg', alt: 'Growth dashboard visualization' },
-      { url: '/assets/systems/bg-web.jpg', alt: 'Website conversion interface' },
-      { url: '/assets/systems/bg-data.jpg', alt: 'Data analytics workspace' },
-      { url: '/assets/systems/bg-automation.jpg', alt: 'Automation workflow interface' },
-      { url: '/assets/systems/bg-digital.jpg', alt: 'Digital campaign interface' },
-      { url: '/assets/systems/bg-charts.jpg', alt: 'Performance chart visualization' },
+      { url: '/assets/system-story/campaign-reach.webp', alt: 'Two men planning a campaign at a studio wall' },
+      { url: '/assets/system-story/responsive-website.webp', alt: 'Man browsing a ceramic shop on his phone' },
+      { url: '/assets/system-story/performance-data.webp', alt: 'Analyst reviewing printed sales charts' },
+      { url: '/assets/system-story/follow-up-flow.webp', alt: 'Sales associate making a customer follow-up call' },
+      { url: '/assets/system-story/campaign-production.webp', alt: 'Photographer shooting a ceramic product in a studio' },
+      { url: '/assets/system-story/business-results.webp', alt: 'Shop owner preparing customer orders for dispatch' },
     ],
   },
   ProblemSolutionSection: {
@@ -143,10 +144,10 @@ export const DEFAULT_SECTION_PROPS = {
     headline: 'From audit to scale —',
     headlineAccent: 'four steps.',
     steps: [
-      { id: 'analyze', num: '01', title: 'Analyze Your Business', description: 'We audit your channels, funnels, and conversion gaps to build a complete picture of where you stand and where the biggest opportunities hide.', imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop' },
-      { id: 'strategy', num: '02', title: 'Build a Custom Strategy', description: 'A system blueprint tailored to your market, audience, and goals — no templates, no guesswork, just a clear plan for growth.', imageUrl: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2670&auto=format&fit=crop' },
-      { id: 'launch', num: '03', title: 'Launch & Optimize the System', description: 'Everything goes live and gets tuned until it performs. We test, iterate, and refine until every metric is moving in the right direction.', imageUrl: 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?q=80&w=2670&auto=format&fit=crop' },
-      { id: 'scale', num: '04', title: 'Scale Your Results', description: 'More traffic, better conversions, automated follow-up — compounding returns that grow your business while you focus on what you do best.', imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2426&auto=format&fit=crop' },
+      { id: 'analyze', num: '01', title: 'Analyze Your Business', description: 'We audit your channels, funnels, and conversion gaps to build a complete picture of where you stand and where the biggest opportunities hide.', imageUrl: '/assets/visuals/analyze.webp' },
+      { id: 'strategy', num: '02', title: 'Build a Custom Strategy', description: 'A system blueprint tailored to your market, audience, and goals — no templates, no guesswork, just a clear plan for growth.', imageUrl: '/assets/visuals/strategy.webp' },
+      { id: 'launch', num: '03', title: 'Launch & Optimize the System', description: 'Everything goes live and gets tuned until it performs. We test, iterate, and refine until every metric is moving in the right direction.', imageUrl: '/assets/visuals/launch.webp' },
+      { id: 'scale', num: '04', title: 'Scale Your Results', description: 'More traffic, better conversions, automated follow-up — compounding returns that grow your business while you focus on what you do best.', imageUrl: '/assets/visuals/scale.webp' },
     ],
   },
   ResultsSection: {
@@ -169,8 +170,7 @@ export const DEFAULT_SECTION_PROPS = {
     logos: ourWorkLogos,
   },
   WhyMiduvaSection: {
-    eyebrow: 'Why Miduva',
-    watermark: 'WHY',
+    eyebrow: '/ why miduva',
     statementLead: "We don't sell",
     statementOldWay: 'services.',
     statementBridge: 'We build',
@@ -195,8 +195,6 @@ export const DEFAULT_SECTION_PROPS = {
     pipelineDelta: '▲ 21.4%',
     pipelineComparison: 'vs last Q',
     chartValues: [42, 58, 51, 64, 72, 69, 81, 88, 83, 92, 97, 104],
-    bottomLabel: 'Eight modules · one OS',
-    bottomDescription: 'Every lever connected, every number visible, every dollar accounted for.',
   },
   ServicesSection: {
     eyebrow: '/ what we do',
@@ -207,12 +205,12 @@ export const DEFAULT_SECTION_PROPS = {
     ctaLabel: 'Book a free strategy call',
     ctaHref: '#cta',
     categories: [
-      { id: 'growth-marketing', title: 'Growth & Marketing', items: ['Paid Ads', 'Social Media Ads', 'Retargeting', 'SEO', 'Content Marketing', 'AI Visibility (GEO)', 'Advanced Growth Strategies'], imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=900&auto=format&fit=crop' },
-      { id: 'conversion-funnels', title: 'Conversion & Funnels', items: ['Landing Pages', 'Sales Funnels', 'CRO', 'A/B Testing', 'UX Optimization', 'Personalization Systems'], imageUrl: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?q=80&w=900&auto=format&fit=crop' },
-      { id: 'websites-dev', title: 'Websites & Development', items: ['Landing Pages', 'E-Commerce', 'Performance Optimization', 'CMS', 'Web Apps', 'SaaS Development'], imageUrl: 'https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=900&auto=format&fit=crop' },
-      { id: 'ecommerce', title: 'E-Commerce', items: ['Shopify', 'WooCommerce', 'Custom Platforms', 'Marketing Integration', 'Conversion Optimization'], imageUrl: 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=900&auto=format&fit=crop' },
-      { id: 'ai-automation', title: 'AI & Automation', items: ['WhatsApp & Website Chatbots', 'CRM Automation', 'Email Automation', 'Lead Management', 'AI Sales Agents', 'n8n Workflows', 'Custom AI'], imageUrl: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?q=80&w=900&auto=format&fit=crop' },
-      { id: 'data-analytics', title: 'Data & Analytics', items: ['GA4 / Meta Setup', 'Conversion Tracking', 'Dashboards', 'Reporting', 'Attribution Modeling', 'Revenue Forecasting'], imageUrl: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=900&auto=format&fit=crop' },
+      { id: 'growth-marketing', title: 'Growth & Marketing', items: ['Paid Ads', 'Social Media Ads', 'Retargeting', 'SEO', 'Content Marketing', 'AI Visibility (GEO)', 'Advanced Growth Strategies'], imageUrl: '/assets/visuals/growth-marketing.webp' },
+      { id: 'conversion-funnels', title: 'Conversion & Funnels', items: ['Landing Pages', 'Sales Funnels', 'CRO', 'A/B Testing', 'UX Optimization', 'Personalization Systems'], imageUrl: '/assets/visuals/conversion-funnels.webp' },
+      { id: 'websites-dev', title: 'Websites & Development', items: ['Landing Pages', 'E-Commerce', 'Performance Optimization', 'CMS', 'Web Apps', 'SaaS Development'], imageUrl: '/assets/visuals/websites-development.webp' },
+      { id: 'ecommerce', title: 'E-Commerce', items: ['Shopify', 'WooCommerce', 'Custom Platforms', 'Marketing Integration', 'Conversion Optimization'], imageUrl: '/assets/visuals/ecommerce.webp' },
+      { id: 'ai-automation', title: 'AI & Automation', items: ['WhatsApp & Website Chatbots', 'CRM Automation', 'Email Automation', 'Lead Management', 'AI Sales Agents', 'n8n Workflows', 'Custom AI'], imageUrl: '/assets/visuals/ai-automation.webp' },
+      { id: 'data-analytics', title: 'Data & Analytics', items: ['GA4 / Meta Setup', 'Conversion Tracking', 'Dashboards', 'Reporting', 'Attribution Modeling', 'Revenue Forecasting'], imageUrl: '/assets/visuals/data-analytics.webp' },
     ],
   },
   GrowthOsSection: {
@@ -232,7 +230,7 @@ export const DEFAULT_SECTION_PROPS = {
     ],
   },
   FaqSection: {
-    eyebrow: 'Common questions',
+    eyebrow: '/ common questions',
     headline: 'What founders ask before they book.',
     body: "If your question isn't here, it will be in the call.",
     items: [
@@ -253,45 +251,37 @@ export const DEFAULT_SECTION_PROPS = {
     headlineLine3: 'for Your Business.',
     includes: ['Full Business Audit', 'Custom Growth Plan', 'Expert Recommendations'],
     ctaLabel: 'Book Your Free Call',
-    ctaHref: '#cta',
+    ctaHref: '#contact',
     trustNote: 'No commitment · No credit card · Just real strategy',
   },
   ContactSection: {
     eyebrow: '/ get in touch',
     headline: "Let's build something",
     headlineAccent: 'that actually works.',
-    body: "Tell us about your business. We'll review your situation and respond with a tailored plan — not a sales pitch.",
+    infoHeadline: 'Talk to a human',
+    infoBody: 'Prefer email? Reach us directly — a strategist, not a sales rep, replies within one business day.',
     contactInfo: [{ icon: 'mail' as const, label: 'hello@miduva.com' }, { icon: 'building' as const, label: 'Available Worldwide · Remote-First' }],
-    trustStats: [{ stat: '4.8×', label: 'Average ROAS' }, { stat: '+312%', label: 'Lead Volume' }, { stat: '14 days', label: 'Time to Launch' }, { stat: '94%', label: 'Client Retention' }],
     formHeadline: 'Start the conversation',
     formSubheadline: 'We respond within 24 hours · No spam, ever',
     nameLabel: 'Full Name', namePlaceholder: 'Your name',
     emailLabel: 'Email Address', emailPlaceholder: 'you@company.com',
     companyLabel: 'Company (Optional)', companyPlaceholder: 'Company name',
-    serviceLabel: 'Service Interest', servicePlaceholder: 'Select a service...',
     messageLabel: 'Your Message', messagePlaceholder: 'Tell us what you need help with...',
-    serviceOptions: [
-      { value: '', label: 'Select a service...' }, { value: 'growth-marketing', label: 'Growth & Marketing' },
-      { value: 'conversion-funnels', label: 'Conversion & Funnels' }, { value: 'websites-dev', label: 'Websites & Development' },
-      { value: 'ecommerce', label: 'E-Commerce' }, { value: 'ai-automation', label: 'AI & Automation' },
-      { value: 'data-analytics', label: 'Data & Analytics' }, { value: 'full-system', label: 'Full Growth System' },
-    ],
     submitLabel: 'Send Message',
     submittingLabel: 'Sending...',
-    finePrint: 'No commitment · No credit card · 100% Confidential',
     successHeadline: 'Message Sent.',
     successBody: "We'll be in touch within 24 hours with a tailored plan — not a sales pitch.",
     resetLabel: 'Send another message',
     errorMessage: 'We could not send your message. Please try again.',
     nameRequiredMessage: 'Name is required', emailRequiredMessage: 'Email is required', emailInvalidMessage: 'Enter a valid email',
-    serviceRequiredMessage: 'Please select a service', messageRequiredMessage: 'Message is required', messageTooShortMessage: 'Please write at least 20 characters',
+    messageRequiredMessage: 'Message is required', messageTooShortMessage: 'Please write at least 20 characters',
   },
   FooterSection: {
     giantBgText: 'MIDUVA',
     heading: 'Ready to grow?',
     marqueeItems: ['More Leads, Less Effort', '4.8× ROAS Guaranteed', 'Launch in 14 Days', '94% Client Retention', 'Done-For-You Systems'],
-    primaryCtas: [{ label: 'Book a Free Call', href: '#' }, { label: 'Get Started', href: '#' }],
-    secondaryLinks: [{ label: 'Privacy Policy', href: '#' }, { label: 'Terms of Service', href: '#' }, { label: 'Support', href: '#' }],
+    primaryCtas: [{ label: 'Book a Free Call', href: '#contact' }, { label: 'Get Started', href: '#contact' }],
+    secondaryLinks: [{ label: 'Services', href: '#services' }, { label: 'Our Work', href: '#our-work' }, { label: 'FAQ', href: '#faq' }],
     copyright: '© 2026 Miduva. All rights reserved.',
     createdByLabel: 'Created by',
     createdByName: 'Miduva',
@@ -311,7 +301,6 @@ const defaultData: LandingPagePuckData = {
         { type: 'HowItWorksSection', props: { id: 'how-it-works-section', ...DEFAULT_SECTION_PROPS.HowItWorksSection } },
         { type: 'ResultsSection', props: { id: 'results-section', ...DEFAULT_SECTION_PROPS.ResultsSection } },
         { type: 'OurWorkSection', props: { id: 'our-work-section', ...DEFAULT_SECTION_PROPS.OurWorkSection } },
-        { type: 'WhyMiduvaSection', props: { id: 'why-miduva-section', ...DEFAULT_SECTION_PROPS.WhyMiduvaSection } },
         { type: 'ParallaxSection', props: { id: 'parallax-section', ...DEFAULT_SECTION_PROPS.ParallaxSection } },
       ],
       afterDashboard: [
@@ -327,5 +316,5 @@ const defaultData: LandingPagePuckData = {
 }
 
 export function getDefaultLandingPageData(): LandingPagePuckData {
-  return structuredClone(defaultData)
+  return migrateNativeItemSlots(defaultData)
 }

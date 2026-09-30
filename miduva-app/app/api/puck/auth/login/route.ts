@@ -12,7 +12,7 @@ function clientKey(request: Request) {
 
 export async function POST(request: Request) {
   if (!isPuckAdminConfigured()) {
-    return Response.json({ error: 'Puck admin is not configured.' }, { status: 503 })
+    return Response.json({ error: 'Miduva Editor is not configured.' }, { status: 503 })
   }
   if (!(await hasValidMutationOrigin(request))) {
     return Response.json({ error: 'Invalid request origin.' }, { status: 403 })
