@@ -184,7 +184,7 @@ export default function Services({ data }: { data?: ServicesData }) {
     : DEFAULT_SLIDES
 
   return (
-    <section id="services" className="pt-10 pb-16 md:pt-16 md:pb-28">
+    <section id="services" className="pt-4 pb-16 md:pt-6 md:pb-28">
       <div className="max-w-6xl mx-auto px-5 md:px-6">
         {/* Header */}
         <div className="mb-9 md:mb-14">

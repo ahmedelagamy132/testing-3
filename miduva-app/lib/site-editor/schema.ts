@@ -177,17 +177,11 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
   },
   ParallaxSection: {
     label: 'The difference',
-    description: 'Parallax pipeline chart',
+    description: 'Big "Built as a system." statement',
     fields: [
       text('eyebrow', 'Eyebrow'),
       text('headline', 'Headline'),
       text('headlineAccent', 'Headline accent'),
-      area('description', 'Description'),
-      text('pipelineLabel', 'Pipeline label'),
-      text('pipelineValue', 'Pipeline value'),
-      text('pipelineDelta', 'Pipeline change'),
-      text('pipelineComparison', 'Pipeline comparison'),
-      { kind: 'numbers', key: 'chartValues', label: 'Chart values', help: 'Comma separated, 0–120' },
     ],
   },
   ServicesSection: {

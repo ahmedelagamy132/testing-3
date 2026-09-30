@@ -2,15 +2,9 @@
 
 import { useRef } from "react"
 import Image from "next/image"
-import { motion, useTransform } from "motion/react"
-import type { MotionValue } from "motion/react"
+import { motion } from "motion/react"
 import type { HowItWorksData } from "@/lib/types"
-import {
-  STICKY_SCROLL_RANGE,
-  useFrameIsDark,
-  useFrameMediaQuery,
-  useFrameScrollProgress,
-} from "@/components/puck/frame-runtime"
+import { useFrameInView } from "@/components/puck/frame-runtime"
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 type Step = {
@@ -61,283 +55,56 @@ const DEFAULT_STEPS: Step[] = [
   },
 ]
 
-// ─── Step Slide ───────────────────────────────────────────────────────────────
-function StepSlide({
-  step,
-  index,
-  progress,
-  isDark,
-  isMobile,
-  totalSteps,
-}: {
-  step: Step
-  index: number
-  progress: MotionValue<number>
-  isDark: boolean
-  isMobile?: boolean
-  totalSteps: number
-}) {
-  const slideStart = index / totalSteps
-  const slideEnd = (index + 1) / totalSteps
-
-  const local = useTransform(progress, [slideStart, slideEnd], [0, 1])
-
-  // The first step is already on screen when the section pins and the last
-  // stays on screen as it unpins — otherwise both ends scroll by empty.
-  const isFirst = index === 0
-  const isLast = index === totalSteps - 1
-  const inOut = (enter: number, rest: number, exit: number) =>
-    [isFirst ? rest : enter, rest, rest, isLast ? rest : exit]
-
-  const textY = useTransform(local, [0, 0.3, 0.7, 1], inOut(120, 0, -120))
-  const textOpacity = useTransform(local, [0, 0.15, 0.85, 1], inOut(0, 1, 0))
-
-  const imageX = useTransform(local, [0, 0.3, 0.7, 1], inOut(200, 0, -200))
-  const imageScale = useTransform(local, [0, 0.3, 0.7, 1], inOut(1.15, 1, 1.15))
-  const imageOpacity = useTransform(local, [0, 0.2, 0.8, 1], inOut(0, 1, 0))
-
-  const numScale = useTransform(local, [0, 0.25, 0.75, 1], inOut(0.6, 1, 0.6))
-  const numOpacity = useTransform(local, [0, 0.2, 0.8, 1], inOut(0, 1, 0))
+// ─── Step Card ────────────────────────────────────────────────────────────────
+function StepCard({ step, index, total }: { step: Step; index: number; total: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useFrameInView(ref, { once: true, margin: "-60px" })
 
   return (
-    <div
+    <motion.div
+      ref={ref}
       data-edit-path={`steps.${index}`}
-      style={{
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        alignItems: isMobile ? "flex-end" : "center",
-        justifyContent: "center",
-        pointerEvents: "none",
-      }}
+      data-miduva-native-id={`step:${step.id}`}
+      className="group relative h-full flex flex-col overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--card)] shadow-[0_1px_2px_rgba(15,35,73,0.04)] transition-[border-color,box-shadow] duration-300 hover:border-[rgba(43,200,183,0.35)] hover:shadow-[0_0_40px_rgba(43,200,183,0.06)]"
+      initial={{ opacity: 0, y: 18 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 }}
+      transition={{ duration: 0.55, delay: 0.08 + index * 0.07, ease: [0.32, 0.72, 0, 1] }}
     >
-      {/* ── Background Image ── */}
-      <motion.div
-        data-miduva-native-id={`step:${step.id}`}
-        style={{
-          position: "absolute",
-          right: isMobile ? undefined : 0,
-          top: 0,
-          width: isMobile ? "100%" : "55%",
-          height: "100%",
-          x: isMobile ? undefined : imageX,
-          opacity: imageOpacity,
-          overflow: "hidden",
-        }}
-      >
-        <motion.div
-          style={{
-            position: "relative",
-            width: "100%",
-            height: "100%",
-            scale: imageScale,
-          }}
-        >
-          {step.imageUrl && (
-            <Image
-              src={step.imageUrl}
-              alt={step.imageAlt || step.title}
-              fill
-              unoptimized
-              style={{
-                objectFit: "cover",
-                objectPosition: isMobile ? "center top" : "center",
-              }}
-            />
-          )}
+      {/* ── Image ── */}
+      <div className="relative h-[184px] border-b border-[var(--line)] overflow-hidden">
+        {step.imageUrl && (
+          <Image
+            src={step.imageUrl}
+            alt={step.imageAlt || step.title}
+            fill
+            unoptimized
+            sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 25vw"
+            className="object-cover transition-transform duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] group-hover:scale-[1.04]"
+          />
+        )}
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "linear-gradient(to top, rgba(2,6,15,0.55) 0%, transparent 55%)" }}
+        />
+        <span className="absolute left-4 bottom-3 mono text-[11px] uppercase tracking-[0.18em] text-white/80">
+          Step {step.num} <span className="text-white/40">/ 0{total}</span>
+        </span>
+      </div>
 
-          {!isMobile && (
-            <>
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: isDark
-                    ? "linear-gradient(to right, #02060F 0%, rgba(2,6,15,0.92) 25%, transparent 60%)"
-                    : "linear-gradient(to right, #F6F8FC 0%, rgba(246,248,252,0.92) 25%, transparent 60%)",
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: isDark
-                    ? "linear-gradient(to top, #02060F 0%, transparent 25%), linear-gradient(to bottom, #02060F 0%, transparent 25%)"
-                    : "linear-gradient(to top, #F6F8FC 0%, transparent 25%), linear-gradient(to bottom, #F6F8FC 0%, transparent 25%)",
-                }}
-              />
-            </>
-          )}
-
-          {isMobile && (
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                background: isDark
-                  ? "linear-gradient(to top, rgba(2,6,15,0.98) 0%, rgba(2,6,15,0.85) 35%, rgba(2,6,15,0.4) 65%, rgba(2,6,15,0.15) 100%)"
-                  : "linear-gradient(to top, rgba(246,248,252,0.98) 0%, rgba(246,248,252,0.85) 35%, rgba(246,248,252,0.4) 65%, rgba(246,248,252,0.15) 100%)",
-              }}
-            />
-          )}
-        </motion.div>
-      </motion.div>
-
-      {/* ── Text ── */}
-      <motion.div
-        style={{
-          position: "relative",
-          zIndex: 20,
-          width: isMobile ? "100%" : "50%",
-          height: isMobile ? "auto" : "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: isMobile ? "flex-end" : "center",
-          padding: isMobile
-            ? "24px 24px 100px"
-            : "clamp(40px, 6vw, 120px)",
-          y: textY,
-          opacity: textOpacity,
-        }}
-      >
-        {/* Giant number */}
-        <motion.div
-          className="mono"
-          style={{
-            marginTop: isMobile ? 20 : "clamp(24px, 3vw, 48px)",
-            marginBottom: isMobile ? 16 : "clamp(16px, 2vw, 32px)",
-            opacity: numOpacity,
-          }}
-        >
-          <motion.div
-            style={{
-              scale: numScale,
-            }}
-          >
-            <div
-              style={{
-                fontSize: isMobile
-                  ? "clamp(48px, 14vw, 80px)"
-                  : "clamp(64px, 10vw, 160px)",
-                fontWeight: 800,
-                lineHeight: 1,
-                letterSpacing: "-0.04em",
-                color: "var(--teal-500)",
-                textShadow: "0 0 60px rgba(43,200,183,0.25)",
-              }}
-            >
-              {step.num}
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* Title */}
-        <h3
-          style={{
-            fontSize: isMobile
-              ? "clamp(24px, 7vw, 36px)"
-              : "clamp(28px, 3.5vw, 56px)",
-            fontWeight: 800,
-            lineHeight: 1.1,
-            letterSpacing: "-0.03em",
-            color: isDark ? "white" : "var(--ink)",
-            margin: "0 0 clamp(12px, 1.5vw, 24px) 0",
-            maxWidth: isMobile ? "100%" : 600,
-          }}
-        >
+      {/* ── Copy ── */}
+      <div className="relative flex flex-col flex-1 p-6 md:p-7">
+        <span className="mono text-[34px] font-extrabold leading-none tracking-[-0.04em] text-[var(--teal-500)]">
+          {step.num}
+        </span>
+        <h3 className="mt-4 text-[20px] md:text-[22px] font-extrabold tracking-[-0.03em] leading-[1.2] text-[var(--ink)]">
           {step.title}
         </h3>
-
-        {/* Description */}
-        <p
-          style={{
-            fontSize: isMobile
-              ? "clamp(14px, 4vw, 16px)"
-              : "clamp(15px, 1.2vw, 20px)",
-            lineHeight: 1.7,
-            color: isDark ? "rgba(255,255,255,0.75)" : "var(--muted)",
-            margin: 0,
-            maxWidth: isMobile ? "100%" : 520,
-          }}
-        >
+        <p className="mt-2 text-[14px] leading-[1.6] text-[var(--muted)]">
           {step.description}
         </p>
-
-        {/* Accent line */}
-        <div
-          style={{
-            marginTop: isMobile ? 20 : "clamp(24px, 3vw, 48px)",
-            width: 60,
-            height: 3,
-            borderRadius: 2,
-            background: "var(--teal-500)",
-            boxShadow: "0 0 20px rgba(43,200,183,0.4)",
-          }}
-        />
-      </motion.div>
-
-      {/* Step indicator pill */}
-      <motion.div
-        style={{
-          position: "absolute",
-          bottom: isMobile ? 24 : "clamp(32px, 4vw, 64px)",
-          left: isMobile ? 24 : "clamp(40px, 6vw, 120px)",
-          zIndex: 30,
-          opacity: textOpacity,
-        }}
-        className="mono"
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            padding: "10px 20px",
-            borderRadius: 100,
-            background: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,35,73,0.05)",
-            border: isDark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(15,35,73,0.1)",
-            backdropFilter: "blur(12px)",
-            fontSize: 13,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            color: isDark ? "rgba(255,255,255,0.5)" : "var(--muted)",
-          }}
-        >
-          <span style={{ color: "var(--teal-500)" }}>{step.num}</span>
-          <span style={{ width: 1, height: 12, background: isDark ? "rgba(255,255,255,0.15)" : "rgba(15,35,73,0.15)" }} />
-          <span>0{totalSteps}</span>
-        </div>
-      </motion.div>
-    </div>
-  )
-}
-
-// ─── Progress Bar ─────────────────────────────────────────────────────────────
-function ProgressBar({ progress, isDark }: { progress: MotionValue<number>, isDark: boolean }) {
-  const scaleX = useTransform(progress, [0, 1], [0, 1])
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 3,
-        zIndex: 100,
-        background: isDark ? "rgba(255,255,255,0.06)" : "rgba(15,35,73,0.1)",
-      }}
-    >
-      <motion.div
-        style={{
-          height: "100%",
-          background: "var(--teal-500)",
-          boxShadow: "0 0 12px rgba(43,200,183,0.5)",
-          transformOrigin: "left",
-          scaleX,
-        }}
-      />
-    </div>
+      </div>
+    </motion.div>
   )
 }
 
@@ -353,132 +120,35 @@ export default function HowItWorks({ data }: { data?: HowItWorksData }) {
       }))
     : DEFAULT_STEPS
 
-  const sectionRef = useRef<HTMLElement>(null)
-  const scrollYProgress = useFrameScrollProgress(sectionRef, STICKY_SCROLL_RANGE)
-  const isDark = useFrameIsDark()
-  const isMobile = useFrameMediaQuery("(max-width: 767px)")
-  const bg = "var(--paper)"
-
   return (
-    <>
-      <ProgressBar progress={scrollYProgress} isDark={isDark} />
+    <section id="how-it-works" className="relative overflow-hidden" style={{ background: "var(--paper)" }}>
+      {/* Top hairline */}
+      <div aria-hidden className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px pointer-events-none" style={{ background: "linear-gradient(90deg, transparent, rgba(43,200,183,0.25), transparent)" }} />
 
-      <section
-        ref={sectionRef}
-        id="how-it-works"
-        style={{
-          position: "relative",
-          height: `${steps.length * 100}vh`,
-          background: bg,
-        }}
-      >
-        {/* Sticky viewport */}
-        <div
-          style={{
-            position: "sticky",
-            top: 0,
-            height: "100vh",
-            overflow: "hidden",
-            background: bg,
-          }}
-          className="grain"
-        >
-          {/* Ambient glows */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              top: -200,
-              left: -200,
-              width: 700,
-              height: 700,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(43,200,183,0.10) 0%, transparent 60%)",
-              filter: "blur(80px)",
-              pointerEvents: "none",
-            }}
-          />
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              bottom: -200,
-              right: -200,
-              width: 600,
-              height: 600,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(43,200,183,0.07) 0%, transparent 60%)",
-              filter: "blur(80px)",
-              pointerEvents: "none",
-            }}
-          />
+      {/* Ambient glow */}
+      <div
+        aria-hidden
+        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{ background: "radial-gradient(circle, rgba(43,200,183,0.07) 0%, transparent 60%)", filter: "blur(80px)" }}
+      />
 
-          {/* Header */}
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              zIndex: 50,
-              padding: isMobile
-                ? "24px 24px 20px"
-                : "clamp(32px, 4vw, 64px) clamp(40px, 6vw, 120px)",
-              pointerEvents: "none",
-              background: isMobile
-                ? isDark
-                  ? "linear-gradient(to bottom, #02060F 0%, rgba(2,6,15,0.9) 60%, transparent 100%)"
-                  : "linear-gradient(to bottom, #F6F8FC 0%, rgba(246,248,252,0.9) 60%, transparent 100%)"
-                : undefined,
-            }}
-          >
-            <div
-              className="mono"
-              data-edit-path="eyebrow"
-              style={{
-                fontSize: 13,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "var(--teal-500)",
-                marginBottom: 12,
-              }}
-            >
-              {eyebrow}
-            </div>
-            <h2
-              data-edit-path="headline"
-              style={{
-                fontSize: isMobile
-                  ? "clamp(20px, 5.5vw, 28px)"
-                  : "clamp(24px, 3vw, 42px)",
-                fontWeight: 800,
-                letterSpacing: "-0.04em",
-                color: isDark ? "white" : "var(--ink)",
-                lineHeight: 1.1,
-                margin: 0,
-              }}
-            >
-              {headline}{" "}
-              <span className="shine" data-edit-path="headlineAccent">{headlineAccent}</span>
-            </h2>
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-20 pb-16 md:pt-28 md:pb-24">
+        <div className="mb-10 md:mb-12">
+          <div className="mono text-[13px] uppercase tracking-[0.22em] text-[var(--teal-500)] mb-3" data-edit-path="eyebrow">
+            {eyebrow}
           </div>
+          <h2 className="text-[34px] md:text-[52px] font-extrabold tracking-[-0.04em] text-[var(--navy-900)] leading-[1.05]" data-edit-path="headline">
+            {headline}{" "}
+            <span className="shine" data-edit-path="headlineAccent">{headlineAccent}</span>
+          </h2>
+        </div>
 
-          {/* Slides */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-4">
           {steps.map((step, i) => (
-            <StepSlide
-              key={step.id}
-              step={step}
-              index={i}
-              progress={scrollYProgress}
-              isDark={isDark}
-              isMobile={isMobile}
-              totalSteps={steps.length}
-            />
+            <StepCard key={step.id} step={step} index={i} total={steps.length} />
           ))}
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   )
 }

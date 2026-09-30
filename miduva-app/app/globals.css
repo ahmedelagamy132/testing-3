@@ -380,8 +380,8 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
 
 /* ─── Parallax ─── */
 .parallax { position: relative; }
-.parallax__header { position: relative; height: 140vh; }
-.parallax__visuals { position: sticky; top: 0; height: 100vh; overflow: hidden; }
+.parallax__header { position: relative; height: 95vh; }
+.parallax__visuals { position: sticky; top: 0; height: 75vh; overflow: hidden; }
 .parallax__layers {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
@@ -399,7 +399,7 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
 }
 .parallax__title em { font-style: normal; color: var(--teal-500); }
 .parallax__fade {
-  position: absolute; inset: auto 0 0 0; height: 30%;
+  position: absolute; inset: auto 0 0 0; height: 22%;
   background: linear-gradient(to bottom, transparent, var(--paper));
   pointer-events: none;
 }
@@ -452,12 +452,12 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
 
 @media (max-width: 700px) {
   .parallax__header {
-    height: 100svh;
-    min-height: 700px;
+    height: 62svh;
+    min-height: 440px;
   }
   .parallax__visuals {
-    height: 100svh;
-    min-height: 700px;
+    height: 62svh;
+    min-height: 440px;
   }
   .parallax__layers {
     align-items: flex-start;
@@ -475,7 +475,7 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
   .parallax__bar-silhouette {
     position: absolute;
     left: 50%;
-    bottom: 132px;
+    bottom: 40px;
     width: 118%;
     max-width: none;
     height: 19svh;
@@ -521,7 +521,7 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
 @media (max-width: 700px) and (max-height: 760px) {
   .parallax__header,
   .parallax__visuals {
-    min-height: 660px;
+    min-height: 420px;
   }
   .parallax__layers {
     padding-top: 70px;
@@ -537,7 +537,7 @@ html.dark .scroll-stack.on .scroll-panel.p2 {
     top: 304px;
   }
   .parallax__bar-silhouette {
-    bottom: 100px;
+    bottom: 32px;
     height: 16svh;
     min-height: 86px;
   }

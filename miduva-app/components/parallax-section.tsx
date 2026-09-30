@@ -56,7 +56,6 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
   const eyebrow         = data?.eyebrow         ?? "The Miduva Difference"
   const headline        = data?.headline        ?? "Built as a"
   const headlineAccent  = data?.headlineAccent  ?? "system."
-  const description     = data?.description     ?? "Not a one-off campaign, not a template. A connected machine — ads → funnels → automation → data — tuned for your business."
   return (
     <div className="parallax" ref={ref}>
       <section className="parallax__header">
@@ -103,9 +102,6 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
                   {headline}<br />
                   <em data-edit-path="headlineAccent">{headlineAccent}</em>
                 </h2>
-                <div className="parallax__description" data-edit-path="description">
-                  {description}
-                </div>
               </div>
             </div>
 
