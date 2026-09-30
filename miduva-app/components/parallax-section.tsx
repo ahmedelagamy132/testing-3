@@ -19,10 +19,12 @@ export default function ParallaxSection({ data }: { data?: ParallaxData }) {
       const layers = el.querySelector("[data-parallax-layers]")
       const header = el.querySelector(".parallax__header")
       if (!layers || !header) return
+      // Progress follows the section through the viewport: -1 as it enters
+      // from below, 0 when its top meets the top of the screen, 1 as it
+      // leaves. Works at any section height, not only when it is taller than
+      // the viewport.
       const rect = (header as HTMLElement).getBoundingClientRect()
-      const scrollable = (header as HTMLElement).offsetHeight - frameWindow.innerHeight
-      if (scrollable <= 0) return
-      const p = Math.min(1, Math.max(0, -rect.top / scrollable))
+      const p = Math.min(1, Math.max(-1, -rect.top / frameWindow.innerHeight))
       const isMobile = frameWindow.matchMedia("(max-width: 700px)").matches
       const config = isMobile
         ? [
