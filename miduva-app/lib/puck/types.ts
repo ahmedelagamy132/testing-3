@@ -1,6 +1,7 @@
 import type {
   BrandingData,
   ContactData,
+  SocialData,
   DashboardData,
   FaqData,
   FooterData,
@@ -62,6 +63,7 @@ export type LandingPageComponents = {
   FaqSection: FaqData & Pick<NativeSectionSlots, 'faqItems'>
   FreeOfferSection: FreeOfferData
   ContactSection: ContactData
+  SocialSection: SocialData
   FooterSection: FooterData
   SystemCardItem: NativeItemProps<SystemCard>
   SystemBackgroundItem: NativeItemProps<SystemBackgroundImage>
@@ -136,6 +138,7 @@ export const SECTION_COMPONENT_NAMES = [
   'FaqSection',
   'FreeOfferSection',
   'ContactSection',
+  'SocialSection',
   'FooterSection',
 ] as const satisfies readonly (keyof LandingPageComponents)[]
 

@@ -158,6 +158,13 @@ export interface ContactData {
 }
 
 export interface FooterLink { label: string; href: string }
+export type SocialPlatform = 'linkedin' | 'instagram' | 'facebook' | 'x' | 'youtube' | 'tiktok' | 'whatsapp' | 'behance' | 'dribbble' | 'github'
+export interface SocialLink { platform: SocialPlatform; url: string; label?: string }
+export interface SocialData {
+  eyebrow?: string; headline?: string; headlineAccent?: string; body?: string
+  links?: SocialLink[]
+}
+
 export interface FooterData {
   giantBgText?: string; heading?: string
   marqueeItems?: string[]

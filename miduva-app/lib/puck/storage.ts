@@ -3,7 +3,7 @@ import 'server-only'
 import { createClient, type Client } from '@libsql/client'
 import { mkdir, readdir, stat } from 'node:fs/promises'
 import path from 'node:path'
-import { getDefaultLandingPageData } from './defaults'
+import { DEFAULT_SECTION_PROPS, getDefaultLandingPageData } from './defaults'
 import { migrateNativeItemSlots } from './native-slots'
 import { migrateLegacyVisuals } from './visual-migration'
 import { migrateLegacyPageLinks } from '@/lib/page-navigation'
@@ -69,8 +69,22 @@ async function getDatabase() {
   return schemaReady
 }
 
+/** Pages saved before the Social media section existed get it added, hidden, above the footer. */
+function ensureSocialSection(data: LandingPagePuckData): LandingPagePuckData {
+  const rootProps = data.root?.props
+  if (!rootProps) return data
+  const zones = [rootProps.beforeDashboard, rootProps.afterDashboard]
+  if (zones.some((zone) => zone?.some((section) => section.type === 'SocialSection'))) return data
+  const zone = zones.find((z) => z?.some((section) => section.type === 'FooterSection')) ?? rootProps.beforeDashboard
+  if (!zone) return data
+  const footerIndex = zone.findIndex((section) => section.type === 'FooterSection')
+  const social = { type: 'SocialSection', props: { id: 'social-section', hidden: true, ...structuredClone(DEFAULT_SECTION_PROPS.SocialSection) } }
+  zone.splice(footerIndex === -1 ? zone.length : footerIndex, 0, social as (typeof zone)[number])
+  return data
+}
+
 function parseData(value: unknown): LandingPagePuckData {
-  return migrateLegacyVisuals(migrateLegacyPageLinks(migrateNativeItemSlots(JSON.parse(String(value)) as LandingPagePuckData)))
+  return ensureSocialSection(migrateLegacyVisuals(migrateLegacyPageLinks(migrateNativeItemSlots(JSON.parse(String(value)) as LandingPagePuckData))))
 }
 
 export async function getPageDocument(): Promise<PuckPageDocument> {

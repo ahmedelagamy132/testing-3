@@ -86,6 +86,9 @@ function validateSectionProps(type: string, props: Record<string, unknown>) {
     case 'ContactSection':
       if (!validRecordArray(props.contactInfo, { icon: 'string', label: 'string' })) return 'Contact information is malformed'
       break
+    case 'SocialSection':
+      if (!validRecordArray(props.links, { platform: 'string', url: 'string' })) return 'Social links are malformed'
+      break
     case 'FooterSection':
       if (!validStringArray(props.marqueeItems)) return 'Footer marquee items are malformed'
       if (!validRecordArray(props.primaryCtas, { label: 'string', href: 'string' }) || !validRecordArray(props.secondaryLinks, { label: 'string', href: 'string' })) return 'Footer links are malformed'

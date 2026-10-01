@@ -284,6 +284,18 @@ export const DEFAULT_SECTION_PROPS = {
     nameRequiredMessage: 'Name is required', emailRequiredMessage: 'Email is required', emailInvalidMessage: 'Enter a valid email',
     messageRequiredMessage: 'Message is required', messageTooShortMessage: 'Please write at least 20 characters',
   },
+  SocialSection: {
+    eyebrow: '/ follow along',
+    headline: 'See how we build',
+    headlineAccent: 'growth systems.',
+    body: 'Behind-the-scenes builds, campaign breakdowns and practical growth tips — follow Miduva wherever you spend time.',
+    links: [
+      { platform: 'linkedin' as const, url: '', label: '' },
+      { platform: 'instagram' as const, url: '', label: '' },
+      { platform: 'facebook' as const, url: '', label: '' },
+      { platform: 'x' as const, url: '', label: '' },
+    ],
+  },
   FooterSection: {
     giantBgText: 'MIDUVA',
     heading: 'Ready to grow?',
@@ -315,6 +327,8 @@ const defaultData: LandingPagePuckData = {
         { type: 'ServicesSection', props: { id: 'services-section', ...DEFAULT_SECTION_PROPS.ServicesSection } },
         { type: 'FaqSection', props: { id: 'faq-section', ...DEFAULT_SECTION_PROPS.FaqSection } },
         { type: 'ContactSection', props: { id: 'contact-section', ...DEFAULT_SECTION_PROPS.ContactSection } },
+        // Ready but hidden until the profile links are filled in.
+        { type: 'SocialSection', props: { id: 'social-section', hidden: true, ...DEFAULT_SECTION_PROPS.SocialSection } },
         { type: 'FooterSection', props: { id: 'footer-section', ...DEFAULT_SECTION_PROPS.FooterSection } },
       ],
     },

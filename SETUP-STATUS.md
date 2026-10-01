@@ -107,11 +107,22 @@ calendar in a popup — once you add the link:
 Until then the button scrolls visitors to the contact form. A Calendly link
 works too.
 
-### 6. Publish blog posts
+### 6. Social media section (built, currently hidden)
+In the **site editor**, the **Social media** section sits just above the footer
+with an *eye-off* icon. To turn it on:
+1. Open it → **Profiles** → paste each full profile link
+   (e.g. `https://www.linkedin.com/company/miduva`). Add/remove platforms as needed
+   (LinkedIn, Instagram, Facebook, X, YouTube, TikTok, WhatsApp, Behance, Dribbble, GitHub).
+2. Click the **eye** icon to show it, then **Publish**.
+
+Profiles without a link are skipped, and the section stays invisible until at
+least one link is filled in.
+
+### 7. Publish blog posts
 Review the four drafts at `/wp-admin` → Posts, edit, and **Publish**. The blog
 starts building search traffic only once posts are live.
 
-### 7. CRM (crm.miduva.com)
+### 8. CRM (crm.miduva.com)
 The CRM returns *403 Forbidden*: the Perfex CRM files were never uploaded to
 `perfex/html/`. Upload your Perfex package there, then ask me to finish the
 install and add HTTPS for `crm.miduva.com`.

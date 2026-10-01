@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useRef, useState } from "react"
 import type { RefObject } from "react"
 import type {
   ContactData,
+  SocialData,
   FaqData,
   FooterData,
   FreeOfferData,
@@ -35,6 +36,7 @@ import SystemRibbon from "@/components/system-ribbon"
 import FaqSection from "@/components/faq-section"
 import FreeOffer from "@/components/free-offer"
 import ContactSection from "@/components/contact-section"
+import SocialSection from "@/components/social-section"
 import { CinematicFooter } from "@/components/ui/motion-footer"
 import { FrameRuntimeProvider, FrameThemeSync } from "@/components/puck/frame-runtime"
 
@@ -92,6 +94,7 @@ const SECTIONS: Record<SectionType, { anchor: string; render: (data: any) => Rea
   FaqSection: { anchor: "faq", render: (data: FaqData) => <FaqSection data={data} /> },
   FreeOfferSection: { anchor: "free-offer", render: (data: FreeOfferData) => <FreeOfferSection data={data} /> },
   ContactSection: { anchor: "contact", render: (data: ContactData) => <ContactSection data={data} /> },
+  SocialSection: { anchor: "social", render: (data: SocialData) => <SocialSection data={data} /> },
   FooterSection: { anchor: "footer", render: (data: FooterData) => <CinematicFooter data={data} /> },
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

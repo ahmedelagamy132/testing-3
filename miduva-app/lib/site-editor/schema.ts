@@ -20,6 +20,7 @@ export type SectionType =
   | 'FaqSection'
   | 'FreeOfferSection'
   | 'ContactSection'
+  | 'SocialSection'
   | 'FooterSection'
 
 type SectionSchema = Omit<SectionDefinition, 'defaults' | 'single'> & { description: string }
@@ -303,6 +304,26 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
           text('errorMessage', 'Sending failed'), text('nameRequiredMessage', 'Name missing'), text('emailRequiredMessage', 'Email missing'),
           text('emailInvalidMessage', 'Email invalid'), text('messageRequiredMessage', 'Message missing'), text('messageTooShortMessage', 'Message too short'),
         ],
+      },
+    ],
+  },
+  SocialSection: {
+    label: 'Social media',
+    description: 'Links to your social profiles',
+    fields: [
+      text('eyebrow', 'Eyebrow'),
+      text('headline', 'Headline'),
+      text('headlineAccent', 'Headline accent'),
+      area('body', 'Intro text'),
+      {
+        kind: 'list', key: 'links', label: 'Profiles', itemLabel: 'profile', min: 1, max: 10,
+        fields: [
+          { kind: 'select', key: 'platform', label: 'Platform', options: [{ label: 'LinkedIn', value: 'linkedin' }, { label: 'Instagram', value: 'instagram' }, { label: 'Facebook', value: 'facebook' }, { label: 'X (Twitter)', value: 'x' }, { label: 'YouTube', value: 'youtube' }, { label: 'TikTok', value: 'tiktok' }, { label: 'WhatsApp', value: 'whatsapp' }, { label: 'Behance', value: 'behance' }, { label: 'Dribbble', value: 'dribbble' }, { label: 'GitHub', value: 'github' }] },
+          text('url', 'Profile link', 'Full address, e.g. https://www.linkedin.com/company/miduva. Profiles without a link are not shown.'),
+          text('label', 'Handle (optional)', 'Shown under the platform name, e.g. @miduva'),
+        ],
+        summary: (item, index) => `${index + 1}. ${String(item.platform ?? '')}${item.url ? '' : ' (no link yet)'}`,
+        newItem: () => ({ platform: 'linkedin', url: '', label: '' }),
       },
     ],
   },
